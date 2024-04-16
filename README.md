@@ -4,7 +4,7 @@ A new Flutter project.
 
 
 ## 說明
-記得將
+記得將(smiley_appAPI)資料夾放入本機的htdocs 才能正常運行
 
 ## Getting Started
 
