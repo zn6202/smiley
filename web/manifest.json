@@ -1,6 +1,6 @@
 {
-    "name": "smiley",
-    "short_name": "smiley",
+    "name": "project",
+    "short_name": "project",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

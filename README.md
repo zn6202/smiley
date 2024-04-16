@@ -1,4 +1,4 @@
-# smiley
+# project
 
 A new Flutter project.
 
