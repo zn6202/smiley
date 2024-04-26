@@ -1,20 +1,79 @@
-# project
 
-A new Flutter project.
+# s110213063_s_application4
+### Table of contents
+- [System requirements](#system-requirements)
+- [Figma design guidelines for better UI accuracy](#figma-design-guideline-for-better-accuracy)
+- [Check the UI of the entire app](#app-navigations)
+- [Application structure](#project-structure)
+- [How to format your code?](#how-you-can-do-code-formatting)
+- [How you can improve code readability?](#how-you-can-improve-the-readability-of-code)
+- [Libraries and tools used](#libraries-and-tools-used)
+- [Support](#support)
 
+### System requirements
 
-## 說明
-記得將(smiley_appAPI)資料夾放入本機的htdocs 才能正常運行
+Dart SDK Version 3.3.2 or greater.
+Flutter SDK Version 3.19.4 or greater.
 
-## Getting Started
+### Figma design guidelines for better UI accuracy
 
-This project is a starting point for a Flutter application.
+Read our guidelines to increase the accuracy of design-to-code conversion by optimizing Figma designs.
+https://docs.dhiwise.com/docs/Designguidelines/intro
 
-A few resources to get you started if this is your first Flutter project:
+### Check the UI of the entire app
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Check the UI of all the app screens from a single place by setting up the 'initialRoute'  to AppNavigation in the AppRoutes.dart file.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### Application structure
+
+After successful build, your application structure should look like this:
+
+```
+.
+├── android                         - It contains files required to run the application on an Android platform.
+├── assets                          - It contains all images and fonts of your application.
+├── ios                             - It contains files required to run the application on an iOS platform.
+├── lib                             - Most important folder in the application, used to write most of the Dart code..
+    ├── main.dart                   - Starting point of the application
+    ├── core
+    │   ├── app_export.dart         - It contains commonly used file imports
+    │   ├── constants               - It contains all constants classes
+    │   ├── errors                  - It contains error handling classes                  
+    │   ├── network                 - It contains network-related classes
+    │   └── utils                   - It contains common files and utilities of the application
+    ├── data
+    │   ├── apiClient               - It contains API calling methods 
+    │   ├── models                  - It contains request/response models 
+    │   └── repository              - Network repository
+    ├── localization                - It contains localization classes
+    ├── presentation                - It contains widgets of the screens with their controllers and the models of the whole application.
+    ├── routes                      - It contains all the routes of the application
+    └── theme                       - It contains app theme and decoration classes
+    └── widgets                     - It contains all custom widget classes
+```
+
+### How to format your code?
+
+- if your code is not formatted then run following command in your terminal to format code
+  ```
+  dart format .
+  ```
+
+### How you can improve code readability?
+
+Resolve the errors and warnings that are shown in the application.
+
+### Libraries and tools used
+
+- get - State management
+  https://pub.dev/packages/get
+- connectivity_plus - For status of network connectivity
+  https://pub.dev/packages/connectivity_plus
+- shared_preferences - Provide persistent storage for simple data
+  https://pub.dev/packages/shared_preferences
+- cached_network_image - For storing internet image into cache
+  https://pub.dev/packages/cached_network_image
+
+### Support
+
+If you have any problems or questions, go to our Discord channel, where we will help you as quickly as possible: https://discord.com/invite/rFMnCG5MZ7
