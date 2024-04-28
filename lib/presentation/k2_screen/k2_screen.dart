@@ -5,20 +5,37 @@ import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'controller/k2_controller.dart'; // ignore_for_file: must_be_immutable
+import 'models/k2_model.dart';
+import 'provider/k2_provider.dart';
 
-class K2Screen extends GetWidget<K2Controller> {
+class K2Screen extends StatefulWidget {
   const K2Screen({Key? key})
       : super(
           key: key,
         );
 
   @override
+  K2ScreenState createState() => K2ScreenState();
+  static Widget builder(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => K2Provider(),
+      child: K2Screen(),
+    );
+  }
+}
+
+class K2ScreenState extends State<K2Screen> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         resizeToAvoidBottomInset: false,
-        appBar: _buildAppBar(),
+        appBar: _buildAppBar(context),
         body: Container(
           width: double.maxFinite,
           padding: EdgeInsets.only(
@@ -28,21 +45,27 @@ class K2Screen extends GetWidget<K2Controller> {
           ),
           child: Column(
             children: [
-              CustomTextFormField(
-                controller: controller.emailaddressController,
-                hintText: "lbl6".tr,
-                textInputAction: TextInputAction.done,
-                prefix: Container(
-                  margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
-                  child: CustomImageView(
-                    imagePath: ImageConstant.imgLock,
-                    height: 20.v,
-                    width: 26.h,
-                  ),
-                ),
-                prefixConstraints: BoxConstraints(
-                  maxHeight: 44.v,
-                ),
+              Selector<K2Provider, TextEditingController?>(
+                selector: (context, provider) =>
+                    provider.emailaddressController,
+                builder: (context, emailaddressController, child) {
+                  return CustomTextFormField(
+                    controller: emailaddressController,
+                    hintText: "lbl6".tr,
+                    textInputAction: TextInputAction.done,
+                    prefix: Container(
+                      margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
+                      child: CustomImageView(
+                        imagePath: ImageConstant.imgLock,
+                        height: 20.v,
+                        width: 26.h,
+                      ),
+                    ),
+                    prefixConstraints: BoxConstraints(
+                      maxHeight: 44.v,
+                    ),
+                  );
+                },
               ),
               SizedBox(height: 34.v),
               CustomElevatedButton(
@@ -58,7 +81,7 @@ class K2Screen extends GetWidget<K2Controller> {
   }
 
   /// Section Widget
-  PreferredSizeWidget _buildAppBar() {
+  PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
       leadingWidth: 50.h,
       leading: AppbarLeadingImage(
@@ -69,7 +92,7 @@ class K2Screen extends GetWidget<K2Controller> {
           bottom: 19.v,
         ),
         onTap: () {
-          onTapArrowleftone();
+          onTapArrowleftone(context);
         },
       ),
       centerTitle: true,
@@ -80,7 +103,7 @@ class K2Screen extends GetWidget<K2Controller> {
   }
 
   /// Navigates to the previous screen.
-  onTapArrowleftone() {
-    Get.back();
+  onTapArrowleftone(BuildContext context) {
+    NavigatorService.goBack();
   }
 }

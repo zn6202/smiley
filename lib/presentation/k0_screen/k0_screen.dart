@@ -1,12 +1,34 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-import 'controller/k0_controller.dart'; // ignore_for_file: must_be_immutable
+import 'models/k0_model.dart';
+import 'provider/k0_provider.dart';
 
-class K0Screen extends GetWidget<K0Controller> {
+class K0Screen extends StatefulWidget {
   const K0Screen({Key? key})
       : super(
           key: key,
         );
+
+  @override
+  K0ScreenState createState() => K0ScreenState();
+  static Widget builder(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => K0Provider(),
+      child: K0Screen(),
+    );
+  }
+}
+
+class K0ScreenState extends State<K0Screen> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(milliseconds: 3000), () {
+      NavigatorService.popAndPushNamed(
+        AppRoutes.k1Screen,
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +72,7 @@ class K0Screen extends GetWidget<K0Controller> {
               SizedBox(height: 2.v),
               GestureDetector(
                 onTap: () {
-                  onTapTxtSmiley();
+                  onTapTxtSmiley(context);
                 },
                 child: Text(
                   "lbl_smiley".tr,
@@ -66,8 +88,8 @@ class K0Screen extends GetWidget<K0Controller> {
   }
 
   /// Navigates to the k1Screen when the action is triggered.
-  onTapTxtSmiley() {
-    Get.toNamed(
+  onTapTxtSmiley(BuildContext context) {
+    NavigatorService.pushNamed(
       AppRoutes.k1Screen,
     );
   }

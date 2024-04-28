@@ -1,12 +1,29 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-import 'controller/app_navigation_controller.dart'; // ignore_for_file: must_be_immutable
+import 'models/app_navigation_model.dart';
+import 'provider/app_navigation_provider.dart';
 
-class AppNavigationScreen extends GetWidget<AppNavigationController> {
+class AppNavigationScreen extends StatefulWidget {
   const AppNavigationScreen({Key? key})
       : super(
           key: key,
         );
+
+  @override
+  AppNavigationScreenState createState() => AppNavigationScreenState();
+  static Widget builder(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => AppNavigationProvider(),
+      child: AppNavigationScreen(),
+    );
+  }
+}
+
+class AppNavigationScreenState extends State<AppNavigationScreen> {
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +34,7 @@ class AppNavigationScreen extends GetWidget<AppNavigationController> {
           width: 375.h,
           child: Column(
             children: [
-              _buildAppNavigation(),
+              _buildAppNavigation(context),
               Expanded(
                 child: SingleChildScrollView(
                   child: Container(
@@ -25,21 +42,25 @@ class AppNavigationScreen extends GetWidget<AppNavigationController> {
                     child: Column(
                       children: [
                         _buildScreenTitle(
+                          context,
                           screenTitle: "lbl13".tr,
                           onTapScreenTitle: () =>
                               onTapScreenTitle(AppRoutes.k0Screen),
                         ),
                         _buildScreenTitle(
+                          context,
                           screenTitle: "lbl14".tr,
                           onTapScreenTitle: () =>
                               onTapScreenTitle(AppRoutes.k1Screen),
                         ),
                         _buildScreenTitle(
+                          context,
                           screenTitle: "lbl15".tr,
                           onTapScreenTitle: () =>
                               onTapScreenTitle(AppRoutes.k2Screen),
                         ),
                         _buildScreenTitle(
+                          context,
                           screenTitle: "lbl16".tr,
                           onTapScreenTitle: () =>
                               onTapScreenTitle(AppRoutes.k3Screen),
@@ -57,7 +78,7 @@ class AppNavigationScreen extends GetWidget<AppNavigationController> {
   }
 
   /// Section Widget
-  Widget _buildAppNavigation() {
+  Widget _buildAppNavigation(BuildContext context) {
     return Container(
       decoration: AppDecoration.fillWhiteA,
       child: Column(
@@ -108,7 +129,8 @@ class AppNavigationScreen extends GetWidget<AppNavigationController> {
   }
 
   /// Common widget
-  Widget _buildScreenTitle({
+  Widget _buildScreenTitle(
+    BuildContext context, {
     required String screenTitle,
     Function? onTapScreenTitle,
   }) {
@@ -152,6 +174,6 @@ class AppNavigationScreen extends GetWidget<AppNavigationController> {
 
   /// Common click event
   void onTapScreenTitle(String routeName) {
-    Get.toNamed(routeName);
+    NavigatorService.pushNamed(routeName);
   }
 }

@@ -79,15 +79,15 @@ class CustomTextFormField extends StatelessWidget {
     return alignment != null
         ? Align(
             alignment: alignment ?? Alignment.center,
-            child: textFormFieldWidget)
-        : textFormFieldWidget;
+            child: textFormFieldWidget(context))
+        : textFormFieldWidget(context);
   }
 
-  Widget get textFormFieldWidget => SizedBox(
+  Widget textFormFieldWidget(BuildContext context) => SizedBox(
         width: width ?? double.maxFinite,
         child: TextFormField(
-          scrollPadding: EdgeInsets.only(
-              bottom: MediaQuery.of(Get.context!).viewInsets.bottom),
+          scrollPadding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           controller: controller,
           focusNode: focusNode,
           onTapOutside: (event) {

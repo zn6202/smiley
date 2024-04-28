@@ -8,7 +8,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
-        android:label="s110213063_s_application4"
+        android:label="smiley"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

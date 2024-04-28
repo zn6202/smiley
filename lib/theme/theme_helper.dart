@@ -23,12 +23,6 @@ class ThemeHelper {
     'lightCode': ColorSchemes.lightCodeColorScheme
   };
 
-  /// Changes the app theme to [_newTheme].
-  void changeTheme(String _newTheme) {
-    PrefUtils().setThemeData(_newTheme);
-    Get.forceAppUpdate();
-  }
-
   /// Returns the lightCode colors for the current theme.
   LightCodeColors _getThemeColors() {
     return _supportedCustomColor[_appTheme] ?? LightCodeColors();

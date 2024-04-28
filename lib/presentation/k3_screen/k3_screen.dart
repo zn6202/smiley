@@ -4,17 +4,34 @@ import '../../core/utils/validation_functions.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
 import '../../widgets/custom_text_form_field.dart';
-import 'controller/k3_controller.dart'; // ignore_for_file: must_be_immutable
-// ignore_for_file: must_be_immutable
+import 'models/k3_model.dart';
+import 'provider/k3_provider.dart';
 
-// ignore_for_file: must_be_immutable
-class K3Screen extends GetWidget<K3Controller> {
-  K3Screen({Key? key})
+class K3Screen extends StatefulWidget {
+  const K3Screen({Key? key})
       : super(
           key: key,
         );
 
+  @override
+  K3ScreenState createState() => K3ScreenState();
+  static Widget builder(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (context) => K3Provider(),
+      child: K3Screen(),
+    );
+  }
+}
+// ignore_for_file: must_be_immutable
+
+// ignore_for_file: must_be_immutable
+class K3ScreenState extends State<K3Screen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,15 +92,15 @@ class K3Screen extends GetWidget<K3Controller> {
                     style: theme.textTheme.headlineLarge,
                   ),
                   SizedBox(height: 48.v),
-                  _buildEmailAddress(),
+                  _buildEmailAddress(context),
                   SizedBox(height: 26.v),
-                  _buildPasswordOne(),
+                  _buildPasswordOne(context),
                   SizedBox(height: 26.v),
-                  _buildConfirmPassword(),
+                  _buildConfirmPassword(context),
                   SizedBox(height: 26.v),
-                  _buildRegister(),
+                  _buildRegister(context),
                   SizedBox(height: 36.v),
-                  _buildRowLineSixteen(),
+                  _buildRowLineSixteen(context),
                   SizedBox(height: 35.v),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 57.h),
@@ -139,7 +156,7 @@ class K3Screen extends GetWidget<K3Controller> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          onTapTxttf();
+                          onTapTxttf(context);
                         },
                         child: Padding(
                           padding: EdgeInsets.only(left: 8.h),
@@ -161,120 +178,128 @@ class K3Screen extends GetWidget<K3Controller> {
   }
 
   /// Section Widget
-  Widget _buildEmailAddress() {
-    return CustomTextFormField(
-      controller: controller.emailAddressController,
-      hintText: "lbl6".tr,
-      prefix: Container(
-        margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgLock,
-          height: 20.v,
-          width: 26.h,
-        ),
-      ),
-      prefixConstraints: BoxConstraints(
-        maxHeight: 44.v,
-      ),
-    );
-  }
-
-  /// Section Widget
-  Widget _buildPasswordOne() {
-    return Obx(
-      () => CustomTextFormField(
-        controller: controller.passwordOneController,
-        hintText: "lbl8".tr,
-        textInputType: TextInputType.visiblePassword,
-        prefix: Container(
-          margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
-          child: CustomImageView(
-            imagePath: ImageConstant.imgKeysvgrepocom1,
-            height: 28.adaptSize,
-            width: 28.adaptSize,
-          ),
-        ),
-        prefixConstraints: BoxConstraints(
-          maxHeight: 44.v,
-        ),
-        suffix: InkWell(
-          onTap: () {
-            controller.isShowPassword.value = !controller.isShowPassword.value;
-          },
-          child: Container(
-            margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+  Widget _buildEmailAddress(BuildContext context) {
+    return Selector<K3Provider, TextEditingController?>(
+      selector: (context, provider) => provider.emailAddressController,
+      builder: (context, emailAddressController, child) {
+        return CustomTextFormField(
+          controller: emailAddressController,
+          hintText: "lbl6".tr,
+          prefix: Container(
+            margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
             child: CustomImageView(
-              imagePath: ImageConstant.imgEyecancelledfilledsvgrepocom1,
-              height: 30.adaptSize,
-              width: 30.adaptSize,
+              imagePath: ImageConstant.imgLock,
+              height: 20.v,
+              width: 26.h,
             ),
           ),
-        ),
-        suffixConstraints: BoxConstraints(
-          maxHeight: 44.v,
-        ),
-        validator: (value) {
-          if (value == null || (!isValidPassword(value, isRequired: true))) {
-            return "err_msg_please_enter_valid_password".tr;
-          }
-          return null;
-        },
-        obscureText: controller.isShowPassword.value,
-        contentPadding: EdgeInsets.symmetric(vertical: 11.v),
-      ),
+          prefixConstraints: BoxConstraints(
+            maxHeight: 44.v,
+          ),
+        );
+      },
     );
   }
 
   /// Section Widget
-  Widget _buildConfirmPassword() {
-    return Obx(
-      () => CustomTextFormField(
-        controller: controller.confirmPasswordController,
-        hintText: "lbl9".tr,
-        textInputAction: TextInputAction.done,
-        textInputType: TextInputType.visiblePassword,
-        prefix: Container(
-          margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
-          child: CustomImageView(
-            imagePath: ImageConstant.imgKeysvgrepocom1,
-            height: 28.adaptSize,
-            width: 28.adaptSize,
-          ),
-        ),
-        prefixConstraints: BoxConstraints(
-          maxHeight: 44.v,
-        ),
-        suffix: InkWell(
-          onTap: () {
-            controller.isShowPassword1.value =
-                !controller.isShowPassword1.value;
-          },
-          child: Container(
-            margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+  Widget _buildPasswordOne(BuildContext context) {
+    return Consumer<K3Provider>(
+      builder: (context, provider, child) {
+        return CustomTextFormField(
+          controller: provider.passwordOneController,
+          hintText: "lbl8".tr,
+          textInputType: TextInputType.visiblePassword,
+          prefix: Container(
+            margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
             child: CustomImageView(
-              imagePath: ImageConstant.imgEyecancelledfilledsvgrepocom1,
-              height: 30.adaptSize,
-              width: 30.adaptSize,
+              imagePath: ImageConstant.imgKeysvgrepocom1,
+              height: 28.adaptSize,
+              width: 28.adaptSize,
             ),
           ),
-        ),
-        suffixConstraints: BoxConstraints(
-          maxHeight: 44.v,
-        ),
-        validator: (value) {
-          if (value == null || (!isValidPassword(value, isRequired: true))) {
-            return "err_msg_please_enter_valid_password".tr;
-          }
-          return null;
-        },
-        obscureText: controller.isShowPassword1.value,
-        contentPadding: EdgeInsets.symmetric(vertical: 11.v),
-      ),
+          prefixConstraints: BoxConstraints(
+            maxHeight: 44.v,
+          ),
+          suffix: InkWell(
+            onTap: () {
+              provider.changePasswordVisibility();
+            },
+            child: Container(
+              margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+              child: CustomImageView(
+                imagePath: ImageConstant.imgEyecancelledfilledsvgrepocom1,
+                height: 30.adaptSize,
+                width: 30.adaptSize,
+              ),
+            ),
+          ),
+          suffixConstraints: BoxConstraints(
+            maxHeight: 44.v,
+          ),
+          validator: (value) {
+            if (value == null || (!isValidPassword(value, isRequired: true))) {
+              return "err_msg_please_enter_valid_password".tr;
+            }
+            return null;
+          },
+          obscureText: provider.isShowPassword,
+          contentPadding: EdgeInsets.symmetric(vertical: 11.v),
+        );
+      },
     );
   }
 
   /// Section Widget
-  Widget _buildRegister() {
+  Widget _buildConfirmPassword(BuildContext context) {
+    return Consumer<K3Provider>(
+      builder: (context, provider, child) {
+        return CustomTextFormField(
+          controller: provider.confirmPasswordController,
+          hintText: "lbl9".tr,
+          textInputAction: TextInputAction.done,
+          textInputType: TextInputType.visiblePassword,
+          prefix: Container(
+            margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
+            child: CustomImageView(
+              imagePath: ImageConstant.imgKeysvgrepocom1,
+              height: 28.adaptSize,
+              width: 28.adaptSize,
+            ),
+          ),
+          prefixConstraints: BoxConstraints(
+            maxHeight: 44.v,
+          ),
+          suffix: InkWell(
+            onTap: () {
+              provider.changePasswordVisibility1();
+            },
+            child: Container(
+              margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+              child: CustomImageView(
+                imagePath: ImageConstant.imgEyecancelledfilledsvgrepocom1,
+                height: 30.adaptSize,
+                width: 30.adaptSize,
+              ),
+            ),
+          ),
+          suffixConstraints: BoxConstraints(
+            maxHeight: 44.v,
+          ),
+          validator: (value) {
+            if (value == null || (!isValidPassword(value, isRequired: true))) {
+              return "err_msg_please_enter_valid_password".tr;
+            }
+            return null;
+          },
+          obscureText: provider.isShowPassword1,
+          contentPadding: EdgeInsets.symmetric(vertical: 11.v),
+        );
+      },
+    );
+  }
+
+  /// Section Widget
+  Widget _buildRegister(BuildContext context) {
     return CustomElevatedButton(
       width: 114.h,
       text: "lbl10".tr,
@@ -282,7 +307,7 @@ class K3Screen extends GetWidget<K3Controller> {
   }
 
   /// Section Widget
-  Widget _buildRowLineSixteen() {
+  Widget _buildRowLineSixteen(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -312,8 +337,8 @@ class K3Screen extends GetWidget<K3Controller> {
   }
 
   /// Navigates to the k1Screen when the action is triggered.
-  onTapTxttf() {
-    Get.toNamed(
+  onTapTxttf(BuildContext context) {
+    NavigatorService.pushNamed(
       AppRoutes.k1Screen,
     );
   }
