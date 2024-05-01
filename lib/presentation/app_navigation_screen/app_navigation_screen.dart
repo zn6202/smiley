@@ -1,29 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-import 'models/app_navigation_model.dart';
-import 'provider/app_navigation_provider.dart';
 
-class AppNavigationScreen extends StatefulWidget {
+class AppNavigationScreen extends StatelessWidget {
   const AppNavigationScreen({Key? key})
       : super(
           key: key,
         );
-
-  @override
-  AppNavigationScreenState createState() => AppNavigationScreenState();
-  static Widget builder(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AppNavigationProvider(),
-      child: AppNavigationScreen(),
-    );
-  }
-}
-
-class AppNavigationScreenState extends State<AppNavigationScreen> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,27 +25,27 @@ class AppNavigationScreenState extends State<AppNavigationScreen> {
                       children: [
                         _buildScreenTitle(
                           context,
-                          screenTitle: "lbl13".tr,
+                          screenTitle: "歡迎頁",
                           onTapScreenTitle: () =>
-                              onTapScreenTitle(AppRoutes.k0Screen),
+                              onTapScreenTitle(context, AppRoutes.k0Screen),
                         ),
                         _buildScreenTitle(
                           context,
-                          screenTitle: "lbl14".tr,
+                          screenTitle: "登入/主畫面",
                           onTapScreenTitle: () =>
-                              onTapScreenTitle(AppRoutes.k1Screen),
+                              onTapScreenTitle(context, AppRoutes.k1Screen),
                         ),
                         _buildScreenTitle(
                           context,
-                          screenTitle: "lbl15".tr,
+                          screenTitle: "找回密碼",
                           onTapScreenTitle: () =>
-                              onTapScreenTitle(AppRoutes.k2Screen),
+                              onTapScreenTitle(context, AppRoutes.k2Screen),
                         ),
                         _buildScreenTitle(
                           context,
-                          screenTitle: "lbl16".tr,
+                          screenTitle: "註冊/主畫面",
                           onTapScreenTitle: () =>
-                              onTapScreenTitle(AppRoutes.k3Screen),
+                              onTapScreenTitle(context, AppRoutes.k3Screen),
                         )
                       ],
                     ),
@@ -89,7 +71,7 @@ class AppNavigationScreenState extends State<AppNavigationScreen> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 20.h),
               child: Text(
-                "lbl_app_navigation".tr,
+                "App Navigation",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: appTheme.black900,
@@ -106,7 +88,7 @@ class AppNavigationScreenState extends State<AppNavigationScreen> {
             child: Padding(
               padding: EdgeInsets.only(left: 20.h),
               child: Text(
-                "msg_check_your_app_s".tr,
+                "Check your app's UI from the below demo screens of your app.",
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: appTheme.blueGray40001,
@@ -173,7 +155,10 @@ class AppNavigationScreenState extends State<AppNavigationScreen> {
   }
 
   /// Common click event
-  void onTapScreenTitle(String routeName) {
-    NavigatorService.pushNamed(routeName);
+  void onTapScreenTitle(
+    BuildContext context,
+    String routeName,
+  ) {
+    Navigator.pushNamed(context, routeName);
   }
 }

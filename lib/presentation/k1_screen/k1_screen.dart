@@ -1,37 +1,21 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-import '../../core/utils/validation_functions.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
-import '../../widgets/custom_text_form_field.dart';
-import 'models/k1_model.dart';
-import 'provider/k1_provider.dart';
+import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 
-class K1Screen extends StatefulWidget {
-  const K1Screen({Key? key})
+// ignore_for_file: must_be_immutable
+class K1Screen extends StatelessWidget {
+  K1Screen({Key? key})
       : super(
           key: key,
         );
 
-  @override
-  K1ScreenState createState() => K1ScreenState();
-  static Widget builder(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => K1Provider(),
-      child: K1Screen(),
-    );
-  }
-}
-// ignore_for_file: must_be_immutable
+  TextEditingController emailController = TextEditingController();
 
-// ignore_for_file: must_be_immutable
-class K1ScreenState extends State<K1Screen> {
+  TextEditingController passwordController = TextEditingController();
+
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -88,85 +72,57 @@ class K1ScreenState extends State<K1Screen> {
                   ),
                   SizedBox(height: 57.v),
                   Text(
-                    "msg_welcome_to_smiley".tr,
+                    "Welcome to SMILEY",
                     style: theme.textTheme.headlineLarge,
                   ),
                   SizedBox(height: 57.v),
-                  Selector<K1Provider, TextEditingController?>(
-                    selector: (context, provider) => provider.emailController,
-                    builder: (context, emailController, child) {
-                      return CustomTextFormField(
-                        controller: emailController,
-                        hintText: "lbl_email".tr,
-                        textInputType: TextInputType.emailAddress,
-                        prefix: Container(
-                          margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
-                          child: CustomImageView(
-                            imagePath: ImageConstant.imgLock,
-                            height: 20.v,
-                            width: 26.h,
-                          ),
-                        ),
-                        prefixConstraints: BoxConstraints(
-                          maxHeight: 44.v,
-                        ),
-                        validator: (value) {
-                          if (value == null ||
-                              (!isValidEmail(value, isRequired: true))) {
-                            return "err_msg_please_enter_valid_email".tr;
-                          }
-                          return null;
-                        },
-                      );
-                    },
+                  CustomTextFormField(
+                    controller: emailController,
+                    hintText: "email...",
+                    textInputType: TextInputType.emailAddress,
+                    prefix: Container(
+                      margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
+                      child: CustomImageView(
+                        imagePath: ImageConstant.imgLock,
+                        height: 20.v,
+                        width: 26.h,
+                      ),
+                    ),
+                    prefixConstraints: BoxConstraints(
+                      maxHeight: 44.v,
+                    ),
                   ),
                   SizedBox(height: 26.v),
-                  Consumer<K1Provider>(
-                    builder: (context, provider, child) {
-                      return CustomTextFormField(
-                        controller: provider.passwordController,
-                        hintText: "lbl_password".tr,
-                        textInputAction: TextInputAction.done,
-                        textInputType: TextInputType.visiblePassword,
-                        prefix: Container(
-                          margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
-                          child: CustomImageView(
-                            imagePath: ImageConstant.imgKeysvgrepocom1,
-                            height: 28.adaptSize,
-                            width: 28.adaptSize,
-                          ),
-                        ),
-                        prefixConstraints: BoxConstraints(
-                          maxHeight: 44.v,
-                        ),
-                        suffix: InkWell(
-                          onTap: () {
-                            provider.changePasswordVisibility();
-                          },
-                          child: Container(
-                            margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
-                            child: CustomImageView(
-                              imagePath: ImageConstant
-                                  .imgEyecancelledfilledsvgrepocom1,
-                              height: 30.adaptSize,
-                              width: 30.adaptSize,
-                            ),
-                          ),
-                        ),
-                        suffixConstraints: BoxConstraints(
-                          maxHeight: 44.v,
-                        ),
-                        validator: (value) {
-                          if (value == null ||
-                              (!isValidPassword(value, isRequired: true))) {
-                            return "err_msg_please_enter_valid_password".tr;
-                          }
-                          return null;
-                        },
-                        obscureText: provider.isShowPassword,
-                        contentPadding: EdgeInsets.symmetric(vertical: 11.v),
-                      );
-                    },
+                  CustomTextFormField(
+                    controller: passwordController,
+                    hintText: "password...",
+                    textInputAction: TextInputAction.done,
+                    textInputType: TextInputType.visiblePassword,
+                    prefix: Container(
+                      margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
+                      child: CustomImageView(
+                        imagePath: ImageConstant.imgKeysvgrepocom1,
+                        height: 28.adaptSize,
+                        width: 28.adaptSize,
+                      ),
+                    ),
+                    prefixConstraints: BoxConstraints(
+                      maxHeight: 44.v,
+                    ),
+                    suffix: Container(
+                      margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+                      child: CustomImageView(
+                        imagePath:
+                            ImageConstant.imgEyecancelledfilledsvgrepocom1,
+                        height: 30.adaptSize,
+                        width: 30.adaptSize,
+                      ),
+                    ),
+                    suffixConstraints: BoxConstraints(
+                      maxHeight: 44.v,
+                    ),
+                    obscureText: true,
+                    contentPadding: EdgeInsets.symmetric(vertical: 11.v),
                   ),
                   SizedBox(height: 7.v),
                   Align(
@@ -178,7 +134,7 @@ class K1ScreenState extends State<K1Screen> {
                       child: Padding(
                         padding: EdgeInsets.only(right: 3.h),
                         child: Text(
-                          "lbl".tr,
+                          "忘記密碼？",
                           style: CustomTextStyles.titleMediumLightgreen300,
                         ),
                       ),
@@ -187,7 +143,7 @@ class K1ScreenState extends State<K1Screen> {
                   SizedBox(height: 26.v),
                   CustomElevatedButton(
                     width: 114.h,
-                    text: "lbl2".tr,
+                    text: "登入",
                   ),
                   SizedBox(height: 34.v),
                   _buildRowLineSixteen(context),
@@ -241,7 +197,7 @@ class K1ScreenState extends State<K1Screen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "lbl3".tr,
+                        "沒有帳號嗎？  ",
                         style: CustomTextStyles.titleMediumGray700,
                       ),
                       GestureDetector(
@@ -251,7 +207,7 @@ class K1ScreenState extends State<K1Screen> {
                         child: Padding(
                           padding: EdgeInsets.only(left: 6.h),
                           child: Text(
-                            "lbl4".tr,
+                            "快速註冊",
                             style: CustomTextStyles.titleMediumLightgreen300,
                           ),
                         ),
@@ -280,7 +236,7 @@ class K1ScreenState extends State<K1Screen> {
           ),
         ),
         Text(
-          "lbl_or".tr,
+          "OR",
           style: CustomTextStyles.titleMediumLightgreen300,
         ),
         Padding(
@@ -299,15 +255,11 @@ class K1ScreenState extends State<K1Screen> {
 
   /// Navigates to the k2Screen when the action is triggered.
   onTapTxttf(BuildContext context) {
-    NavigatorService.pushNamed(
-      AppRoutes.k2Screen,
-    );
+    Navigator.pushNamed(context, AppRoutes.k2Screen);
   }
 
   /// Navigates to the k3Screen when the action is triggered.
   onTapTxttf1(BuildContext context) {
-    NavigatorService.pushNamed(
-      AppRoutes.k3Screen,
-    );
+    Navigator.pushNamed(context, AppRoutes.k3Screen);
   }
 }

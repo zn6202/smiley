@@ -1,15 +1,7 @@
-export 'package:connectivity_plus/connectivity_plus.dart';
 export 'package:smiley/core/utils/image_constant.dart';
-export 'package:smiley/core/network/network_info.dart';
-export 'package:smiley/core/utils/logger.dart';
-export 'package:smiley/core/utils/navigator_service.dart';
-export 'package:smiley/core/utils/pref_utils.dart';
 export 'package:smiley/core/utils/size_utils.dart';
-export 'package:smiley/localization/app_localization.dart';
 export 'package:smiley/routes/app_routes.dart';
 export 'package:smiley/theme/app_decoration.dart';
 export 'package:smiley/theme/custom_text_style.dart';
 export 'package:smiley/theme/theme_helper.dart';
 export 'package:smiley/widgets/custom_image_view.dart';
-export 'package:provider/provider.dart';
-export 'package:smiley/theme/provider/theme_provider.dart';

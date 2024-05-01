@@ -4,8 +4,9 @@ import '../presentation/app_navigation_screen/app_navigation_screen.dart';
 import '../presentation/k0_screen/k0_screen.dart';
 import '../presentation/k1_screen/k1_screen.dart';
 import '../presentation/k2_screen/k2_screen.dart';
-import '../presentation/k3_screen/k3_screen.dart';
+import '../presentation/k3_screen/k3_screen.dart'; // ignore_for_file: must_be_immutable
 
+// ignore_for_file: must_be_immutable
 class AppRoutes {
   static const String k0Screen = '/k0_screen';
 
@@ -19,12 +20,12 @@ class AppRoutes {
 
   static const String initialRoute = '/initialRoute';
 
-  static Map<String, WidgetBuilder> get routes => {
-        k0Screen: K0Screen.builder,
-        k1Screen: K1Screen.builder,
-        k2Screen: K2Screen.builder,
-        k3Screen: K3Screen.builder,
-        appNavigationScreen: AppNavigationScreen.builder,
-        initialRoute: K0Screen.builder
-      };
+  static Map<String, WidgetBuilder> routes = {
+    k0Screen: (context) => K0Screen(),
+    k1Screen: (context) => K1Screen(),
+    k2Screen: (context) => K2Screen(),
+    k3Screen: (context) => K3Screen(),
+    appNavigationScreen: (context) => AppNavigationScreen(),
+    initialRoute: (context) => K0Screen()
+  };
 }

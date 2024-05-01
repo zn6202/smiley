@@ -1,1 +1,0 @@
-class K0Model {}

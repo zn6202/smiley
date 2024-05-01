@@ -4,31 +4,16 @@ import '../../widgets/app_bar/appbar_leading_image.dart';
 import '../../widgets/app_bar/appbar_title.dart';
 import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_text_form_field.dart';
-import 'models/k2_model.dart';
-import 'provider/k2_provider.dart';
+import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
 
-class K2Screen extends StatefulWidget {
-  const K2Screen({Key? key})
+// ignore_for_file: must_be_immutable
+class K2Screen extends StatelessWidget {
+  K2Screen({Key? key})
       : super(
           key: key,
         );
 
-  @override
-  K2ScreenState createState() => K2ScreenState();
-  static Widget builder(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => K2Provider(),
-      child: K2Screen(),
-    );
-  }
-}
-
-class K2ScreenState extends State<K2Screen> {
-  @override
-  void initState() {
-    super.initState();
-  }
+  TextEditingController emailaddressController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -45,32 +30,26 @@ class K2ScreenState extends State<K2Screen> {
           ),
           child: Column(
             children: [
-              Selector<K2Provider, TextEditingController?>(
-                selector: (context, provider) =>
-                    provider.emailaddressController,
-                builder: (context, emailaddressController, child) {
-                  return CustomTextFormField(
-                    controller: emailaddressController,
-                    hintText: "lbl6".tr,
-                    textInputAction: TextInputAction.done,
-                    prefix: Container(
-                      margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
-                      child: CustomImageView(
-                        imagePath: ImageConstant.imgLock,
-                        height: 20.v,
-                        width: 26.h,
-                      ),
-                    ),
-                    prefixConstraints: BoxConstraints(
-                      maxHeight: 44.v,
-                    ),
-                  );
-                },
+              CustomTextFormField(
+                controller: emailaddressController,
+                hintText: "電子郵件地址...",
+                textInputAction: TextInputAction.done,
+                prefix: Container(
+                  margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
+                  child: CustomImageView(
+                    imagePath: ImageConstant.imgLock,
+                    height: 20.v,
+                    width: 26.h,
+                  ),
+                ),
+                prefixConstraints: BoxConstraints(
+                  maxHeight: 44.v,
+                ),
               ),
               SizedBox(height: 34.v),
               CustomElevatedButton(
                 width: 114.h,
-                text: "lbl7".tr,
+                text: "發送驗證碼",
               ),
               SizedBox(height: 5.v)
             ],
@@ -97,13 +76,13 @@ class K2ScreenState extends State<K2Screen> {
       ),
       centerTitle: true,
       title: AppbarTitle(
-        text: "lbl5".tr,
+        text: "密碼找回",
       ),
     );
   }
 
-  /// Navigates to the previous screen.
+  /// Navigates back to the previous screen.
   onTapArrowleftone(BuildContext context) {
-    NavigatorService.goBack();
+    Navigator.pop(context);
   }
 }

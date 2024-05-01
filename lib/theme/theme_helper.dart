@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
+String _appTheme = "lightCode";
 LightCodeColors get appTheme => ThemeHelper().themeColor();
 ThemeData get theme => ThemeHelper().themeData();
 
@@ -10,10 +11,7 @@ ThemeData get theme => ThemeHelper().themeData();
 
 // ignore_for_file: must_be_immutable
 class ThemeHelper {
-  // The current app theme
-  var _appTheme = PrefUtils().getThemeData();
-
-// A map of custom color themes supported by the app
+  // A map of custom color themes supported by the app
   Map<String, LightCodeColors> _supportedCustomColor = {
     'lightCode': LightCodeColors()
   };
@@ -22,6 +20,11 @@ class ThemeHelper {
   Map<String, ColorScheme> _supportedColorScheme = {
     'lightCode': ColorSchemes.lightCodeColorScheme
   };
+
+  /// Changes the app theme to [_newTheme].
+  void changeTheme(String _newTheme) {
+    _appTheme = _newTheme;
+  }
 
   /// Returns the lightCode colors for the current theme.
   LightCodeColors _getThemeColors() {
