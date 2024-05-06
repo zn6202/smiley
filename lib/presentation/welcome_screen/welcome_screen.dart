@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 
-class K0Screen extends StatelessWidget {
-  const K0Screen({Key? key})
+class WelcomeScreen extends StatelessWidget {
+  const WelcomeScreen({Key? key})
       : super(
           key: key,
         );
@@ -64,8 +64,8 @@ class K0Screen extends StatelessWidget {
     );
   }
 
-  /// Navigates to the k1Screen when the action is triggered.
+  /// Navigates to the loginScreen when the action is triggered.
   onTapTxtSmiley(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.k1Screen);
+    Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 }

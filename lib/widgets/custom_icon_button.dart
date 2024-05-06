@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
+extension IconButtonStyleHelper on CustomIconButton {
+  static BoxDecoration get fillBlueA => BoxDecoration(
+        color: appTheme.blueA100,
+        borderRadius: BorderRadius.circular(15.h),
+      );
+}
+
 class CustomIconButton extends StatelessWidget {
   CustomIconButton(
       {Key? key,
@@ -46,7 +53,15 @@ class CustomIconButton extends StatelessWidget {
             height: height ?? 0,
             width: width ?? 0,
             padding: padding ?? EdgeInsets.zero,
-            decoration: decoration,
+            decoration: decoration ??
+                BoxDecoration(
+                  color: appTheme.whiteA70001,
+                  borderRadius: BorderRadius.circular(15.h),
+                  border: Border.all(
+                    color: appTheme.gray300,
+                    width: 1.h,
+                  ),
+                ),
             child: child,
           ),
           onPressed: onTap,

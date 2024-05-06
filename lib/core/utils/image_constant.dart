@@ -3,7 +3,7 @@ class ImageConstant {
   // Image folder path
   static String imagePath = 'assets/images';
 
-// 找回密碼 images
+// forgetPWD images
   static String imgArrowLeft = '$imagePath/img_arrow_left.svg';
 
 // Common images
@@ -20,9 +20,10 @@ class ImageConstant {
   static String imgEyecancelledfilledsvgrepocom1 =
       '$imagePath/img_eyecancelledfilledsvgrepocom_1.svg';
 
-  static String imgWarning = '$imagePath/img_warning.svg';
+  static String imgEyeopenfilledsvgrepocom =
+      '$imagePath/img_eyeopenfilledsvgrepocom.svg';
 
-  static String imgGoogleSvgrepoCom = '$imagePath/img_google_svgrepo_com.svg';
+  static String imgGoogle = '$imagePath/img_google.svg';
 
   static String imgFacebook = '$imagePath/img_facebook.svg';
 

@@ -1,23 +1,37 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_icon_button.dart';
-import '../../widgets/custom_text_form_field.dart'; // ignore_for_file: must_be_immutable
+import '../../core/app_export.dart'; // 應用程式導出模組
+import '../../widgets/custom_elevated_button.dart'; // 自訂的高架按鈕元件
+import '../../widgets/custom_icon_button.dart'; // 自訂的圖示按鈕元件
+import '../../widgets/custom_text_form_field.dart'; // 自訂的文字輸入欄位元件
 
+// 忽略檔案錯誤: 必須是不可變的
 // ignore_for_file: must_be_immutable
-class K3Screen extends StatelessWidget {
-  K3Screen({Key? key})
-      : super(
-          key: key,
-        );
+class RegisterScreen extends StatefulWidget {
+  RegisterScreen({Key? key}) : super(key: key);
 
-  TextEditingController emailAddressController = TextEditingController();
+  @override
+  _RegisterScreenState createState() => _RegisterScreenState();
+}
 
-  TextEditingController passwordOneController = TextEditingController();
+class _RegisterScreenState extends State<RegisterScreen> {
+  // 輸入控制器
+  TextEditingController emailAddressController =
+      TextEditingController(); // 電子郵件地址輸入控制器
+  TextEditingController passwordOneController =
+      TextEditingController(); // 密碼輸入控制器
+  TextEditingController confirmPasswordController =
+      TextEditingController(); // 確認密碼輸入控制器
 
-  TextEditingController confirmPasswordController = TextEditingController();
+  // 全局表單鍵
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // 表單鍵全局鍵
+  bool isPasswordVisible = false;
 
-  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  // 定義切換密碼可見性的方法
+  void togglePasswordVisibility() {
+    setState(() {
+      isPasswordVisible = !isPasswordVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +52,7 @@ class K3Screen extends StatelessWidget {
               ),
               child: Column(
                 children: [
+                  // 應用程式 Logo
                   SizedBox(height: 57.v),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 34.h),
@@ -73,66 +88,55 @@ class K3Screen extends StatelessWidget {
                     ),
                   ),
                   SizedBox(height: 57.v),
+                  // 歡迎訊息
                   Text(
                     "Welcome to SMILEY",
                     style: theme.textTheme.headlineLarge,
                   ),
                   SizedBox(height: 48.v),
+                  // 電子郵件輸入區塊
                   _buildEmailAddress(context),
                   SizedBox(height: 26.v),
+                  // 密碼輸入區塊
                   _buildPasswordOne(context),
                   SizedBox(height: 26.v),
+                  // 確認密碼輸入區塊
                   _buildConfirmPassword(context),
                   SizedBox(height: 26.v),
-                  _buildRegister(context),
+                  // 註冊按鈕
+                  _buildRegisterButton(context),
                   SizedBox(height: 36.v),
+                  // 分隔線
                   _buildRowLineSixteen(context),
                   SizedBox(height: 35.v),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 57.h),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CustomIconButton(
-                          height: 38.v,
-                          width: 40.h,
-                          child: CustomImageView(
-                            imagePath: ImageConstant.imgWarning,
-                          ),
+                  // 社交媒體圖示按鈕
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      CustomIconButton(
+                        height: 52.v,
+                        width: 55.h,
+                        padding: EdgeInsets.all(11.h),
+                        child: CustomImageView(
+                          imagePath: ImageConstant.imgGoogle,
                         ),
-                        Spacer(
-                          flex: 46,
-                        ),
-                        CustomImageView(
-                          imagePath: ImageConstant.imgGoogleSvgrepoCom,
-                          height: 23.adaptSize,
-                          width: 23.adaptSize,
-                          radius: BorderRadius.circular(
-                            5.h,
-                          ),
-                          margin: EdgeInsets.symmetric(vertical: 7.v),
-                        ),
-                        Spacer(
-                          flex: 53,
-                        ),
-                        Container(
-                          height: 23.adaptSize,
-                          width: 23.adaptSize,
-                          padding: EdgeInsets.symmetric(horizontal: 5.h),
-                          decoration: AppDecoration.outlineBlueA.copyWith(
-                            borderRadius: BorderRadiusStyle.roundedBorder5,
-                          ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 57.h),
+                        child: CustomIconButton(
+                          height: 50.v,
+                          width: 53.h,
+                          padding: EdgeInsets.all(10.h),
+                          decoration: IconButtonStyleHelper.fillBlueA,
                           child: CustomImageView(
                             imagePath: ImageConstant.imgFacebook,
-                            height: 22.v,
-                            width: 11.h,
-                            alignment: Alignment.center,
                           ),
-                        )
-                      ],
-                    ),
+                        ),
+                      )
+                    ],
                   ),
-                  SizedBox(height: 53.v),
+                  SizedBox(height: 40.v),
+                  // 登錄連結
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -142,7 +146,7 @@ class K3Screen extends StatelessWidget {
                       ),
                       GestureDetector(
                         onTap: () {
-                          onTapTxttf(context);
+                          onTaplogin(context); // 呼叫登錄方法
                         },
                         child: Padding(
                           padding: EdgeInsets.only(left: 8.h),
@@ -163,11 +167,11 @@ class K3Screen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
+  /// 電子郵件輸入欄位
   Widget _buildEmailAddress(BuildContext context) {
     return CustomTextFormField(
       controller: emailAddressController,
-      hintText: "電子郵件地址...",
+      hintText: "email...",
       prefix: Container(
         margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
         child: CustomImageView(
@@ -182,11 +186,12 @@ class K3Screen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
+  /// 密碼輸入欄位
   Widget _buildPasswordOne(BuildContext context) {
     return CustomTextFormField(
       controller: passwordOneController,
-      hintText: "密碼...",
+      hintText: "password...",
+      textInputAction: TextInputAction.done,
       textInputType: TextInputType.visiblePassword,
       prefix: Container(
         margin: EdgeInsets.fromLTRB(20.h, 8.v, 10.h, 8.v),
@@ -199,27 +204,34 @@ class K3Screen extends StatelessWidget {
       prefixConstraints: BoxConstraints(
         maxHeight: 44.v,
       ),
-      suffix: Container(
-        margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgEyecancelledfilledsvgrepocom1,
-          height: 30.adaptSize,
-          width: 30.adaptSize,
+      suffix: GestureDetector(
+        onTap: () {
+          togglePasswordVisibility(); // 切換密碼可見性
+        },
+        child: Container(
+          margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+          child: CustomImageView(
+            imagePath: isPasswordVisible
+                ? ImageConstant.imgEyeopenfilledsvgrepocom // 可視狀態的圖示
+                : ImageConstant.imgEyecancelledfilledsvgrepocom1, // 不可視狀態的圖示
+            height: 30.adaptSize,
+            width: 30.adaptSize,
+          ),
         ),
       ),
       suffixConstraints: BoxConstraints(
         maxHeight: 44.v,
       ),
-      obscureText: true,
+      obscureText: !isPasswordVisible, // 切換密碼的可視/不可視狀態
       contentPadding: EdgeInsets.symmetric(vertical: 11.v),
     );
   }
 
-  /// Section Widget
+  /// 確認密碼輸入欄位
   Widget _buildConfirmPassword(BuildContext context) {
     return CustomTextFormField(
       controller: confirmPasswordController,
-      hintText: "再次輸入密碼...",
+      hintText: "confirm password...",
       textInputAction: TextInputAction.done,
       textInputType: TextInputType.visiblePassword,
       prefix: Container(
@@ -249,15 +261,18 @@ class K3Screen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildRegister(BuildContext context) {
+  /// 註冊按鈕
+  Widget _buildRegisterButton(BuildContext context) {
     return CustomElevatedButton(
       width: 114.h,
       text: "註冊",
+      onTap: () {
+        Register(context);
+      },
     );
   }
 
-  /// Section Widget
+  /// 分隔線
   Widget _buildRowLineSixteen(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -271,24 +286,23 @@ class K3Screen extends StatelessWidget {
         ),
         Text(
           "OR",
-          style: CustomTextStyles.titleMediumLightgreen300,
+          style: CustomTextStyles.titleMediumGray700,
         ),
         Padding(
-          padding: EdgeInsets.only(
-            top: 10.v,
-            bottom: 9.v,
-          ),
+          padding: EdgeInsets.symmetric(vertical: 10.v),
           child: SizedBox(
             width: 135.h,
             child: Divider(),
           ),
-        )
+        ),
       ],
     );
   }
 
-  /// Navigates to the k1Screen when the action is triggered.
-  onTapTxttf(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.k1Screen);
+  void onTaplogin(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.loginScreen); // 跳轉至登錄頁面
   }
+
+  /// 預留的註冊函數
+  void Register(BuildContext context) {}
 }
