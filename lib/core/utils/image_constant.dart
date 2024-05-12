@@ -28,4 +28,6 @@ class ImageConstant {
   static String imgFacebook = '$imagePath/img_facebook.svg';
 
   static String imageNotFound = 'assets/images/image_not_found.png';
+
+  static String imgAddDiary = 'assets/images/img_AddDiary.png';
 }

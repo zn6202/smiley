@@ -6,7 +6,11 @@ extension IconButtonStyleHelper on CustomIconButton {
         color: appTheme.blueA100,
         borderRadius: BorderRadius.circular(15.h),
       );
+  static BoxDecoration get fillLightGreen => BoxDecoration(
+        color: appTheme.lightGreen300,
+      );
 }
+
 
 class CustomIconButton extends StatelessWidget {
   CustomIconButton(

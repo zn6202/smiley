@@ -60,7 +60,7 @@ class ForgetpwdScreen extends StatelessWidget {
                 width: 114.h, // 設定按鈕寬度
                 text: "發送驗證碼", // 按鈕文字
                 // 點擊按鈕時，呼叫 `_onSendVerificationCode` 函數
-                onTap: () {
+                onPressed: () {
                   _onSendVerificationCode(context);
                 },
               ),

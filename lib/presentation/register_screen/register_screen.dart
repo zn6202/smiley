@@ -230,7 +230,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   /// 確認密碼輸入欄位
   Widget _buildConfirmPassword(BuildContext context) {
     return CustomTextFormField(
-      controller: confirmPasswordController,
+      controller: passwordOneController,
       hintText: "confirm password...",
       textInputAction: TextInputAction.done,
       textInputType: TextInputType.visiblePassword,
@@ -245,18 +245,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
       prefixConstraints: BoxConstraints(
         maxHeight: 44.v,
       ),
-      suffix: Container(
-        margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
-        child: CustomImageView(
-          imagePath: ImageConstant.imgEyecancelledfilledsvgrepocom1,
-          height: 30.adaptSize,
-          width: 30.adaptSize,
+      suffix: GestureDetector(
+        onTap: () {
+          togglePasswordVisibility(); // 切換密碼可見性
+        },
+        child: Container(
+          margin: EdgeInsets.fromLTRB(30.h, 7.v, 19.h, 7.v),
+          child: CustomImageView(
+            imagePath: isPasswordVisible
+                ? ImageConstant.imgEyeopenfilledsvgrepocom // 可視狀態的圖示
+                : ImageConstant.imgEyecancelledfilledsvgrepocom1, // 不可視狀態的圖示
+            height: 30.adaptSize,
+            width: 30.adaptSize,
+          ),
         ),
       ),
       suffixConstraints: BoxConstraints(
         maxHeight: 44.v,
       ),
-      obscureText: true,
+      obscureText: !isPasswordVisible, // 切換密碼的可視/不可視狀態
       contentPadding: EdgeInsets.symmetric(vertical: 11.v),
     );
   }
@@ -266,7 +273,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return CustomElevatedButton(
       width: 114.h,
       text: "註冊",
-      onTap: () {
+      onPressed: () {
         Register(context);
       },
     );

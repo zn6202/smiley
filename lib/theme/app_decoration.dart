@@ -11,4 +11,9 @@ class AppDecoration {
       );
 }
 
-class BorderRadiusStyle {}
+class BorderRadiusStyle {
+  // Custom borders
+  static BorderRadius get customBorderTL24 => BorderRadius.vertical(
+        top: Radius.circular(24.h),
+      );
+}

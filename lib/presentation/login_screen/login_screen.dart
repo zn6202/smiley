@@ -175,7 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomElevatedButton(
                     width: 114.h,
                     text: "登入",
-                    onTap: () {
+                    onPressed: () {
                       login(context);
                     },
                   ),
@@ -283,5 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   /// 預留的登入函數
-  void login(BuildContext context) {}
+  void login(BuildContext context) {
+    Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+  }
 }

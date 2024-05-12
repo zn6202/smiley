@@ -12,6 +12,7 @@ dependencies:
   flutter_svg: ^2.0.9
   intl: ^0.18.0
   connectivity_plus: ^5.0.2
+  calendar_date_picker2: ^1.0.2
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
@@ -20,6 +21,7 @@ flutter:
   assets: 
     - assets/
     - assets/images/
+    - assets/images/img_AddDiary.svg
   fonts: 
     - family: Inter
       fonts: 

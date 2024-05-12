@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
@@ -7,9 +6,6 @@ LightCodeColors get appTheme => ThemeHelper().themeColor();
 ThemeData get theme => ThemeHelper().themeData();
 
 /// Helper class for managing themes and colors.
-// ignore_for_file: must_be_immutable
-
-// ignore_for_file: must_be_immutable
 class ThemeHelper {
   // A map of custom color themes supported by the app
   Map<String, LightCodeColors> _supportedCustomColor = {
@@ -89,6 +85,24 @@ class TextThemes {
           fontFamily: 'Inter',
           fontWeight: FontWeight.w700,
         ),
+        headlineSmall: TextStyle(
+          color: appTheme.gray700,
+          fontSize: 25.fSize,
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w100,
+        ),
+        labelLarge: TextStyle(
+          color: appTheme.gray700,
+          fontSize: 12.fSize,
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w600,
+        ),
+        titleSmall: TextStyle(
+          color: appTheme.gray700,
+          fontSize: 14.fSize,
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.w600,
+        ),
       );
 }
 
@@ -110,6 +124,7 @@ class LightCodeColors {
   Color get gray300 => Color(0XFFE5E5E5);
   Color get gray400 => Color(0XFFC4C4C4);
   Color get gray700 => Color(0XFF545453);
+  Color get gray800 => Color(0XFF4B543D);
 // LightGreen
   Color get lightGreen300 => Color(0XFFA7BA89);
   Color get lightGreen50 => Color(0XFFF4F4E6);

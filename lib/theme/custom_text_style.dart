@@ -1,13 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/app_export.dart';
 
-extension on TextStyle {
-  TextStyle get inter {
-    return copyWith(
-      fontFamily: 'Inter',
-    );
-  }
-}
+extension on TextStyle {}
 
 /// A collection of pre-defined text styles for customizing text appearance,
 /// categorized by different font families and weights.
@@ -27,6 +21,14 @@ class CustomTextStyles {
       );
   static get titleMediumWhiteA700 => theme.textTheme.titleMedium!.copyWith(
         color: appTheme.whiteA700,
+        fontWeight: FontWeight.w600,
+      );
+  static get headlineSmall => theme.textTheme.titleMedium!.copyWith(
+        color: appTheme.whiteA700,
+        fontWeight: FontWeight.w600,
+      );
+  static get headlineSmallGray800 => theme.textTheme.headlineSmall!.copyWith(
+        color: appTheme.gray800,
         fontWeight: FontWeight.w600,
       );
 }
