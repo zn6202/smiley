@@ -4,6 +4,8 @@ import '../../widgets/custom_elevated_button.dart'; // 自訂的高架按鈕元�
 import '../../widgets/custom_icon_button.dart'; // 自訂的圖示按鈕元件
 import '../../widgets/custom_text_form_field.dart'; // 自訂的文字輸入欄位元件
 
+import 'package:firebase_auth/firebase_auth.dart';
+
 // 忽略檔案錯誤: 必須是不可變的
 // ignore_for_file: must_be_immutable
 class RegisterScreen extends StatefulWidget {
@@ -21,6 +23,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
       TextEditingController(); // 密碼輸入控制器
   TextEditingController confirmPasswordController =
       TextEditingController(); // 確認密碼輸入控制器
+
+  // 錯誤訊息
+  String? errorMessage;
+
+  void createUserWithEmailAndPassword() async {
+    try {
+      if (passwordOneController.text.trim() != confirmPasswordController.text.trim()) {
+        setState(() {
+          errorMessage = '該密碼不一致';
+        });
+      }else{
+      // 呼叫Firebase的createUserWithEmailAndPassword()方法
+        final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailAddressController.text.trim(), // 取得使用者輸入的電子郵件
+          password: passwordOneController.text.trim(), // 取得使用者輸入的密碼
+        );
+        // 如果成功建立新帳戶，credential 將包含用戶的驗證資訊
+        // 這裡您可以添加任何註冊成功後的後續操作
+        print('註冊成功! 使用者的ID: ${credential.user?.uid}');
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') { // 至少6個字元
+        setState(() {
+          errorMessage = '提供的密碼太弱';
+        });
+      } else if (e.code == 'email-already-in-use') {
+        setState(() {
+          errorMessage = '該電子郵件地址已經被使用';
+        });
+      } else if (e.code == 'invalid-email') {
+        setState(() {
+          errorMessage = '該電子郵件格式不正確';
+        });
+      } else if (emailAddressController.text.isEmpty) {
+        setState(() {
+          errorMessage = '電子郵件尚未填寫';
+        });
+      } else if (passwordOneController.text.isEmpty) {
+        setState(() {
+          errorMessage = '密碼尚未填寫';
+        });
+      } else {
+        setState(() {
+          errorMessage = '發生了一些錯誤：$e';
+        });
+      }
+    }
+  }
 
   // 全局表單鍵
   GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // 表單鍵全局鍵
@@ -88,28 +138,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                   SizedBox(height: 57.v),
-                  // 歡迎訊息
-                  Text(
-                    "Welcome to SMILEY",
-                    style: theme.textTheme.headlineLarge,
+                  Column(
+                    children: [
+                      // 歡迎訊息
+                      Text(
+                        "Welcome to SMILEY",
+                        style: theme.textTheme.headlineLarge,
+                      ),
+                      SizedBox(
+                        height: 48.v,
+                        child: Center(
+                          child: errorMessage != null
+                              ? Text(
+                                  errorMessage!,
+                                  style: TextStyle(color: Colors.red),
+                                )
+                              : null,
+                        ),
+                      ),
+
+                      // 電子郵件輸入區塊
+                      _buildEmailAddress(context),
+                      SizedBox(height: 26.v),
+                      // 密碼輸入區塊
+                      _buildPasswordOne(context),
+                      SizedBox(height: 26.v),
+                      // 確認密碼輸入區塊
+                      _buildConfirmPassword(context),
+                      SizedBox(height: 26.v),
+                      // 註冊按鈕
+                      _buildRegisterButton(context),
+                      SizedBox(height: 36.v),
+                      // 分隔線
+                      _buildRowLineSixteen(context),
+                      SizedBox(height: 35.v),
+                    ],
                   ),
-                  SizedBox(height: 48.v),
-                  // 電子郵件輸入區塊
-                  _buildEmailAddress(context),
-                  SizedBox(height: 26.v),
-                  // 密碼輸入區塊
-                  _buildPasswordOne(context),
-                  SizedBox(height: 26.v),
-                  // 確認密碼輸入區塊
-                  _buildConfirmPassword(context),
-                  SizedBox(height: 26.v),
-                  // 註冊按鈕
-                  _buildRegisterButton(context),
-                  SizedBox(height: 36.v),
-                  // 分隔線
-                  _buildRowLineSixteen(context),
-                  SizedBox(height: 35.v),
-                  // 社交媒體圖示按鈕
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -230,7 +294,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   /// 確認密碼輸入欄位
   Widget _buildConfirmPassword(BuildContext context) {
     return CustomTextFormField(
-      controller: passwordOneController,
+      controller: confirmPasswordController,
       hintText: "confirm password...",
       textInputAction: TextInputAction.done,
       textInputType: TextInputType.visiblePassword,
@@ -274,7 +338,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       width: 114.h,
       text: "註冊",
       onPressed: () {
-        Register(context);
+        createUserWithEmailAndPassword();
       },
     );
   }
@@ -310,6 +374,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
     Navigator.pushNamed(context, AppRoutes.loginScreen); // 跳轉至登錄頁面
   }
 
-  /// 預留的註冊函數
-  void Register(BuildContext context) {}
+
 }

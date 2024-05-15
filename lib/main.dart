@@ -1,17 +1,35 @@
 // 引入 Flutter 相關的庫，提供 Material Design 的組件和功能
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // 自訂的應用程式組件匯入
 import 'core/app_export.dart';
 
+// 導入 Firebase 核心插件和先前產生的設定檔
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
 // 建立一個全域的 ScaffoldMessengerState 鍵，以用於顯示通知訊息
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 // 程式入口，定義 main 函數
-void main() {
+void main() async{
   // 確保在執行框架相關的任何操作之前 Flutter 綁定已經初始化
   WidgetsFlutterBinding.ensureInitialized();
+  if(kIsWeb){
+    // 初始化 firebase
+    await Firebase.initializeApp(
+      options: FirebaseOptions(apiKey: "AIzaSyAmMSDYiayqcG5jY7zJ6wTp0_CTVImeCgM",
+      authDomain: "authentication-873b5.firebaseapp.com",
+      projectId: "authentication-873b5",
+      storageBucket: "authentication-873b5.appspot.com",
+      messagingSenderId: "335884564585",
+      appId: "1:335884564585:web:fcb5491a95029eae3c4af8",
+      measurementId: "G-1P51PCR60T"));
+  }else{
+    await Firebase.initializeApp();
+  }
 
   // 鎖定應用程式方向為豎屏（portrait）
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);

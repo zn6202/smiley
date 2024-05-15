@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "335884564585",
+    "project_id": "authentication-873b5",
+    "storage_bucket": "authentication-873b5.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:335884564585:android:82eb52839fb8cc653c4af8",
+        "android_client_info": {
+          "package_name": "com.smiley.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "335884564585-ih9c542oh4iqolfvf6rtifa0qs4geha3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCketFhoz9C9Koq5BkEMSsudUUHCa3xE0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "335884564585-ih9c542oh4iqolfvf6rtifa0qs4geha3.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "335884564585-m059i07ai7uckr46p2nm5ksh6m28grfm.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.smiley.app.testProject"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -4,6 +4,10 @@ import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
 import '../../widgets/custom_text_form_field.dart'; // 忽略文件: 必須是可變的
 
+import 'package:firebase_auth/firebase_auth.dart';
+
+// import 'package:google_sign_in/google_sign_in.dart';
+
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
 
@@ -20,6 +24,38 @@ class _LoginScreenState extends State<LoginScreen> {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   // 密碼可見性狀態
   bool _isPasswordVisible = false;
+
+  // 錯誤訊息
+  String? errorMessage;
+
+
+  void signInWithEmailAndPassword() async {
+    try {
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: emailController.text.trim(),
+        password: passwordController.text.trim()
+      );
+      print('登入成功! 使用者的ID: ${credential.user?.uid}');
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+          errorMessage = '帳號密碼輸入錯誤';
+      });
+    }
+  }
+
+  // Future<UserCredential> signInWithGoogle() async {
+  //   // Trigger the authentication flow
+  //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+  //   // Obtain the auth details from the request
+  //   final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+  //   // Create a new credential
+  //   final credential = GoogleAuthProvider.credential(
+  //     accessToken: googleAuth?.accessToken,
+  //     idToken: googleAuth?.idToken,
+  //   );
+  // }
 
   // 定義切換密碼可見性的方法
   void togglePasswordVisibility() {
@@ -91,7 +127,17 @@ class _LoginScreenState extends State<LoginScreen> {
                     "Welcome to SMILEY",
                     style: theme.textTheme.headlineLarge,
                   ),
-                  SizedBox(height: 57.v), // 上方間距
+                  SizedBox(
+                        height: 57.v,
+                        child: Center(
+                          child: errorMessage != null
+                              ? Text(
+                                  errorMessage!,
+                                  style: TextStyle(color: Colors.red),
+                                )
+                              : null,
+                        ),
+                      ),
                   // 電子郵件輸入框
                   CustomTextFormField(
                     controller: emailController,
@@ -176,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: 114.h,
                     text: "登入",
                     onPressed: () {
-                      login(context);
+                      signInWithEmailAndPassword();
                     },
                   ),
                   SizedBox(height: 34.v), // 上方間距
