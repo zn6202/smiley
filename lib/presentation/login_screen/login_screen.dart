@@ -6,7 +6,7 @@ import '../../widgets/custom_text_form_field.dart'; // 忽略文件: 必須是�
 
 import 'package:firebase_auth/firebase_auth.dart';
 
-// import 'package:google_sign_in/google_sign_in.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -43,19 +43,27 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // Future<UserCredential> signInWithGoogle() async {
-  //   // Trigger the authentication flow
-  //   final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+  Future<UserCredential> signInWithGoogle() async {
+    try {
+      // 觸發身份驗證
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-  //   // Obtain the auth details from the request
-  //   final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      // 從請求中獲取身份驗證詳細信息
+      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
 
-  //   // Create a new credential
-  //   final credential = GoogleAuthProvider.credential(
-  //     accessToken: googleAuth?.accessToken,
-  //     idToken: googleAuth?.idToken,
-  //   );
-  // }
+      // 創建新憑據
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      // 使用憑據登錄到 Firebase 並返回 UserCredential
+      return await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      // 處理可能的錯誤並拋出異常
+      throw Exception('Failed to sign in with Google: $e');
+    }
+  }
 
   // 定義切換密碼可見性的方法
   void togglePasswordVisibility() {
@@ -235,6 +243,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       // Google 按鈕
                       CustomIconButton(
+                        onTap: () {
+                          signInWithGoogle();
+                        },
                         height: 52.v,
                         width: 55.h,
                         padding: EdgeInsets.all(11.h),
