@@ -6,6 +6,7 @@ import '../../widgets/custom_text_form_field.dart'; // 忽略文件: 必須是�
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../diarymain_screen/diarymain_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -42,25 +43,30 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<UserCredential> signInWithGoogle() async {
+  // google 註冊(如果已經註冊過就會直接登入)
+  Future<void> signInWithGoogle() async {
     try {
-      // 觸發身份驗證
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      // 從請求中獲取身份驗證詳細信息
-      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
 
-      // 創建新憑據
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
 
-      // 使用憑據登錄到 Firebase 並返回 UserCredential
-      return await FirebaseAuth.instance.signInWithCredential(credential);
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      );
     } catch (e) {
-      // 處理可能的錯誤並拋出異常
-      throw Exception('Failed to sign in with Google: $e');
+      print('Google sign in error: $e');
+      // 處理登入錯誤
+      // 可以顯示錯誤訊息給用戶或者執行其他處理邏輯
     }
   }
 

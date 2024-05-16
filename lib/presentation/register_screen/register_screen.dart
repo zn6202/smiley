@@ -5,6 +5,9 @@ import '../../widgets/custom_icon_button.dart'; // 自訂的圖示按鈕元件
 import '../../widgets/custom_text_form_field.dart'; // 自訂的文字輸入欄位元件
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import '../diarymain_screen/diarymain_screen.dart';
+
 
 // 忽略檔案錯誤: 必須是不可變的
 // ignore_for_file: must_be_immutable
@@ -42,6 +45,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // 如果成功建立新帳戶，credential 將包含用戶的驗證資訊
         // 這裡您可以添加任何註冊成功後的後續操作
         print('註冊成功! 使用者的ID: ${credential.user?.uid}');
+        // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+        );
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') { // 至少6個字元
@@ -72,6 +80,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  // google 註冊(如果已經註冊過就會直接登入)
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      );
+    } catch (e) {
+      print('Google sign in error: $e');
+      // 處理登入錯誤
+      // 可以顯示錯誤訊息給用戶或者執行其他處理邏輯
+    }
+  }
   // 全局表單鍵
   GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // 表單鍵全局鍵
   bool isPasswordVisible = false;
@@ -178,6 +212,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       CustomIconButton(
+                        onTap: () {
+                          signInWithGoogle();
+                        },
                         height: 52.v,
                         width: 55.h,
                         padding: EdgeInsets.all(11.h),
