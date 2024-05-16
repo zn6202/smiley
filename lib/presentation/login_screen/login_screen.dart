@@ -5,7 +5,6 @@ import '../../widgets/custom_icon_button.dart';
 import '../../widgets/custom_text_form_field.dart'; // 忽略文件: 必須是可變的
 
 import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,17 +27,17 @@ class _LoginScreenState extends State<LoginScreen> {
   // 錯誤訊息
   String? errorMessage;
 
-
   void signInWithEmailAndPassword() async {
     try {
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text.trim(),
-        password: passwordController.text.trim()
+        password: passwordController.text.trim(),
       );
       print('登入成功! 使用者的ID: ${credential.user?.uid}');
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } on FirebaseAuthException catch (e) {
       setState(() {
-          errorMessage = '帳號密碼輸入錯誤';
+        errorMessage = '帳號密碼輸入錯誤';
       });
     }
   }
@@ -136,21 +135,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: theme.textTheme.headlineLarge,
                   ),
                   SizedBox(
-                        height: 57.v,
-                        child: Center(
-                          child: errorMessage != null
-                              ? Text(
-                                  errorMessage!,
-                                  style: TextStyle(color: Colors.red),
-                                )
-                              : null,
-                        ),
-                      ),
+                    height: 57.v,
+                    child: Center(
+                      child: errorMessage != null
+                          ? Text(
+                              errorMessage!,
+                              style: TextStyle(color: Colors.red),
+                            )
+                          : null,
+                    ),
+                  ),
                   // 電子郵件輸入框
                   CustomTextFormField(
                     controller: emailController,
                     hintText: "email...",
                     textInputType: TextInputType.emailAddress, // 指定輸入類型
+                    textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色
                     prefix: Container(
                       margin: EdgeInsets.fromLTRB(
                           20.h, 11.v, 10.h, 11.v), // 左、上、右、下間距
@@ -171,6 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     hintText: "password...",
                     textInputAction: TextInputAction.done, // 完成輸入操作
                     textInputType: TextInputType.visiblePassword,
+                    textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色
                     prefix: Container(
                       margin: EdgeInsets.fromLTRB(
                           20.h, 8.v, 10.h, 8.v), // 左、上、右、下間距
@@ -192,10 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             30.h, 7.v, 19.h, 7.v), // 左、上、右、下間距
                         child: CustomImageView(
                           imagePath: _isPasswordVisible
-                              ? ImageConstant
-                                  .imgEyeopenfilledsvgrepocom // 可視狀態的圖示
-                              : ImageConstant
-                                  .imgEyecancelledfilledsvgrepocom1, // 不可視狀態的圖示
+                              ? ImageConstant.imgEyeopenfilledsvgrepocom // 可視狀態的圖示
+                              : ImageConstant.imgEyecancelledfilledsvgrepocom1, // 不可視狀態的圖示
                           height: 30.adaptSize,
                           width: 30.adaptSize,
                         ),
@@ -344,3 +343,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
   }
 }
+
+/*
+1. 輸入文字改黑色
+*/

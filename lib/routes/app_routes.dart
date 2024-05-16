@@ -5,6 +5,7 @@ import '../presentation/login_screen/login_screen.dart'; // 引入登入頁面�
 import '../presentation/register_screen/register_screen.dart'; // 引入註冊頁面組件
 import '../presentation/welcome_screen/welcome_screen.dart'; // 引入歡迎頁面組件
 import '../presentation/diarymain_screen/diarymain_screen.dart'; // 引入日記頁面組件
+import '../presentation/AddDiary_screen/AddDiary_screen.dart'; // 引入日記頁面組件
 
 // ignore_for_file: must_be_immutable  // 忽略不可變性的警告，通常不建議在生產代碼中使用
 
@@ -16,6 +17,8 @@ class AppRoutes {
   static const String forgetpwdScreen = '/forgetpwd_screen';
   static const String registerScreen = '/register_screen';
   static const String diaryMainScreen = '/diary_main_screen';
+  static const String addDiaryScreen = '/AddDiary_screen';
+  
   // 路由表，將路由名稱映射到對應的頁面建造者
   static Map<String, WidgetBuilder> routes = {
     welcomeScreen: (context) => WelcomeScreen(), // 歡迎頁面
@@ -23,5 +26,6 @@ class AppRoutes {
     forgetpwdScreen: (context) => ForgetpwdScreen(), // 忘記密碼頁面
     registerScreen: (context) => RegisterScreen(), // 註冊頁面
     diaryMainScreen: (context) => DiaryMainScreen(), // 日記頁面
+    addDiaryScreen: (context) => AddDiaryScreen(),
   };
 }

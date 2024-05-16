@@ -38,6 +38,7 @@ class ForgetpwdScreen extends StatelessWidget {
               CustomTextFormField(
                 controller: emailaddressController, // 關聯控制器
                 hintText: "電子郵件地址...", // 提示文字
+                textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色ㄇ
                 textInputAction: TextInputAction.done, // 輸入完成後的操作
                 // 設定前綴圖標
                 prefix: Container(

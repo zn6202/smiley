@@ -236,6 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return CustomTextFormField(
       controller: emailAddressController,
       hintText: "email...",
+      textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色
       prefix: Container(
         margin: EdgeInsets.fromLTRB(20.h, 11.v, 10.h, 11.v),
         child: CustomImageView(
@@ -255,6 +256,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return CustomTextFormField(
       controller: passwordOneController,
       hintText: "password...",
+      textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色
       textInputAction: TextInputAction.done,
       textInputType: TextInputType.visiblePassword,
       prefix: Container(
@@ -296,6 +298,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return CustomTextFormField(
       controller: confirmPasswordController,
       hintText: "confirm password...",
+      textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色ㄇ
       textInputAction: TextInputAction.done,
       textInputType: TextInputType.visiblePassword,
       prefix: Container(
