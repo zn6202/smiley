@@ -46,9 +46,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             top: 19.v,
             bottom: 19.v,
           ),
-          // 點擊返回按鈕時，呼叫 `onTapArrowleftone` 函數返回上一頁
+          // 點擊返回按鈕時，呼叫 `showExitConfirmationDialog` 函數顯示對話框。
           onTap: () {
-            onTapArrowleftone(context);
+            showExitConfirmationDialog(context);
           },
         ),
       ),
@@ -73,13 +73,15 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                   keyboardType: TextInputType.multiline, // 設置輸入類型為多行文本。
                   decoration: InputDecoration(
                     border: InputBorder.none, // 無邊框樣式。
-                    hintText: '說說你的心情吧', // 提示文字。
+                    hintText: '說說你的心情吧...', // 提示文字。
                   ),
                   style: TextStyle(fontSize: 16), // 文本樣式。
                 ),
               ),
             ),
-            SizedBox(height: 8), // 調整間距，使按鈕向上移動。
+            SizedBox(height: 16), // 添加垂直間距。
+            // 使用 Spacer 元件將按鈕向上推。
+            Spacer(flex: 1),
             // 中間對齊的完成按鈕。
             Center(
               child: ElevatedButton(
@@ -101,20 +103,45 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                 ),
               ),
             ),
+            SizedBox(height: 16), // 確保按鈕下方有足夠間距。
           ],
         ),
       ),
     );
   }
 
-  // 返回按鈕的點擊事件，使用 Navigator 導航返回上一頁。
-  void onTapArrowleftone(BuildContext context) {
-    Navigator.pop(context);
+  // 顯示返回確認對話框。
+  void showExitConfirmationDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('返回首頁確認'),
+          content: Text('按下返回鍵後，無法儲存日記內容。您確認您要返回嗎？'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 關閉對話框，繼續編輯。
+              },
+              child: Text('繼續編輯'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 關閉對話框。
+                Navigator.of(context).pop(); // 返回上一頁。
+              },
+              child: Text('返回'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }
 
 
 /*
-1. 將按鈕往上移一點 
-2. 未連接資料庫
-*/
+1. 未連接資料庫
+2. 未將返回dialog改成設計樣式
+3. 未加入繳交dialog
+ */

@@ -5,6 +5,7 @@ import '../../core/app_export.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 // 匯入國際化工具套件，用於日期格式化。
 import 'package:intl/intl.dart';
+import '../../widgets/bottom_navigation.dart'; // 引用自訂的 BottomNavigationBar
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
@@ -27,6 +28,7 @@ class DiaryMainScreen extends StatefulWidget {
 class _DiaryMainScreenState extends State<DiaryMainScreen> {
   // 儲存當前選定日期的變數，初始化為今天。
   DateTime? selectedDate = DateTime.now();
+  int _currentIndex = 0;
 
   @override
   // 構建主要小部件結構。
@@ -52,6 +54,16 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+            // 根據選擇的頁面更新日記頁面
+            // 這裡您可以根據需求進行導航或其他操作
+          });
+        },
       ),
     );
   }
@@ -139,9 +151,3 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
     Navigator.pushNamed(context, AppRoutes.addDiaryScreen);
   }
 }
-
-
-/*
-1. _buildAddDiary()區未實現圓角 (有寫但看不出來)
-2. 按鈕圖示改figma設計 (有換過路徑 但無法顯示)
-*/
