@@ -69,3 +69,5 @@ class WelcomeScreen extends StatelessWidget {
     Navigator.pushNamed(context, AppRoutes.loginScreen);
   }
 }
+
+/*如何讓此頁在Loading時顯現 */

@@ -28,7 +28,7 @@ class DiaryMainScreen extends StatefulWidget {
 class _DiaryMainScreenState extends State<DiaryMainScreen> {
   // 儲存當前選定日期的變數，初始化為今天。
   DateTime? selectedDate = DateTime.now();
-  int _currentIndex = 0;
+  int _currentIndex = 2;
 
   @override
   // 構建主要小部件結構。
@@ -151,3 +151,10 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
     Navigator.pushNamed(context, AppRoutes.addDiaryScreen);
   }
 }
+
+/*
+ 1. 加入圖標改圓形
+ 2. 最上排白標移除
+ 3. 圓角
+ 4. 日記資料庫整合
+ */

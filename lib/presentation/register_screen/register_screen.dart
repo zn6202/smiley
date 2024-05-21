@@ -6,7 +6,6 @@ import '../../widgets/custom_text_form_field.dart'; // 自訂的文字輸入欄�
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../diarymain_screen/diarymain_screen.dart';
 
 
 // 忽略檔案錯誤: 必須是不可變的
@@ -46,10 +45,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // 這裡您可以添加任何註冊成功後的後續操作
         print('註冊成功! 使用者的ID: ${credential.user?.uid}');
         // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => DiaryMainScreen()),
-        );
+        Navigator.pushNamed(context, AppRoutes.setNamePhoto);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') { // 至少6個字元
@@ -96,10 +92,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
-      );
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } catch (e) {
       print('Google sign in error: $e');
       // 處理登入錯誤
@@ -416,3 +409,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 
 }
+
+/* 
+1. 可視不可視圖標大小有差
+2. 拉掉FB icon
+3. 密碼註冊規則提醒
+ */

@@ -10,12 +10,14 @@ dependencies:
     sdk: flutter
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
-  intl: ^0.19.0
+  intl: ^0.18.1
   connectivity_plus: ^5.0.2
   calendar_date_picker2: ^1.0.2
   firebase_core: ^2.31.0
   firebase_auth: ^4.19.5
   google_sign_in: ^6.2.1
+  image_picker: ^0.8.4+4
+  provider: ^6.0.3
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
@@ -24,7 +26,17 @@ flutter:
   assets: 
     - assets/
     - assets/images/
-    - assets/images/img_AddDiary.svg
+    - assets/images/diary_on.png
+    - assets/images/diary_off.png
+    - assets/images/setting_on.png
+    - assets/images/setting_off.png
+    - assets/images/social_on.png
+    - assets/images/social_off.png
+    - assets/images/analyze_on.png
+    - assets/images/analyze_off.png
+    - assets/images/chatRobot_on.png
+    - assets/images/chatRobot_off.png
+    - assets/images/default_avatar.png
   fonts: 
     - family: Inter
       fonts: 
