@@ -29,7 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // 錯誤訊息
   String? errorMessage;
 
-  void createUserWithEmailAndPassword() async {
+  Future<void> createUserWithEmailAndPassword() async {
     try {
       if (passwordOneController.text.trim() != confirmPasswordController.text.trim()) {
         setState(() {

@@ -35,7 +35,10 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text.trim(),
       );
       print('登入成功! 使用者的ID: ${credential.user?.uid}');
-      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      );
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = '帳號密碼輸入錯誤';

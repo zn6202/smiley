@@ -6,6 +6,11 @@ import '../../widgets/app_bar/custom_app_bar.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_text_form_field.dart';
 
+
+import 'package:firebase_auth/firebase_auth.dart';
+import '../login_screen/login_screen.dart';
+
+
 // 忽略「不可變」的警告
 // ignore_for_file: must_be_immutable
 
@@ -16,6 +21,16 @@ class ForgetpwdScreen extends StatelessWidget {
   // 建立電子郵件地址的文字編輯控制器
   TextEditingController emailaddressController = TextEditingController();
 
+  // 發送驗證信至該 email
+  Future<void> sendPasswordResetLink(context) async{
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: emailaddressController.text.trim()
+      );
+    } catch (e) {
+      print(e.toString);
+    }
+  }
   /// 構建畫面
   @override
   Widget build(BuildContext context) {
@@ -59,10 +74,11 @@ class ForgetpwdScreen extends StatelessWidget {
               // 發送驗證碼按鈕
               CustomElevatedButton(
                 width: 114.h, // 設定按鈕寬度
-                text: "發送驗證碼", // 按鈕文字
-                // 點擊按鈕時，呼叫 `_onSendVerificationCode` 函數
+                text: "發送驗證信", // 按鈕文字
                 onPressed: () {
-                  _onSendVerificationCode(context);
+                  sendPasswordResetLink(context); //發送驗證信
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text("驗證信已發送至該電子信箱")));
+                  Navigator.pop(context,MaterialPageRoute(builder: (context) => LoginScreen()),); // 跳回 loginScreen
                 },
               ),
               // 設定垂直間距
@@ -99,10 +115,7 @@ class ForgetpwdScreen extends StatelessWidget {
     );
   }
 
-  /// 預留的發送驗證碼函數
-  void _onSendVerificationCode(BuildContext context) {}
-
-  /// 返回到上一個畫面
+  // 返回到上一個畫面
   void onTapArrowleftone(BuildContext context) {
     Navigator.pop(context); // 使用 Navigator 導航返回
   }

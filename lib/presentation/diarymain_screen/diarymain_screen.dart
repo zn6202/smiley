@@ -148,6 +148,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 
   // 顯示新增日記頁面的函數。
   void _showAddDiaryScreen(BuildContext context) {
+    
     Navigator.pushNamed(context, AppRoutes.addDiaryScreen);
   }
 }
