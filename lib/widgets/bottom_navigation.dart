@@ -34,7 +34,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   }
 
   void _onTap(int index) {
-    if (index == 2) {
+    if (index == 4) {
       _handleLogout(context);
     } else {
       widget.onTap(index);
