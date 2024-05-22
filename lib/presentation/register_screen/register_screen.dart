@@ -50,7 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') { // 至少6個字元
         setState(() {
-          errorMessage = '提供的密碼太弱';
+          errorMessage = '提供的密碼太弱 (至少 6 碼)';
         });
       } else if (e.code == 'email-already-in-use') {
         setState(() {
