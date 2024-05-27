@@ -2,41 +2,92 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../../core/app_export.dart';
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import '../../routes/user.dart';
+import 'dart:convert'; // for jsonDecode
 
-// 定義一個無狀態小部件 SetNamePhotoApp
 class SetNamePhotoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SetNamePhoto(), // 設定首頁為 SetNamePhoto
+      home: SetNamePhoto(),
     );
   }
 }
 
-// 定義一個有狀態的小部件 SetNamePhoto
 class SetNamePhoto extends StatefulWidget {
   @override
   _SetNamePhotoState createState() => _SetNamePhotoState();
 }
 
-// 定義一個方法，用於完成後跳轉到日記主頁
-void addComplete(BuildContext context) {
-  Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
-}
-
-// 定義 SetNamePhoto 的狀態類
 class _SetNamePhotoState extends State<SetNamePhoto> {
-  final TextEditingController _controller = TextEditingController(); // 控制文本輸入的控制器
-  File? _image; // 用於存儲選擇的圖片文件
+  final TextEditingController _controller = TextEditingController();
+  File? _image;
+  String? firebaseId;
+  final picker = ImagePicker();
 
-  // 定義一個異步方法，用於從相冊中選擇圖片
+  void addComplete() async {
+    // 獲取 Firebase 使用者 ID
+    firebaseId = ModalRoute.of(context)!.settings.arguments as String?;
+    if (firebaseId == null) {
+      print('Error: firebaseId is null');
+      return;
+    }
+
+    final uri = Uri.parse(API.user);
+    print('Sending request to: $uri');
+
+    var request = http.MultipartRequest('POST', uri);
+
+    // 創建 User 對象
+    User user = User(
+      0, // 假設 ID 在此階段不重要
+      firebaseId!,
+      _controller.text.trim(),
+      _image != null ? _image!.path.split('/').last : 'default_avatar.png', // 取得圖片名稱
+    );
+
+    // 添加文本字段到請求
+    user.toJson().forEach((key, value) {
+      request.fields[key] = value.toString();
+    });
+
+    print('Request fields: ${request.fields}');
+
+    if (_image != null) {
+      var pic = await http.MultipartFile.fromPath("photo", _image!.path);
+      request.files.add(pic);
+      print('Image Path: ${_image!.path}');
+    } else {
+      request.fields['default_photo'] = 'true'; // 標識使用默認圖片
+      print('Using default image: default_avatar.png');
+    }
+
+    var response = await request.send();
+
+    if (response.statusCode == 200) {
+      var responseData = await http.Response.fromStream(response);
+      var result = jsonDecode(responseData.body);
+
+      if (result['success'] == true) {
+        print("Congratulations, you are SignUp Successfully.");
+      } else {
+        print("Error Occurred: ${result['message']}");
+      }
+    } else {
+      print('Failed to upload image, status code: ${response.statusCode}');
+    }
+  }
+
+
+
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery); // 從相冊中選擇圖片
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
       setState(() {
-        _image = File(pickedFile.path); // 如果選擇了圖片，更新狀態
+        _image = File(pickedFile.path);
       });
     }
   }
@@ -44,80 +95,81 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5DC), // 設定背景顏色
+      backgroundColor: Color(0xFFF5F5DC),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // 垂直方向居中
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Stack(
               children: [
                 CircleAvatar(
-                  radius: 50, // 設定圓形頭像的半徑
+                  radius: 50,
                   backgroundImage: _image != null
-                      ? FileImage(_image!) // 如果有選擇圖片，顯示選擇的圖片
+                      ? FileImage(_image!)
                       : AssetImage('assets/images/default_avatar.png')
-                          as ImageProvider, // 否則顯示默認頭像
+                          as ImageProvider,
                 ),
                 Positioned(
                   bottom: 0,
                   right: 0,
                   child: GestureDetector(
-                    onTap: _pickImage, // 點擊時調用 _pickImage 方法
+                    onTap: _pickImage,
                     child: CircleAvatar(
-                      radius: 15, // 設定小圓形圖標的半徑
-                      backgroundColor: Colors.white, // 背景顏色為白色
+                      radius: 15,
+                      backgroundColor: Colors.white,
                       child: Icon(
-                        Icons.camera_alt, // 相機圖標
-                        color: Color(0xFFA7BA89), // 圖標顏色
-                        size: 20, // 圖標大小
+                        Icons.camera_alt,
+                        color: Color(0xFFA7BA89),
+                        size: 20,
                       ),
                     ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20), // 增加垂直間距
+            SizedBox(height: 20),
             Container(
               width: 254,
               height: 44,
               child: TextField(
-                controller: _controller, // 綁定文本輸入控制器
-                textAlignVertical: TextAlignVertical.center, // 垂直方向居中
+                controller: _controller,
+                textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person, color: Color(0xFFA7BA89)), // 前置圖標
-                  hintText: 'me', // 提示文字
+                  prefixIcon: Icon(Icons.person, color: Color(0xFFA7BA89)),
+                  hintText: 'me',
                   filled: true,
-                  fillColor: Colors.white, // 背景顏色
-                  contentPadding: EdgeInsets.symmetric(vertical: 0), // 調整內邊距以垂直居中
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(vertical: 0),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20), // 圓角邊框
-                    borderSide: BorderSide.none, // 無邊框線
+                    borderRadius: BorderRadius.circular(20),
+                    borderSide: BorderSide.none,
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20), // 增加垂直間距
+            SizedBox(height: 20),
             Container(
               width: 114,
               height: 40,
               child: ElevatedButton(
                 onPressed: () {
-                  addComplete(context); // 點擊按鈕時調用 addComplete 方法
-                  print("用戶名: ${_controller.text}"); // 在控制台打印用戶名
+                  addComplete();
+                  print("用戶名: ${_controller.text}");
+                  Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
                 },
                 child: Text(
-                  '確認更改', // 按鈕文字
+                  '確認更改',
                   style: TextStyle(
                     fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600, // 半粗體
+                    fontWeight: FontWeight.w600,
                     fontSize: 18,
-                    color: Colors.white, // 文字顏色
+                    color: Colors.white,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFA7BA89), // 按鈕背景顏色
+                  backgroundColor: Color(0xFFA7BA89),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // 圓角按鈕
+                    borderRadius: BorderRadius.circular(20),
                   ),
                 ),
               ),
@@ -128,8 +180,3 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     );
   }
 }
-
-/*
-1. 三元件間的寬度與大小未調
-2. 未連接資料庫
-*/

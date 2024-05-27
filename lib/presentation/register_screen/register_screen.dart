@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 
+
 // 忽略檔案錯誤: 必須是不可變的
 // ignore_for_file: must_be_immutable
 class RegisterScreen extends StatefulWidget {
@@ -28,6 +29,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   // 錯誤訊息
   String? errorMessage;
+  String? firebaseId;
 
   Future<void> createUserWithEmailAndPassword() async {
     try {
@@ -43,9 +45,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         );
         // 如果成功建立新帳戶，credential 將包含用戶的驗證資訊
         // 這裡您可以添加任何註冊成功後的後續操作
-        print('註冊成功! 使用者的ID: ${credential.user?.uid}');
+        firebaseId = credential.user?.uid;
+        print('註冊成功! 使用者的ID: ${firebaseId}');
         // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
-        Navigator.pushNamed(context, AppRoutes.setNamePhoto);
+        Navigator.pushNamed(context, AppRoutes.setNamePhoto, arguments:firebaseId);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') { // 至少6個字元
@@ -88,7 +91,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-
+      firebaseId = credential.idToken;
+      print("註冊成功! 使用者的ID: ${firebaseId}");
       await FirebaseAuth.instance.signInWithCredential(credential);
 
       // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
@@ -99,6 +103,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // 可以顯示錯誤訊息給用戶或者執行其他處理邏輯
     }
   }
+
+
   // 全局表單鍵
   GlobalKey<FormState> _formKey = GlobalKey<FormState>(); // 表單鍵全局鍵
   bool isPasswordVisible = false;

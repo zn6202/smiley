@@ -26,6 +26,10 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   // 用於保存選定的日期，初始為當前日期。
   DateTime? selectedDate = DateTime.now();
 
+  void submitDiary(context){
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,6 +91,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               child: ElevatedButton(
                 // 按鈕的點擊事件，目前未設置具體功能。
                 onPressed: () {
+                  submitDiary(context);
                   // Add your onPressed functionality here
                 },
                 style: ElevatedButton.styleFrom(
@@ -144,4 +149,5 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 1. 未連接資料庫
 2. 未將返回dialog改成設計樣式
 3. 未加入繳交dialog
+4. 提示文字(說說你的心情吧)，改成用灰色
  */
