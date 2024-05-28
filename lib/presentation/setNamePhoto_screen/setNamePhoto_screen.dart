@@ -4,7 +4,7 @@ import 'dart:io';
 import '../../core/app_export.dart';
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
-import '../../routes/user.dart';
+import '../../routes/user.dart'; // user model
 import 'dart:convert'; // for jsonDecode
 
 class SetNamePhotoApp extends StatelessWidget {
@@ -28,16 +28,15 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   final picker = ImagePicker();
 
   void addComplete() async {
-    // 獲取 Firebase 使用者 ID
-    firebaseId = ModalRoute.of(context)!.settings.arguments as String?;
+
+    firebaseId = ModalRoute.of(context)!.settings.arguments as String?;  // 獲取 Firebase UID
     if (firebaseId == null) {
       print('Error: firebaseId is null');
       return;
     }
 
-    final uri = Uri.parse(API.user);
+    final uri = Uri.parse(API.user);  // user.php
     print('Sending request to: $uri');
-
     var request = http.MultipartRequest('POST', uri); // 對 user.php 發送 POST 請求
 
     // 創建 User 對象
