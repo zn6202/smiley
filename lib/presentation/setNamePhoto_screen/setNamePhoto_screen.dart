@@ -38,11 +38,11 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     final uri = Uri.parse(API.user);
     print('Sending request to: $uri');
 
-    var request = http.MultipartRequest('POST', uri);
+    var request = http.MultipartRequest('POST', uri); // 對 user.php 發送 POST 請求
 
     // 創建 User 對象
     User user = User(
-      0, // 假設 ID 在此階段不重要
+      0,
       firebaseId!,
       _controller.text.trim(),
       _image != null ? _image!.path.split('/').last : 'default_avatar.png', // 取得圖片名稱
@@ -50,14 +50,14 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
 
     // 添加文本字段到請求
     user.toJson().forEach((key, value) {
-      request.fields[key] = value.toString();
+      request.fields[key] = value;
     });
-
     print('Request fields: ${request.fields}');
 
     if (_image != null) {
-      var pic = await http.MultipartFile.fromPath("photo", _image!.path);
-      request.files.add(pic);
+      print(_image!.path);
+      var pic = await http.MultipartFile.fromPath("photo", _image!.path); // 選擇的圖片數據
+      request.files.add(pic); // 加到 http 請求文件上
       print('Image Path: ${_image!.path}');
     } else {
       request.fields['default_photo'] = 'true'; // 標識使用默認圖片
@@ -79,8 +79,6 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       print('Failed to upload image, status code: ${response.statusCode}');
     }
   }
-
-
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
