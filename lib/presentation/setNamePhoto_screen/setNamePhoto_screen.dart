@@ -44,7 +44,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       0,
       firebaseId!,
       _controller.text.trim(),
-      _image != null ? _image!.path.split('/').last : 'default_avatar.png', // 取得圖片名稱
+      _image != null ? _image!.path.split('/').last : 'default_avatar.png',
     );
 
     // 添加文本字段到請求
@@ -54,7 +54,6 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     print('Request fields: ${request.fields}');
 
     if (_image != null) {
-      print(_image!.path);
       var pic = await http.MultipartFile.fromPath("photo", _image!.path); // 選擇的圖片數據
       request.files.add(pic); // 加到 http 請求文件上
       print('Image Path: ${_image!.path}');
