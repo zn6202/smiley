@@ -418,6 +418,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
 /* 
 1. 可視不可視圖標大小有差
-2. 拉掉FB icon
+2. fb 註冊鈕刪掉
 3. 密碼註冊規則提醒
+4. google 註冊後，要連到 setNamePhoto_screen.dart
  */

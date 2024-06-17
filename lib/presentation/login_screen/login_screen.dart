@@ -355,7 +355,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 /*
 1. 可視不可視圖標大小統一
-2. 只能用最新登入過的 google 登入註冊
-3. logo 被切掉
-4. 畫面縮放
+2. logo 被切掉
+3. 畫面縮放
+4. fb 登入鈕刪掉
 */
