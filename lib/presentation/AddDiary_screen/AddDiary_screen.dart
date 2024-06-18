@@ -133,7 +133,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // 關閉對話框。
-                Navigator.of(context).pop(); // 返回上一頁。
+                 Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
               },
               child: Text('返回'),
             ),
