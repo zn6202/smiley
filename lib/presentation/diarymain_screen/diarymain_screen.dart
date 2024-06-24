@@ -60,8 +60,6 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
-            // 根據選擇的頁面更新日記頁面
-            // 這裡您可以根據需求進行導航或其他操作
           });
         },
       ),

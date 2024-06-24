@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../main.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
@@ -17,25 +15,11 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   late int _currentIndex = widget.currentIndex;
 
-  Future<bool> _handleLogout(BuildContext context) async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      print("登出成功");
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => MyApp()),
-        (route) => false,
-      );
-      return true;
-    } catch (e) {
-      print('signOut->$e');
-      return false;
-    }
-  }
-
   void _onTap(int index) {
     if (index == 4) {
-      _handleLogout(context);
+      Navigator.pushNamed(context, AppRoutes.Setting);
+    } else if (index == 2) {
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } else {
       widget.onTap(index);
     }
