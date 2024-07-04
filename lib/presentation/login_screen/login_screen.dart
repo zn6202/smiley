@@ -1,3 +1,4 @@
+import 'dart:convert'; //jsonDecode
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -7,6 +8,9 @@ import '../../widgets/custom_text_form_field.dart'; // 忽略文件: 必須是�
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../diarymain_screen/diarymain_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../../routes/api_connection.dart';
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -27,6 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   // 錯誤訊息
   String? errorMessage;
+  String? firebaseId;
 
   void signInWithEmailAndPassword() async {
     try {
@@ -35,6 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
         password: passwordController.text.trim(),
       );
       print('登入成功! 使用者的ID: ${credential.user?.uid}');
+
+      // 從伺服器獲取 user_id 並存儲到 SharedPreferences
+      await _fetchAndSaveUserId(credential.user?.uid);
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => DiaryMainScreen()),
@@ -46,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // google 註冊(如果已經註冊過就會直接登入)
+  // google 登入(如果已經註冊過就會直接登入)
   Future<void> signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -58,8 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-
+      firebaseId = credential.idToken;
+      print("登入成功! 使用者的ID: ${firebaseId}");
       await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // 從伺服器獲取 user_id 並存儲到 SharedPreferences
+      await _fetchAndSaveUserId(firebaseId);
 
       // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
       Navigator.pushReplacement(
@@ -70,6 +83,32 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Google sign in error: $e');
       // 處理登入錯誤
       // 可以顯示錯誤訊息給用戶或者執行其他處理邏輯
+    }
+  }
+
+  Future<void> _fetchAndSaveUserId(String? firebaseUid) async {
+    final response = await http.post(
+      Uri.parse(API.getUid), // 替換為你的 API 路徑
+      body: {
+        'firebase_user_id': firebaseUid,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var responseData = jsonDecode(response.body);
+      if (responseData['success'] == true) {
+        int userId = responseData['user_id'];
+        
+        // 存儲 user_id 到 SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_id', userId.toString());
+
+        print('user_id 儲存成功: $userId');
+      } else {
+        print('伺服器返回錯誤: ${responseData['message']}');
+      }
+    } else {
+      print('請求失敗，狀態碼: ${response.statusCode}');
     }
   }
 

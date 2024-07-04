@@ -157,5 +157,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
  1. 加入圖標改圓形
  2. 最上排白標移除
  3. 圓角
- 4. 日記資料庫整合
+ 4. 非當日之前的日記顯示畫面
+    o 有日記 -> 日記內容
+    o 無日記 -> ???
  */

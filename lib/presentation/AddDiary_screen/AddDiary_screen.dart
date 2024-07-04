@@ -5,6 +5,12 @@ import '../../core/app_export.dart';
 // 匯入國際化工具套件，用於日期格式化。
 import 'package:intl/intl.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart';
+// http
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
@@ -26,8 +32,51 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   // 用於保存選定的日期，初始為當前日期。
   DateTime? selectedDate = DateTime.now();
 
-  void submitDiary(context){
-    
+  // 抓取當前 user_id
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
+  // 替換日記內容中的換行符為空格
+  String _formatContent(String content) {
+    return content.replaceAll('\n', ' ');
+  }
+
+  void submitDiary(BuildContext context) async {
+    final String content = _formatContent(_textController.text);
+    final String date = DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
+
+    // 獲取 user_id
+    final String? userId = await getUserId();
+
+    if (userId == null) {
+      // 處理 user_id 為空的情況
+      print('Error: user_id is null');
+      return;
+    }
+
+    print("進入提交日記函式");
+    final response = await http.post( // await 等待完成。 ex:等 post 完成再開始執行 69 行
+      Uri.parse(API.diary), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userId,
+        'content': content,
+        'date': date,
+      },
+    );
+
+    // print('Response body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      // 修改 73 -> 顯示完成分析對話框
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+      print('日記提交成功!');
+    } else {
+      // 修改 77 -> ???
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+      print('日記提交失敗...');
+    }
   }
 
   @override
@@ -91,8 +140,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               child: ElevatedButton(
                 // 按鈕的點擊事件，目前未設置具體功能。
                 onPressed: () {
-                  submitDiary(context);
-                  // Add your onPressed functionality here
+                  // 顯示等待分析對話框
+                  submitDiary(context); // 完成"日記"、"分析"、"小天使小怪獸" 的後端
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor, // 設置按鈕的背景色。
@@ -146,8 +195,13 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 
 
 /*
-1. 未連接資料庫
-2. 未將返回dialog改成設計樣式
-3. 未加入繳交dialog
-4. 提示文字(說說你的心情吧)，改成用灰色
+1. 未將返回dialog改成設計樣式
+2. 未加入繳交dialog
+3. 提示文字(說說你的心情吧)，改成用灰色
  */
+
+/*
+1. 日記打很長的時候，發現能瀏覽的範圍很小。
+2. 按"完成"後，出現等待畫面 (143 修改) -> 進入後端 -> 提交跟分析完成後，出現分析完成畫面 (73 77 修改)
+3. 等待結束後，要能顯示日記跟小天使小怪獸。
+*/

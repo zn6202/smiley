@@ -6,6 +6,8 @@ import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import '../../routes/user.dart'; // user model
 import 'dart:convert'; // for jsonDecode
+// 處理回應並存儲 user_id
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SetNamePhotoApp extends StatelessWidget {
   @override
@@ -27,8 +29,18 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   String? firebaseId;
   final picker = ImagePicker();
 
-  void addComplete() async {
+  Future<void> saveUserId(String userId) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_id', userId);
+    print("usesr_id: $userId");
+  }
 
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
+  void addComplete() async {
     firebaseId = ModalRoute.of(context)!.settings.arguments as String?;  // 獲取 Firebase UID
     if (firebaseId == null) {
       print('Error: firebaseId is null');
@@ -69,6 +81,8 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       var result = jsonDecode(responseData.body);
 
       if (result['success'] == true) {
+        String userId = result['user_id'].toString();
+        await saveUserId(userId);
         print("Congratulations, you are SignUp Successfully.");
       } else {
         print("Error Occurred: ${result['message']}");
