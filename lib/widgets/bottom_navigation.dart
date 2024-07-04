@@ -36,7 +36,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   void _onTap(int index) {
     if (index == 4) {
       // _handleLogout(context);
-      Navigator.pushNamed(context, AppRoutes.Setting);
+      // Navigator.pushNamed(context, AppRoutes.Setting);
     } else if (index == 2) {
       Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } else if (index == 3) {

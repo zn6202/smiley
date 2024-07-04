@@ -41,6 +41,10 @@ flutter:
     - assets/images/chatRobot_on.png
     - assets/images/chatRobot_off.png
     - assets/images/default_avatar.png
+    - assets/images/Record.png
+    - assets/images/friend.png
+    - assets/images/edit.png
+    - assets/images/notify.png
   fonts: 
     - family: Inter
       fonts: 

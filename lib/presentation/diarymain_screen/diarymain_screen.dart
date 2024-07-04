@@ -6,6 +6,8 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 // 匯入國際化工具套件，用於日期格式化。
 import 'package:intl/intl.dart';
 import '../../widgets/bottom_navigation.dart'; // 引用自訂的 BottomNavigationBar
+import 'dart:convert'; // 用於 JSON 處理
+import 'package:http/http.dart' as http; // 用於 HTTP 請求
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
@@ -35,24 +37,24 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       // Scaffold 提供一個架構以布局主要組件。
+      backgroundColor: calendarBackgroundColor, // 將背景顏色設置為日曆底色
       body: Container(
-        color: Colors.white, // 整個螢幕的背景顏色。
-        child: SafeArea(
-          // SafeArea 確保內容顯示在顯示器安全區域邊界內。
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // 在列中居中對齊內容。
-            children: [
-              // 每個子元件均分屏幕空間。
-              Expanded(
-                flex: 1,
-                child: _buildCalendar(), // 構建並顯示日曆的小部件。
+        color: calendarBackgroundColor, // 設定整個螢幕的背景顏色為日曆背景顏色。
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center, // 在列中居中對齊內容。
+          children: [
+            // 每個子元件均分屏幕空間。
+            Expanded(
+              flex: 1,
+              child: Center(
+                child: _buildCalendar(), // 構建並顯示日曆的小部件，垂直居中。
               ),
-              Expanded(
-                flex: 1,
-                child: _buildAddDiary(), // 構建並顯示日記條目介面的小部件。
-              ),
-            ],
-          ),
+            ),
+            Expanded(
+              flex: 1,
+              child: _buildAddDiary(), // 構建並顯示日記條目介面的小部件。
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
@@ -60,8 +62,6 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
-            // 根據選擇的頁面更新日記頁面
-            // 這裡您可以根據需求進行導航或其他操作
           });
         },
       ),
@@ -115,6 +115,10 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 
   // 構建新增日記小部件的函數。
   Widget _buildAddDiary() {
+    bool isToday = selectedDate != null &&
+        selectedDate!.year == DateTime.now().year &&
+        selectedDate!.month == DateTime.now().month &&
+        selectedDate!.day == DateTime.now().day;  // 判斷選定日期是否為今天。
     return Container(
       decoration: BoxDecoration(
         color: addDiaryBackgroundColor,
@@ -131,13 +135,28 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
             ),
             Expanded(
               child: Center(
-                child: FloatingActionButton(
-                  onPressed: () {
-                    _showAddDiaryScreen(context); // 按鈕動作觸發顯示底部彈窗。
-                  }, // 按鈕動作的佔位處理。
-                  child: Icon(Icons.add, size: 30), // 按鈕的圖標。
-                  backgroundColor: primaryColor, // 按鈕的背景顏色。
-                ),
+                child: isToday
+                  ? FloatingActionButton(
+                    onPressed: () {
+                      _showAddDiaryScreen(context); // 按鈕動作觸發顯示底部彈窗。
+                    }, // 按鈕動作的佔位處理。
+                    child: Icon(Icons.add, size: 30), // 按鈕的圖標。
+                    backgroundColor: primaryColor, // 按鈕的背景顏色。
+                  )
+                : FutureBuilder<Map<String, dynamic>>(
+                    future: _fetchDiaryData(selectedDate!), // 從後端獲取日記數據
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)), // 設置加載圓圈的顏色
+                        ); // 加載中顯示旋轉指示器
+                      } else if (snapshot.hasData && snapshot.data != null) {
+                        return Text(snapshot.data!['diary']['content']); // 顯示日記內容
+                      } else {
+                        return Text(''); // 無數據顯示提示
+                      }
+                    },
+                  ),
               ),
             ),
           ],
@@ -148,16 +167,31 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 
   // 顯示新增日記頁面的函數。
   void _showAddDiaryScreen(BuildContext context) {
-    
     Navigator.pushNamed(context, AppRoutes.addDiaryScreen);
+  }
+
+  // 從後端獲取日記數據的函數
+  Future<Map<String, dynamic>> _fetchDiaryData(DateTime date) async {
+    final dateString = DateFormat('yyyy-MM-dd').format(date);
+    final response = await http.get(Uri.parse('http://192.168.56.1/smiley_backend/diaries?date=$dateString'));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['diary'] != null && data['diary']['content'] != null) {
+        return data;
+      } else {
+        return {};
+      }
+    } else {
+      throw Exception('Failed to load diary data');
+    }
   }
 }
 
+
 /*
- 1. 加入圖標改圓形
- 2. 最上排白標移除
- 3. 圓角
- 4. 非當日之前的日記顯示畫面
-    o 有日記 -> 日記內容
-    o 無日記 -> ???
+ 1. 改圓形按鈕
+ 2. 非當日之前的日記顯示畫面
+    o 有日記 -> 日記內容 (等候端串接 再來修改內容顯示格式等)
+    o 無日記 -> ??? (目前無顯示東西 等組內開會與大家討論)
  */
