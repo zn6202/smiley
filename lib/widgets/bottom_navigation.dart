@@ -16,7 +16,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
 
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   late int _currentIndex = widget.currentIndex;
-
+  /*
   Future<bool> _handleLogout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
@@ -32,10 +32,17 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       return false;
     }
   }
-
+  */
   void _onTap(int index) {
     if (index == 4) {
-      _handleLogout(context);
+      // _handleLogout(context);
+      Navigator.pushNamed(context, AppRoutes.Setting);
+    } else if (index == 2) {
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+    } else if (index == 3) {
+      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+    } else if (index == 1) {
+      Navigator.pushNamed(context, AppRoutes.setNamePhoto);
     } else {
       widget.onTap(index);
     }

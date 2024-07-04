@@ -8,7 +8,6 @@ import 'core/app_export.dart';
 
 // 導入 Firebase 核心插件和先前產生的設定檔
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 
 // 建立一個全域的 ScaffoldMessengerState 鍵，以用於顯示通知訊息
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
