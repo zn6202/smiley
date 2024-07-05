@@ -45,6 +45,7 @@ flutter:
     - assets/images/friend.png
     - assets/images/edit.png
     - assets/images/notify.png
+    - assets/images/add.png
   fonts: 
     - family: Inter
       fonts: 

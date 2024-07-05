@@ -113,7 +113,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           icon: Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: SizedBox(
-              height: 24.0,
+              height: 32.0,
               width: 24.0,
               child: Image.asset(
                 _currentIndex == 4 ? 'assets/images/setting_on.png' : 'assets/images/setting_off.png',
@@ -127,3 +127,6 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     );
   }
 }
+
+/*
+1. 調整icon大小 */

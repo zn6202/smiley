@@ -112,58 +112,68 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
       ),
     );
   }
-
-  // 構建新增日記小部件的函數。
-  Widget _buildAddDiary() {
-    bool isToday = selectedDate != null &&
-        selectedDate!.year == DateTime.now().year &&
-        selectedDate!.month == DateTime.now().month &&
-        selectedDate!.day == DateTime.now().day;  // 判斷選定日期是否為今天。
-    return Container(
-      decoration: BoxDecoration(
-        color: addDiaryBackgroundColor,
-        borderRadius: BorderRadius.circular(20.0), // 容器的圓角設定。
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0), // 容器內部的填充。
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // 將子元件對齊到列的起始位置。
-          children: [
-            Text(
-              "${DateFormat('yyyy.MM.dd').format(selectedDate ?? DateTime.now())}",
-              style: selectedDateStyle, // 日期文字的樣式。
+// 構建新增日記小部件的函數。
+Widget _buildAddDiary() {
+  bool isToday = selectedDate != null &&
+      selectedDate!.year == DateTime.now().year &&
+      selectedDate!.month == DateTime.now().month &&
+      selectedDate!.day == DateTime.now().day; // 判斷選定日期是否為今天。
+  return Container(
+    decoration: BoxDecoration(
+      color: addDiaryBackgroundColor,
+      borderRadius: BorderRadius.circular(20.0), // 容器的圓角設定。
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16.0), // 容器內部的填充。
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start, // 將子元件對齊到列的起始位置。
+        children: [
+          Text(
+            "${DateFormat('yyyy.MM.dd').format(selectedDate ?? DateTime.now())}",
+            style: selectedDateStyle, // 日期文字的樣式。
+          ),
+          SizedBox(height: 27.0), // 與日期文字之間的距離。
+          Expanded(
+            child: Center(
+              child: isToday
+                  ? GestureDetector(
+                      onTap: () {
+                        _showAddDiaryScreen(context); // 按鈕動作觸發顯示底部彈窗。
+                      },
+                      child: Container(
+                        width: 60, // 按鈕的寬度
+                        height: 60, // 按鈕的高度
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle, // 圓形形狀
+                          image: DecorationImage(
+                            image: AssetImage('assets/images/add.png'), // 替換為您的圖片路徑
+                            fit: BoxFit.cover, // 確保圖片完全填滿容器
+                          ),
+                        ),
+                      ),
+                    )
+                  : FutureBuilder<Map<String, dynamic>>(
+                      future: _fetchDiaryData(selectedDate!), // 從後端獲取日記數據
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)), // 設置加載圓圈的顏色
+                          ); // 加載中顯示旋轉指示器
+                        } else if (snapshot.hasData && snapshot.data != null) {
+                          return Text(snapshot.data!['diary']['content']); // 顯示日記內容
+                        } else {
+                          return Text(''); // 無數據顯示提示
+                        }
+                      },
+                    ),
             ),
-            Expanded(
-              child: Center(
-                child: isToday
-                  ? FloatingActionButton(
-                    onPressed: () {
-                      _showAddDiaryScreen(context); // 按鈕動作觸發顯示底部彈窗。
-                    }, // 按鈕動作的佔位處理。
-                    child: Icon(Icons.add, size: 30), // 按鈕的圖標。
-                    backgroundColor: primaryColor, // 按鈕的背景顏色。
-                  )
-                : FutureBuilder<Map<String, dynamic>>(
-                    future: _fetchDiaryData(selectedDate!), // 從後端獲取日記數據
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)), // 設置加載圓圈的顏色
-                        ); // 加載中顯示旋轉指示器
-                      } else if (snapshot.hasData && snapshot.data != null) {
-                        return Text(snapshot.data!['diary']['content']); // 顯示日記內容
-                      } else {
-                        return Text(''); // 無數據顯示提示
-                      }
-                    },
-                  ),
-              ),
-            ),
-          ],
-        ),
+          ),
+          SizedBox(height: 36.0), // 與底部之間的距離
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
   // 顯示新增日記頁面的函數。
   void _showAddDiaryScreen(BuildContext context) {
@@ -189,9 +199,9 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 }
 
 
+
 /*
- 1. 改圓形按鈕
- 2. 非當日之前的日記顯示畫面
+ 1. 非當日之前的日記顯示畫面
     o 有日記 -> 日記內容 (等候端串接 再來修改內容顯示格式等)
     o 無日記 -> ??? (目前無顯示東西 等組內開會與大家討論)
  */
