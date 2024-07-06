@@ -60,7 +60,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   final TextEditingController _textController = TextEditingController();
   // 用於保存選定的日期，初始為當前日期。
   DateTime? selectedDate = DateTime.now();
-
+  bool isSubmitted = false; // 表示日記是否已提交
+  String submittedContent = ""; // 保存提交的日記內容
   // 抓取當前 user_id
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -73,7 +74,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   }
 
   void submitDiary(BuildContext context) async {
-    waitDialog(context);
+    showWaitingDialog(context);
     final String content = _formatContent(_textController.text);
     final String date =
         DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
@@ -96,9 +97,13 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
         'date': date,
       },
     );
+    Navigator.of(context).pop();
     if (response.statusCode == 200) {
-      Navigator.of(context).pop();
       completeDialog(context);
+      setState(() {
+        isSubmitted = true;
+        submittedContent = content;
+      });
       print('日記提交成功!');
     } else {
       Navigator.of(context).pop();
@@ -107,7 +112,6 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       // 設置主體背景顏色為白色。
@@ -127,7 +131,11 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
           ),
           // 點擊返回按鈕時，呼叫 `showExitConfirmationDialog` 函數顯示對話框。
           onTap: () {
-            showExitConfirmationDialog(context);
+            if (isSubmitted) {
+              Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+            } else {
+              showExitConfirmationDialog(context);
+            }
           },
         ),
       ),
@@ -145,50 +153,160 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             SizedBox(height: 16), // 添加垂直間距。
             // 展開多行文本輸入框，以覆蓋整個頁面
             Expanded(
-              child: TextField(
-                maxLines: null, // 設置輸入框可以多行輸入。
-                controller: _textController, // 綁定文本控制器。
-                keyboardType: TextInputType.multiline, // 設置輸入類型為多行文本。
-                decoration: InputDecoration(
-                  border: InputBorder.none, // 無邊框樣式。
-                  hintText: '說說你的心情吧...', // 提示文字。
-                ),
-                style: TextStyle(fontSize: 16), // 文本樣式。
+              child: Container(
+                alignment: Alignment.topLeft,
+                child: isSubmitted
+                    ? SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              submittedContent, // 顯示已提交的日記內容
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(height: 20), // 添加間距
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                buildEmotionBlock('assets/images/monster_1.png'), //這裡到時候要改成小怪獸演算法函式
+                                buildEmotionBlock('assets/images/monster_2.png'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    : TextField(
+                        maxLines: null, // 設置輸入框可以多行輸入。
+                        controller: _textController, // 綁定文本控制器。
+                        keyboardType: TextInputType.multiline, // 設置輸入類型為多行文本。
+                        decoration: InputDecoration(
+                          border: InputBorder.none, // 無邊框樣式。
+                          hintText: '說說你的心情吧...', // 提示文字。
+                        ),
+                        style: TextStyle(fontSize: 16), // 文本樣式。
+                      ),
               ),
             ),
             // 完成按鈕
-            Center(
-              child: Container(
-                height: 40,
-                width: 114,
-                decoration: ShapeDecoration(
-                  color: Color(0xFFA7BA89),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+            if (!isSubmitted)
+              Center(
+                child: Container(
+                  height: 40,
+                  width: 114,
+                  decoration: ShapeDecoration(
+                    color: Color(0xFFA7BA89),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
                   ),
-                ),
-                child: Center(
-                  child: TextButton(
-                    onPressed: () {
-                      showSaveConfirmationDialog(context); // 完成"日記"、"分析"、"小天使小怪獸" 的後端
-                    },
-                    child: Text(
-                      '完成', // 按鈕上的文字。
-                      textAlign: TextAlign.center,
-                      style: buttonTextStyleWhite,
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () {
+                        showSaveConfirmationDialog(
+                            context); // 完成"日記"、"分析"、"小天使小怪獸" 的後端
+                      },
+                      child: Text(
+                        '完成', // 按鈕上的文字。
+                        textAlign: TextAlign.center,
+                        style: buttonTextStyleWhite,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
             SizedBox(height: 16), // 確保按鈕下方有足夠間距。
           ],
         ),
       ),
     );
   }
+/*
+!!!!小怪獸演算法區域!!!!
+目前先顯示figma上的圖片，之後演算法建立好後 只要呼叫這個 並附上圖片網址即可
+ */
+  Widget buildEmotionBlock(String imageUrl) {
+    return Container(
+      width: 150, // 設置容器寬度
+      height: 246, // 設置容器高度
+      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20), // 設置容器內邊距
+      clipBehavior: Clip.antiAlias, // 防止內容超出邊界
+      decoration: ShapeDecoration(
+        color: Colors.white, // 設置容器背景顏色
+        shape: RoundedRectangleBorder(
+          side: BorderSide(width: 1, color: Color(0xFFC4C4C4)), // 設置邊框顏色和寬度
+          borderRadius: BorderRadius.circular(20), // 設置圓角半徑
+        ),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // 設置列的最小尺寸
+        mainAxisAlignment: MainAxisAlignment.start, // 垂直方向對齊到頂部
+        crossAxisAlignment: CrossAxisAlignment.center, // 水平方向居中對齊
+        children: [
+          SizedBox(
+            width: 106, // 設置文本容器寬度
+            height: 27, // 設置文本容器高度
+            child: Text(
+              '情緒小怪獸', // 顯示標題文本
+              textAlign: TextAlign.center, // 文本居中對齊
+              style: TextStyle(
+                color: Color(0xFFC4C4C4), // 設置文本顏色
+                fontSize: 16, // 設置文本字體大小
+                fontFamily: 'Inter', // 設置字體
+                fontWeight: FontWeight.w700, // 設置字體粗細
+                letterSpacing: -0.32, // 設置字間距
+              ),
+            ),
+          ),
+          Container(
+            width: 126, // 設置圖片容器寬度
+            height: 122, // 設置圖片容器高度
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(imageUrl), // 設置圖片來源
+                fit: BoxFit.fill, // 設置圖片填充方式
+              ),
+            ),
+          ),
+          Container(
+            width: 114, // 設置按鈕容器寬度
+            decoration: ShapeDecoration(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20), // 設置圓角半徑
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min, // 設置行的最小尺寸
+              mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中對齊
+              crossAxisAlignment: CrossAxisAlignment.center, // 垂直方向居中對齊
+              children: [
+                TextButton(
+                  onPressed: () {
+                    // 連到發文頁面
+                  },
+                  child: Text(
+                    '輕觸發文', // 按鈕文本
+                    textAlign: TextAlign.center, // 文本居中對齊
+                    style: TextStyle(
+                      color: Color(0xFFCDCED0), // 設置文本顏色
+                      fontSize: 15, // 設置文本字體大小
+                      fontFamily: 'Inter', // 設置字體
+                      fontWeight: FontWeight.w600, // 設置字體粗細
+                      height: 1.5, // 設置行高
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-  void showExitConfirmationDialog(BuildContext context) {
+
+
+
+  showExitConfirmationDialog(BuildContext context) {
     // 顯示對話框
     showDialog(
       context: context,
@@ -267,8 +385,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                       child: Center(
                         child: TextButton(
                           onPressed: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop(); //回到主頁
+                            Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
                           },
                           child: Text(
                             '返回', // 按鈕文本
@@ -311,7 +428,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     );
   }
 
-  void showSaveConfirmationDialog(BuildContext context) {
+  showSaveConfirmationDialog(BuildContext context) {
     // 顯示對話框
     showDialog(
       context: context,
@@ -433,144 +550,79 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     );
   }
 
-  waitDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // 返回一個自定義的 Dialog 小部件
-        return Dialog(
-          // 設置對話框的形狀和圓角
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
-          ),
-          child: Container(
-            width: 304.0, // 設置對話框的寬度
-            height: 142.4, // 設置對話框的高度
-            padding: const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
-            clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
-            decoration: ShapeDecoration(
-              color: Colors.white, // 設置對話框的背景顏色
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
-              ),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
-              crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
-              children: [
-                const SizedBox(height: 10), // 添加垂直間距
-                // 設置標題文本
-                SizedBox(
-                  width: double.infinity, // 寬度設置為充滿父容器
-                  child: Text(
-                    '分析情緒中', // 標題文本
-                    textAlign: TextAlign.center, // 文本居中對齊
-                    style: dialogTitleStyle,
-                  ),
-                ),
-                const SizedBox(height: 10), // 添加垂直間距
-                // 添加橫線
-                Container(
-                  width: 244.50,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 1,
-                        strokeAlign: BorderSide.strokeAlignCenter,
-                        color: Color(0xFFDADADA),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10), // 添加垂直間距
-                // 設置提示文本
-                SizedBox(
-                  width: double.infinity, // 寬度設置為充滿父容器
-                  child: Text(
-                    '聽說多微笑會變漂亮耶~\n要不要笑一個ㄚ', // 提示文本
-                    textAlign: TextAlign.center, // 文本居中對齊
-                    style: dialogContentStyle,
-                  ),
-                ),
-                const SizedBox(height: 20), // 添加垂直間距
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
   completeDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // 返回一個自定義的 Dialog 小部件
         return Dialog(
-          // 設置對話框的形狀和圓角
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
-          ),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pushNamed(context, AppRoutes.diaryMainScreen); //要再改成analyzeDiaryScreen
-            
-            },
-            child: Container(
-              width: 304.0, // 設置對話框的寬度
-              height: 121.4, // 設置對話框的高度
-              padding: const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
-              clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
-              decoration: ShapeDecoration(
-                color: Colors.white, // 設置對話框的背景顏色
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
-                ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
-                crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
-                children: [
-                  const SizedBox(height: 10), // 添加垂直間距
-                  // 設置標題文本
-                  SizedBox(
-                    width: double.infinity, // 寬度設置為充滿父容器
-                    child: Text(
-                      '完成', // 標題文本
-                      textAlign: TextAlign.center, // 文本居中對齊
-                      style: dialogTitleStyle,
-                    ),
+            // 設置對話框的形狀和圓角
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
+            ),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  isSubmitted = true;
+                  submittedContent = _textController.text; // 保存提交的日记内容
+                });
+              },
+              child: Container(
+                width: 304.0, // 設置對話框的寬度
+                height: 121.4, // 設置對話框的高度
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
+                clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
+                decoration: ShapeDecoration(
+                  color: Colors.white, // 設置對話框的背景顏色
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
                   ),
-                  const SizedBox(height: 10), // 添加垂直間距
-                  // 添加橫線
-                  Container(
-                    width: 244.50,
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          width: 1,
-                          strokeAlign: BorderSide.strokeAlignCenter,
-                          color: Color(0xFFDADADA),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
+                  crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
+                  children: [
+                    const SizedBox(height: 10), // 添加垂直間距
+                    // 設置標題文本
+                    SizedBox(
+                      width: double.infinity, // 寬度設置為充滿父容器
+                      child: Text(
+                        '完成', // 標題文本
+                        textAlign: TextAlign.center, // 文本居中對齊
+                        style: dialogTitleStyle,
+                      ),
+                    ),
+                    const SizedBox(height: 10), // 添加垂直間距
+                    // 添加橫線
+                    Container(
+                      width: 244.50,
+                      decoration: ShapeDecoration(
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                            width: 1,
+                            strokeAlign: BorderSide.strokeAlignCenter,
+                            color: Color(0xFFDADADA),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10), // 添加垂直間距
-                  // 設置提示文本
-                  SizedBox(
-                    width: double.infinity, // 寬度設置為充滿父容器
-                    child: Text(
-                      '分析結果出爐了~ 快去看看吧！', // 提示文本
-                      textAlign: TextAlign.center, // 文本居中對齊
-                      style: dialogContentStyle,
+                    const SizedBox(height: 10), // 添加垂直間距
+                    // 設置提示文本
+                    SizedBox(
+                      width: double.infinity, // 寬度設置為充滿父容器
+                      child: Text(
+                        '分析結果出爐了~ 快去看看吧！', // 提示文本
+                        textAlign: TextAlign.center, // 文本居中對齊
+                        style: dialogContentStyle,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 20), // 添加垂直間距
-                ],
+                    const SizedBox(height: 20), // 添加垂直間距
+                  ],
+                ),
               ),
-            ),
-          )
-        );
+            ));
       },
     );
   }
@@ -648,8 +700,76 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
       },
     );
   }
+   void showWaitingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          child: Container(
+            width: 304.0,
+            height: 142.4,
+            padding: const EdgeInsets.symmetric(horizontal: 23),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0),
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    '分析情緒中',
+                    textAlign: TextAlign.center,
+                    style: dialogTitleStyle,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Container(
+                  width: 244.50,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1,
+                        color: Color(0xFFDADADA),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    '聽說多微笑會變漂亮耶~\n要不要笑一個ㄚ',
+                    textAlign: TextAlign.center,
+                    style: dialogContentStyle,
+                  ),
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
+
 /*
+前端修正:
 1. 捲動畫面最上方會有紫色陰影
 2. 用Navigator.of(context).pop();來關閉前一個dialog時 會回到輸入日記 會彈出鍵盤 看如何修改
+3. 輸入框與提交後日記顯示的起始點有些微不同
+4. dialog太多 不確定會不會例外狀況 需要想更好的方法
+*/
+
+/*
+後端需再處理的事項：
+1.連接情緒辨識模型
+2.連接情緒小怪獸結果
 */

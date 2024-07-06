@@ -46,6 +46,8 @@ flutter:
     - assets/images/edit.png
     - assets/images/notify.png
     - assets/images/add.png
+    - assets/images/monster_1.png
+    - assets/images/monster_2.png
   fonts: 
     - family: Inter
       fonts: 

@@ -9,6 +9,7 @@ import '../presentation/AddDiary_screen/AddDiary_screen.dart'; // 引入寫日�
 import '../presentation/setNamePhoto_screen/setNamePhoto_screen.dart'; //引入設定姓名照片頁面組件
 import '../presentation/setting_screen/setting_screen.dart'; //引入設定頁面組件
 
+
 // ignore_for_file: must_be_immutable  // 忽略不可變性的警告，通常不建議在生產代碼中使用
 
 // 定義應用中的路由
@@ -23,6 +24,7 @@ class AppRoutes {
   static const String setNamePhoto = '/setNamePhoto_screen';
   static const String Setting = '/setting_screen';
 
+
   // 路由表，將路由名稱映射到對應的頁面建造者
   static Map<String, WidgetBuilder> routes = {
     welcomeScreen: (context) => WelcomeScreen(), // 歡迎頁面
@@ -32,6 +34,7 @@ class AppRoutes {
     diaryMainScreen: (context) => DiaryMainScreen(), // 日記頁面
     addDiaryScreen: (context) => AddDiaryScreen(),
     setNamePhoto: (context) => SetNamePhoto(),
-    Setting: (context) => settingScreen()
+    Setting: (context) => settingScreen(),
+
   };
 }

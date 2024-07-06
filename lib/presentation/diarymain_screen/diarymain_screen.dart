@@ -114,10 +114,6 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   }
 // 構建新增日記小部件的函數。
 Widget _buildAddDiary() {
-  bool isToday = selectedDate != null &&
-      selectedDate!.year == DateTime.now().year &&
-      selectedDate!.month == DateTime.now().month &&
-      selectedDate!.day == DateTime.now().day; // 判斷選定日期是否為今天。
   return Container(
     decoration: BoxDecoration(
       color: addDiaryBackgroundColor,
@@ -135,37 +131,44 @@ Widget _buildAddDiary() {
           SizedBox(height: 27.0), // 與日期文字之間的距離。
           Expanded(
             child: Center(
-              child: isToday
-                  ? GestureDetector(
-                      onTap: () {
-                        _showAddDiaryScreen(context); // 按鈕動作觸發顯示底部彈窗。
-                      },
-                      child: Container(
-                        width: 60, // 按鈕的寬度
-                        height: 60, // 按鈕的高度
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle, // 圓形形狀
-                          image: DecorationImage(
-                            image: AssetImage('assets/images/add.png'), // 替換為您的圖片路徑
-                            fit: BoxFit.cover, // 確保圖片完全填滿容器
+              child: FutureBuilder<Map<String, dynamic>>(
+                future: _fetchDiaryData(selectedDate!), // 從後端獲取日記數據
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)), // 設置加載圓圈的顏色
+                    ); // 加載中顯示旋轉指示器
+                  } else if (snapshot.hasData && snapshot.data != null) {
+                    return Text(snapshot.data!['diary']['content']); // 顯示日記內容
+                  } else {
+                    bool isToday = selectedDate != null &&
+                        selectedDate!.year == DateTime.now().year &&
+                        selectedDate!.month == DateTime.now().month &&
+                        selectedDate!.day == DateTime.now().day; // 判斷選定日期是否為今天。
+
+                    if (isToday) {
+                      return GestureDetector(
+                        onTap: () {
+                          _showAddDiaryScreen(context); // 按鈕動作觸發顯示底部彈窗。
+                        },
+                        child: Container(
+                          width: 60, // 按鈕的寬度
+                          height: 60, // 按鈕的高度
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle, // 圓形形狀
+                            image: DecorationImage(
+                              image: AssetImage('assets/images/add.png'), 
+                              fit: BoxFit.cover, // 確保圖片完全填滿容器
+                            ),
                           ),
                         ),
-                      ),
-                    )
-                  : FutureBuilder<Map<String, dynamic>>(
-                      future: _fetchDiaryData(selectedDate!), // 從後端獲取日記數據
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)), // 設置加載圓圈的顏色
-                          ); // 加載中顯示旋轉指示器
-                        } else if (snapshot.hasData && snapshot.data != null) {
-                          return Text(snapshot.data!['diary']['content']); // 顯示日記內容
-                        } else {
-                          return Text(''); // 無數據顯示提示
-                        }
-                      },
-                    ),
+                      );
+                    } else {
+                      return Text(''); // 無數據且非今天日期顯示空白
+                    }
+                  }
+                },
+              ),
             ),
           ),
           SizedBox(height: 36.0), // 與底部之間的距離
@@ -174,6 +177,7 @@ Widget _buildAddDiary() {
     ),
   );
 }
+
 
   // 顯示新增日記頁面的函數。
   void _showAddDiaryScreen(BuildContext context) {
@@ -197,11 +201,9 @@ Widget _buildAddDiary() {
     }
   }
 }
-
-
-
 /*
  1. 非當日之前的日記顯示畫面
     o 有日記 -> 日記內容 (等候端串接 再來修改內容顯示格式等)
     o 無日記 -> ??? (目前無顯示東西 等組內開會與大家討論)
+  2. 未實現有日記 可以上滑遍全螢幕
  */

@@ -34,6 +34,8 @@ android {
 
     lintOptions {
         disable 'InvalidPackage'
+        warningsAsErrors true
+        disable 'Deprecation'
     }
 
     defaultConfig {

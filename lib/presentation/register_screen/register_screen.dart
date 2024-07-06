@@ -95,8 +95,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       print("註冊成功! 使用者的ID: ${firebaseId}");
       await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
-      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+      // 登入成功後 導航到設定照片名字畫面
+      Navigator.pushNamed(context, AppRoutes.setNamePhoto);
     } catch (e) {
       print('Google sign in error: $e');
       // 處理登入錯誤
@@ -420,5 +420,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
 1. 可視不可視圖標大小有差
 2. fb 註冊鈕刪掉
 3. 密碼註冊規則提醒
-4. google 註冊後，要連到 setNamePhoto_screen.dart
  */

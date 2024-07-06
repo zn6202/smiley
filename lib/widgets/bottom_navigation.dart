@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../main.dart';
@@ -11,7 +12,8 @@ class CustomBottomNavigationBar extends StatefulWidget {
   CustomBottomNavigationBar({required this.currentIndex, required this.onTap});
 
   @override
-  _CustomBottomNavigationBarState createState() => _CustomBottomNavigationBarState();
+  _CustomBottomNavigationBarState createState() =>
+      _CustomBottomNavigationBarState();
 }
 
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
@@ -40,9 +42,11 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     } else if (index == 2) {
       Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } else if (index == 3) {
-      Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+      // 社群頁面
     } else if (index == 1) {
-      Navigator.pushNamed(context, AppRoutes.setNamePhoto);
+      //分析頁面
+    } else if (Index == 0) {
+      //聊天機器人頁面
     } else {
       widget.onTap(index);
     }
@@ -64,7 +68,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               height: 24.0,
               width: 24.0,
               child: Image.asset(
-                _currentIndex == 0 ? 'assets/images/chatRobot_on.png' : 'assets/images/chatRobot_off.png',
+                _currentIndex == 0
+                    ? 'assets/images/chatRobot_on.png'
+                    : 'assets/images/chatRobot_off.png',
               ),
             ),
           ),
@@ -77,7 +83,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               height: 24.0,
               width: 24.0,
               child: Image.asset(
-                _currentIndex == 1 ? 'assets/images/analyze_on.png' : 'assets/images/analyze_off.png',
+                _currentIndex == 1
+                    ? 'assets/images/analyze_on.png'
+                    : 'assets/images/analyze_off.png',
               ),
             ),
           ),
@@ -90,7 +98,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               height: 24.0,
               width: 24.0,
               child: Image.asset(
-                _currentIndex == 2 ? 'assets/images/diary_on.png' : 'assets/images/diary_off.png',
+                _currentIndex == 2
+                    ? 'assets/images/diary_on.png'
+                    : 'assets/images/diary_off.png',
               ),
             ),
           ),
@@ -103,7 +113,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               height: 24.0,
               width: 24.0,
               child: Image.asset(
-                _currentIndex == 3 ? 'assets/images/social_on.png' : 'assets/images/social_off.png',
+                _currentIndex == 3
+                    ? 'assets/images/social_on.png'
+                    : 'assets/images/social_off.png',
               ),
             ),
           ),
@@ -116,7 +128,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               height: 32.0,
               width: 24.0,
               child: Image.asset(
-                _currentIndex == 4 ? 'assets/images/setting_on.png' : 'assets/images/setting_off.png',
+                _currentIndex == 4
+                    ? 'assets/images/setting_on.png'
+                    : 'assets/images/setting_off.png',
               ),
             ),
           ),
