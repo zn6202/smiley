@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../widgets/bottom_navigation.dart'; // 引用自訂的 BottomNavigationBar
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../main.dart';
 
 // 主題色彩常數，用於應用程式中的主色調。

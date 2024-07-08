@@ -22,6 +22,9 @@ dependencies:
   cloud_firestore: ^4.17.4
   path_provider: ^2.0.2
   shared_preferences: ^2.2.3
+  get: ^4.6.6
+  fl_chart: ^0.68.0
+  google_fonts: ^4.0.5
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
@@ -48,6 +51,7 @@ flutter:
     - assets/images/add.png
     - assets/images/monster_1.png
     - assets/images/monster_2.png
+    - assets/images/questionMark.jpg
   fonts: 
     - family: Inter
       fonts: 

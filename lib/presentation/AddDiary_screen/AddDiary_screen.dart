@@ -764,6 +764,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 前端修正:
 1. 捲動畫面最上方會有紫色陰影
 2. 用Navigator.of(context).pop();來關閉前一個dialog時 會回到輸入日記 會彈出鍵盤 看如何修改
+  - 試過每次pop回去後 unfocus() 但是還是會閃
+  - 試過改用GetX管理狀態 但會有例外狀況
+  - flutter_smart_dialog: ^4.9.7+8試試看
 3. 輸入框與提交後日記顯示的起始點有些微不同
 4. dialog太多 不確定會不會例外狀況 需要想更好的方法
 */

@@ -1,10 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../core/app_export.dart';
 import '../../main.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-
 class CustomBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
@@ -43,8 +41,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } else if (index == 3) {
       // 社群頁面
+      Navigator.pushNamed(context, AppRoutes.setNamePhoto);
     } else if (index == 1) {
-      //分析頁面
+      Navigator.pushNamed(context,AppRoutes.Analysis);
     } else if (Index == 0) {
       //聊天機器人頁面
     } else {
