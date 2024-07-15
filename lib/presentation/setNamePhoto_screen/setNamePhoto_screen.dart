@@ -27,11 +27,11 @@ class SetNamePhoto extends StatefulWidget {
 // 設置名稱和照片頁面的狀態
 class _SetNamePhotoState extends State<SetNamePhoto> {
   final TextEditingController _controller = TextEditingController(); // 控制輸入框
-  File? _image; // 選擇的圖片文件(相簿的照片檔)
+  File? _image; // 選擇的相簿的照片檔
   String? firebaseId; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
-  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑 )
+  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
 
 
   @override
