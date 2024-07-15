@@ -31,7 +31,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   String? firebaseId; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
-  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
+  String? selectedAvatarPath = '../../../assets/images/default_avatar_9.png'; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
 
 
   @override
@@ -174,11 +174,8 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                       backgroundColor: Color(0xFFF4F4E6), // 設置圓形頭像背景顏色
                       backgroundImage: _image != null
                         ? FileImage(_image!) // 顯示選擇的圖片
-                        : selectedAvatarPath != null
-                          ? AssetImage(selectedAvatarPath!) as ImageProvider<Object>
-                          : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
+                        : AssetImage(selectedAvatarPath!) as ImageProvider
                     ),
-
                   ),
                   Positioned(
                     bottom: 0,
