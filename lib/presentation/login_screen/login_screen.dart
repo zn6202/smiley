@@ -93,19 +93,25 @@ class _LoginScreenState extends State<LoginScreen> {
         'firebase_user_id': firebaseUid,
       },
     );
+    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body);
-      if (responseData['success'] == true) {
-        int userId = responseData['user_id'];
-        
-        // 存儲 user_id 到 SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_id', userId.toString());
+      try {
+        var responseData = jsonDecode(response.body);
+        if (responseData['success'] == true) {
+          int userId = responseData['user_id'];
+          
+          // 存儲 user_id 到 SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('user_id', userId.toString());
 
-        print('user_id 儲存成功: $userId');
-      } else {
-        print('伺服器返回錯誤: ${responseData['message']}');
+          print('user_id 儲存成功: $userId');
+        } else {
+          print('伺服器返回錯誤: ${responseData['message']}');
+        }
+      } catch (e) {
+        print('JSON 解析錯誤: $e');
+        // 顯示錯誤訊息給用戶或執行其他處理邏輯
       }
     } else {
       print('請求失敗，狀態碼: ${response.statusCode}');
@@ -391,10 +397,3 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
   }
 }
-
-/*
-1. 可視不可視圖標大小統一
-2. logo 被切掉
-3. 畫面縮放
-4. fb 登入鈕刪掉
-*/

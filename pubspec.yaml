@@ -51,7 +51,21 @@ flutter:
     - assets/images/add.png
     - assets/images/monster_1.png
     - assets/images/monster_2.png
+    - assets/images/monster_3.png
+    - assets/images/monster_4.png
     - assets/images/questionMark.jpg
+    - assets/images/arrow-left-g.png
+    - assets/images/null.png
+    - assets/images/default_avatar_icon.png
+    - assets/images/default_avatar_1.png
+    - assets/images/default_avatar_2.png
+    - assets/images/default_avatar_3.png
+    - assets/images/default_avatar_4.png
+    - assets/images/default_avatar_5.png
+    - assets/images/default_avatar_6.png
+    - assets/images/default_avatar_7.png
+    - assets/images/default_avatar_8.png
+    - assets/images/default_avatar_9.png
   fonts: 
     - family: Inter
       fonts: 

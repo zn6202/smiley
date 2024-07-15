@@ -79,53 +79,88 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
             title: '${testData['happiness']}%',
             radius: 50,
             titleStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF545453),
+              color: Color(0xFF72805C),
+              shadows: [
+                Shadow(
+                  offset: Offset(0.1, 0.1), // Figma中的X和Y偏移量
+                  blurRadius: 2.0, // Figma中的模糊半徑
+                  color: Color.fromRGBO(0, 0, 0, 0.5), // Figma中的顏色和透明度 (黑色，50%透明度)
+                ),
+              ],
             ),
           ),
           PieChartSectionData(
-            color: Color(0xFFE5E2A6),
+            color: Color(0xFFDCDE76),
             value: testData['like']?.toDouble() ?? 0.0,
             title: '${testData['like']}%',
             radius: 50,
             titleStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF545453),
+              color: Color(0xFF949551),
+              shadows: [
+                Shadow(
+                  offset: Offset(0.1, 0.1), // Figma中的X和Y偏移量
+                  blurRadius: 2.0, // Figma中的模糊半徑
+                  color: Color.fromRGBO(0, 0, 0, 0.5), // Figma中的顏色和透明度 (黑色，50%透明度)
+                ),
+              ],
             ),
           ),
           PieChartSectionData(
-            color: Color(0xFFCCD9D4),
+            color: Color(0xFFD1BA7E),
             value: testData['sadness']?.toDouble() ?? 0.0,
             title: '${testData['sadness']}%',
             radius: 50,
             titleStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF545453),
+              color: Color(0xFF8F8059),
+              shadows: [
+                Shadow(
+                  offset: Offset(0.1, 0.1),
+                  blurRadius: 2.0, 
+                  color: Color.fromRGBO(0, 0, 0, 0.5), 
+                ),
+              ],
             ),
           ),
           PieChartSectionData(
-            color: Color(0xFF95A3A4),
+            color: Color(0xFF7FA99B),
             value: testData['disgust']?.toDouble() ?? 0.0,
             title: '${testData['disgust']}%',
             radius: 50,
             titleStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF545453),
+              color: Color(0xFF546F66),
+              shadows: [
+                Shadow(
+                  offset: Offset(0.1, 0.1), 
+                  blurRadius: 2.0, 
+                  color: Color.fromRGBO(0, 0, 0, 0.5), 
+                ),
+              ],
             ),
           ),
           PieChartSectionData(
-            color: Color(0xFF3B4A4E),
+            color: Color(0xFF394A51),
             value: testData['anger']?.toDouble() ?? 0.0,
             title: '${testData['anger']}%',
             radius: 50,
             titleStyle: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF545453),
+              color: Color(0xFF6D8E9B),
+              shadows: [
+                Shadow(
+                  offset: Offset(0.1, 0.1), 
+                  blurRadius: 2.0, 
+                  color: Color.fromRGBO(0, 0, 0, 0.5), 
+                ),
+              ],
             ),
           ),
         ];
@@ -527,13 +562,13 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                     children: [
                                       Indicator(color: Color(0xFFA7BA89), text: '開心'),
                                       SizedBox(height: 8),
-                                      Indicator(color: Color(0xFFE5E2A6), text: '喜歡'),
+                                      Indicator(color: Color(0xFFDCDE76), text: '喜歡'),
                                       SizedBox(height: 8),
-                                      Indicator(color: Color(0xFFCCD9D4), text: '悲傷'),
+                                      Indicator(color: Color(0xFFD1BA7E), text: '悲傷'),
                                       SizedBox(height: 8),
-                                      Indicator(color: Color(0xFF95A3A4), text: '噁心'),
+                                      Indicator(color: Color(0xFF7FA99B), text: '噁心'),
                                       SizedBox(height: 8),
-                                      Indicator(color: Color(0xFF3B4A4E), text: '憤怒'),
+                                      Indicator(color: Color(0xFF394A51), text: '憤怒'),
                                     ],
                                   ),
                                 ),
@@ -605,13 +640,14 @@ class Indicator extends StatelessWidget {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF545453),
+            color: color, // 將文字顏色設置為與指示器顏色塊一致
           ),
         ),
       ],
     );
   }
 }
+
 
 // 自定義標籤 Widget
 class CustomLabel extends StatelessWidget {
@@ -646,7 +682,6 @@ class CustomLabel extends StatelessWidget {
 
 /*
 前端
-1. 圓餅圖沒按照figma設計 問大家是否可以
 2. 折線圖
 - 沒有0/100的灰線
 - 縱軸距離圖表太近

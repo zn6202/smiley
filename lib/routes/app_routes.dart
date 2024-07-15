@@ -9,12 +9,12 @@ import '../presentation/AddDiary_screen/AddDiary_screen.dart'; // 引入寫日�
 import '../presentation/setNamePhoto_screen/setNamePhoto_screen.dart'; //引入設定姓名照片頁面組件
 import '../presentation/setting_screen/setting_screen.dart'; //引入設定頁面組件
 import '../presentation/analysis_screen/analysis_screen.dart';
+import '../presentation/setNamePhoto_screen/defaultAvatar.dart';
+import '../presentation/friend_screen/friendScreen.dart';
+import '../presentation/postRecord_screen/postRecord.dart';
+import '../presentation/notification_screen/notification.dart';
 
-// ignore_for_file: must_be_immutable  // 忽略不可變性的警告，通常不建議在生產代碼中使用
-
-// 定義應用中的路由
 class AppRoutes {
-  // 定義各個頁面的路由名稱常量
   static const String welcomeScreen = '/welcome_screen';
   static const String loginScreen = '/login_screen';
   static const String forgetpwdScreen = '/forgetpwd_screen';
@@ -22,20 +22,28 @@ class AppRoutes {
   static const String diaryMainScreen = '/diary_main_screen';
   static const String addDiaryScreen = '/AddDiary_screen';
   static const String setNamePhoto = '/setNamePhoto_screen';
-  static const String Setting = '/setting_screen';
-  static const String Analysis = '/analysis_screen';
+  static const String setting = '/setting_screen';
+  static const String analysis = '/analysis_screen';
+  static const String defaultAvatar = '/default_avatar';
+  static const String friendScreen = '/friend_screen';
+  static const String postRecord = '/post_record';
+  static const String notificationScreen = '/notification_screen';
 
-
-  // 路由表，將路由名稱映射到對應的頁面建造者
   static Map<String, WidgetBuilder> routes = {
-    welcomeScreen: (context) => WelcomeScreen(), // 歡迎頁面
-    loginScreen: (context) => LoginScreen(), // 登入頁面
-    forgetpwdScreen: (context) => ForgetpwdScreen(), // 忘記密碼頁面
-    registerScreen: (context) => RegisterScreen(), // 註冊頁面
-    diaryMainScreen: (context) => DiaryMainScreen(), // 日記頁面
+    welcomeScreen: (context) => WelcomeScreen(),
+    loginScreen: (context) => LoginScreen(),
+    forgetpwdScreen: (context) => ForgetpwdScreen(),
+    registerScreen: (context) => RegisterScreen(),
+    diaryMainScreen: (context) => DiaryMainScreen(),
     addDiaryScreen: (context) => AddDiaryScreen(),
     setNamePhoto: (context) => SetNamePhoto(),
-    Setting: (context) => settingScreen(),
-    Analysis: (context) => AnalysisScreen(),
+    setting: (context) => settingScreen(),
+    analysis: (context) => AnalysisScreen(),
+    defaultAvatar: (context) => Defaultavatar(),
+    friendScreen: (context) => Friendscreen(), 
+    postRecord: (context) => Postrecord(),
+    notificationScreen: (context) => Notificationscreen(),
   };
 }
+
+
