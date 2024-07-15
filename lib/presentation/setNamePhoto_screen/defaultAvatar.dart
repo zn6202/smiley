@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'package:http/http.dart' as http; // HTTP請求插件
+import '../setNamePhoto_screen/setNamePhoto_screen.dart';
 
 const TextStyle dialogTitleStyle = TextStyle(
     color: Color(0xFF545453),
@@ -37,8 +38,16 @@ class _DefaultavatarState extends State<Defaultavatar> {
     'assets/images/default_avatar_9.png',
   ];
 
-  // 將選擇的頭像路徑發送到後端
-  Future<void> sendAvatarPath(String path) async {}
+  // 將選擇的頭像路徑發送到 setNamePhoto
+  Future<void> sendAvatarPath(String path) async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => SetNamePhoto(),
+        settings: RouteSettings(arguments: path), // 傳遞選擇的圖片路徑
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {

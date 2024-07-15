@@ -31,11 +31,17 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   String? firebaseId; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
+  String? selectedAvatarPath; // 選擇的預設頭像路徑
+
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 獲取導航傳遞過來的來源頁面名稱
+    // 獲取 defaultAvatar 傳來的頭像資料
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments is String) {
+      selectedAvatarPath = arguments; // 獲取傳遞的圖片路徑
+    }
     sourcePage = ModalRoute.of(context)?.settings.arguments as String?;
   }
 
@@ -71,7 +77,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       0,
       firebaseId!,
       _controller.text.trim(),
-      _image != null ? _image!.path.split('/').last : 'default_avatar.png',
+      _image != null ? _image!.path.split('/').last : selectedAvatarPath!.split('/').last,
     );
 
     // 添加文本字段到請求
@@ -168,7 +174,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                       backgroundColor: Color(0xFFF4F4E6), // 設置圓形頭像背景顏色
                       backgroundImage: _image != null
                           ? FileImage(_image!) // 顯示選擇的圖片
-                          : AssetImage('assets/images/default_avatar.png')
+                          : AssetImage('assets/images/default_avatar_9.png')
                               as ImageProvider, // 顯示默認頭像
                     ),
                   ),
