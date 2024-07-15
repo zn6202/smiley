@@ -91,12 +91,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
+
+      // 確認使用者 id
       firebaseId = credential.idToken;
       print("註冊成功! 使用者的ID: ${firebaseId}");
-      await FirebaseAuth.instance.signInWithCredential(credential);
 
-      // 登入成功後 導航到設定照片名字畫面
-      Navigator.pushNamed(context, AppRoutes.setNamePhoto);
+      if (isNewUser) {
+        print("使用者是新註冊的");
+        // 新註冊用戶，導航到 setNamePhoto
+        Navigator.pushNamed(context, AppRoutes.setNamePhoto);
+      } else {
+        print("使用者已經註冊過");
+        // 已註冊過的用戶，導航到 diaryMainScreen
+        Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+      }
     } catch (e) {
       print('Google sign in error: $e');
       // 處理登入錯誤
