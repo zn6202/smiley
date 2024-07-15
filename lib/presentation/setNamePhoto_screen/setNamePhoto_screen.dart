@@ -27,11 +27,11 @@ class SetNamePhoto extends StatefulWidget {
 // 設置名稱和照片頁面的狀態
 class _SetNamePhotoState extends State<SetNamePhoto> {
   final TextEditingController _controller = TextEditingController(); // 控制輸入框
-  File? _image; // 選擇的圖片文件
+  File? _image; // 選擇的圖片文件(相簿的照片檔)
   String? firebaseId; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
-  String? selectedAvatarPath; // 選擇的預設頭像路徑
+  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑 )
 
 
   @override
@@ -94,7 +94,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     } else {
       // 使用默認圖片
       request.fields['default_photo'] = 'true';
-      print('Using default image: default_avatar.png');
+      print('Using default image: ${selectedAvatarPath!.split('/').last}');
     }
 
     // 發送請求並處理回應
@@ -173,10 +173,12 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                       radius: 50,
                       backgroundColor: Color(0xFFF4F4E6), // 設置圓形頭像背景顏色
                       backgroundImage: _image != null
-                          ? FileImage(_image!) // 顯示選擇的圖片
-                          : AssetImage('assets/images/default_avatar_9.png')
-                              as ImageProvider, // 顯示默認頭像
+                        ? FileImage(_image!) // 顯示選擇的圖片
+                        : selectedAvatarPath != null
+                          ? AssetImage(selectedAvatarPath!) as ImageProvider<Object>
+                          : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
                     ),
+
                   ),
                   Positioned(
                     bottom: 0,
@@ -266,4 +268,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
 /*
 給後端的備註
 把註冊後設定頭貼與設定頁連接到同一頁
-需再確認是否與後端連接好 */
+需再確認是否與後端連接好 
+
+
+*/
