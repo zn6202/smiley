@@ -4,6 +4,7 @@ import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'package:http/http.dart' as http; // HTTP請求插件
 import '../setNamePhoto_screen/setNamePhoto_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // 引入 SharedPreferences
 
 const TextStyle dialogTitleStyle = TextStyle(
     color: Color(0xFF545453),
@@ -38,13 +39,15 @@ class _DefaultavatarState extends State<Defaultavatar> {
     'assets/images/default_avatar_9.png',
   ];
 
+
   // 將選擇的頭像路徑發送到 setNamePhoto
   Future<void> sendAvatarPath(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_avatar_path', path.split('/').last);
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SetNamePhoto(),
-        settings: RouteSettings(arguments: path), // 傳遞選擇的圖片路徑
       ),
     );
   }

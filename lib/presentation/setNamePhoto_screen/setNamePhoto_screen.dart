@@ -28,22 +28,28 @@ class SetNamePhoto extends StatefulWidget {
 class _SetNamePhotoState extends State<SetNamePhoto> {
   final TextEditingController _controller = TextEditingController(); // 控制輸入框
   File? _image; // 選擇的相簿的照片檔
-  String? firebaseId; // Firebase用戶ID
+  String? firebaseId ; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
-  String? selectedAvatarPath = '../../../assets/images/default_avatar_9.png'; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
+  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
 
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // 獲取 defaultAvatar 傳來的頭像資料
-    final arguments = ModalRoute.of(context)?.settings.arguments;
-    if (arguments is String) {
-      selectedAvatarPath = arguments; // 獲取傳遞的圖片路徑
-    }
-    sourcePage = ModalRoute.of(context)?.settings.arguments as String?;
+  void initState() {
+    super.initState();
+    loadAvatarPath(); // 調用異步方法來設置 selectedAvatarPath
   }
+
+  Future<void> loadAvatarPath() async {
+    selectedAvatarPath = await getSavedAvatarPath(); // 使用異步方法獲取頭像路徑
+    setState(() {}); // 更新狀態以觸發 UI 重繪
+  }
+
+  Future<String?> getSavedAvatarPath() async {
+    final Avatar = await SharedPreferences.getInstance();
+    return Avatar.getString('selected_avatar_path');
+  }
+
 
   // 保存用戶ID到本地存儲
   Future<void> saveUserId(String userId) async {
@@ -58,10 +64,16 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     return prefs.getString('user_id');
   }
 
+  Future<String?> getFirebaseId() async {
+    final Avatar = await SharedPreferences.getInstance();
+    return Avatar.getString('firebaseId');
+  }
+
   // 添加完成的處理函數
   void addComplete() async {
     // 獲取導航傳遞過來的Firebase UID
-    firebaseId = ModalRoute.of(context)!.settings.arguments as String?;
+    firebaseId = await getFirebaseId();
+    print('firebaseId = $firebaseId');
     if (firebaseId == null) {
       print('Error: firebaseId is null');
       return;
@@ -77,7 +89,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       0,
       firebaseId!,
       _controller.text.trim(),
-      _image != null ? _image!.path.split('/').last : selectedAvatarPath!.split('/').last,
+      _image != null ? _image!.path.split('/').last : selectedAvatarPath!,
     );
 
     // 添加文本字段到請求
@@ -94,7 +106,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     } else {
       // 使用默認圖片
       request.fields['default_photo'] = 'true';
-      print('Using default image: ${selectedAvatarPath!.split('/').last}');
+      print('Using default image: ${selectedAvatarPath}');
     }
 
     // 發送請求並處理回應
@@ -167,15 +179,17 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.defaultAvatar); 
+                      Navigator.pushNamed(context, AppRoutes.defaultAvatar, arguments: firebaseId); 
                     },
                     child: CircleAvatar(
                       radius: 50,
                       backgroundColor: Color(0xFFF4F4E6), // 設置圓形頭像背景顏色
                       backgroundImage: _image != null
-                        ? FileImage(_image!) // 顯示選擇的圖片
-                        : AssetImage(selectedAvatarPath!) as ImageProvider
-                    ),
+                        ? FileImage(_image!)
+                        : selectedAvatarPath != null
+                          ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>// 使用 selectedAvatarPath
+                          : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
+                    ),  
                   ),
                   Positioned(
                     bottom: 0,

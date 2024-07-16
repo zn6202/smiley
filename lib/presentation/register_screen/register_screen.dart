@@ -6,7 +6,7 @@ import '../../widgets/custom_text_form_field.dart'; // 自訂的文字輸入欄�
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 // 忽略檔案錯誤: 必須是不可變的
@@ -31,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String? errorMessage;
   String? firebaseId;
 
+
   Future<void> createUserWithEmailAndPassword() async {
     try {
       if (passwordOneController.text.trim() != confirmPasswordController.text.trim()) {
@@ -48,7 +49,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         firebaseId = credential.user?.uid;
         print('註冊成功! 使用者的ID: ${firebaseId}');
         // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
-        Navigator.pushNamed(context, AppRoutes.setNamePhoto, arguments:firebaseId);
+        
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('firebaseId', firebaseId!);
+
+        Navigator.pushNamed(context, AppRoutes.setNamePhoto);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') { // 至少6個字元
@@ -97,6 +102,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // 確認使用者 id
       firebaseId = credential.idToken;
       print("註冊成功! 使用者的ID: ${firebaseId}");
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('firebaseId', firebaseId!);
 
       if (isNewUser) {
         print("使用者是新註冊的");
