@@ -6,6 +6,7 @@ import '../../core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
 import '../../main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../setNamePhoto_screen/setNamePhoto_screen.dart';
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
@@ -264,10 +265,11 @@ class _SettingScreenState extends State<settingScreen> {
         break;
       case 2:
         // 編輯的操作
-        Navigator.pushNamed(
+        Navigator.push(
           context,
-          AppRoutes.setNamePhoto,
-          arguments: 'setting',
+          MaterialPageRoute(
+            builder: (context) => SetNamePhoto(sourcePage: 'setting'),
+          ),
         );
         break;
       case 3:

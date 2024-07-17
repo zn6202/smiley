@@ -437,5 +437,4 @@ class _RegisterScreenState extends State<RegisterScreen> {
 /* 
 1. 可視不可視圖標大小有差
 2. fb 註冊鈕刪掉
-3. 密碼註冊規則提醒
  */

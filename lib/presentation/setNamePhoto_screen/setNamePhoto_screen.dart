@@ -9,17 +9,13 @@ import 'dart:convert'; // for jsonDecode
 // 處理回應並存儲 user_id
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
-class SetNamePhotoApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SetNamePhoto(),
-    );
-  }
-}
+import 'defaultAvatar.dart';
 
-// 設置名稱和照片頁面的狀態管理
 class SetNamePhoto extends StatefulWidget {
+  final String? sourcePage;
+
+  SetNamePhoto({this.sourcePage});
+
   @override
   _SetNamePhotoState createState() => _SetNamePhotoState();
 }
@@ -28,28 +24,31 @@ class SetNamePhoto extends StatefulWidget {
 class _SetNamePhotoState extends State<SetNamePhoto> {
   final TextEditingController _controller = TextEditingController(); // 控制輸入框
   File? _image; // 選擇的相簿的照片檔
-  String? firebaseId ; // Firebase用戶ID
+  String? firebaseId; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
-  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
-
+  String?
+      selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
 
   @override
   void initState() {
     super.initState();
-    loadAvatarPath(); // 調用異步方法來設置 selectedAvatarPath
+    sourcePage = widget.sourcePage;
+    loadAvatarPath();
   }
 
   Future<void> loadAvatarPath() async {
-    selectedAvatarPath = await getSavedAvatarPath(); // 使用異步方法獲取頭像路徑
-    setState(() {}); // 更新狀態以觸發 UI 重繪
+    selectedAvatarPath = await getSavedAvatarPath();
+    if (mounted) {
+      setState(() {});
+    }
   }
+
 
   Future<String?> getSavedAvatarPath() async {
     final Avatar = await SharedPreferences.getInstance();
     return Avatar.getString('selected_avatar_path');
   }
-
 
   // 保存用戶ID到本地存儲
   Future<void> saveUserId(String userId) async {
@@ -126,7 +125,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       print('Failed to upload image, status code: ${response.statusCode}');
     }
   }
-
+/*
   // 選擇圖片的函數
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -136,7 +135,21 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       });
     }
   }
-
+*/
+  Future<void> navigateToDefaultAvatar() async {
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Defaultavatar(sourcePage: sourcePage),
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        selectedAvatarPath = result;
+        _image = null; // 清除之前選擇的相冊圖片
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -161,7 +174,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
               )
             : AppbarLeadingImage(
                 imagePath: 'assets/images/null.png', // 返回圖標圖片
-                ),
+              ),
         // 正中間顯示圖片
         title: Image.asset(
           'assets/images/edit.png',
@@ -178,19 +191,18 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
               child: Stack(
                 children: [
                   GestureDetector(
-                    onTap: () {
-                      Navigator.pushNamed(context, AppRoutes.defaultAvatar, arguments: firebaseId); 
-                    },
+                    onTap: navigateToDefaultAvatar,
                     child: CircleAvatar(
                       radius: 50,
-                      backgroundColor: Color(0xFFF4F4E6), // 設置圓形頭像背景顏色
+                      backgroundColor: Color(0xFFF4F4E6),
                       backgroundImage: _image != null
                         ? FileImage(_image!)
                         : selectedAvatarPath != null
-                          ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>// 使用 selectedAvatarPath
+                          ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>
                           : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
                     ),  
                   ),
+                  /* 
                   Positioned(
                     bottom: 0,
                     right: 0,
@@ -206,7 +218,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                         ),
                       ),
                     ),
-                  ),
+                  ), */
                 ],
               ),
             ),
@@ -248,7 +260,8 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                     await Future.delayed(Duration(milliseconds: 500));
                     addComplete();
                     print("用戶名: ${_controller.text}");
-                    Navigator.pushNamed(context, AppRoutes.diaryMainScreen); // 導航到日記主頁
+                    Navigator.pushNamed(
+                        context, AppRoutes.diaryMainScreen); // 導航到日記主頁
                   }
                 },
                 child: Text(
@@ -277,9 +290,6 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
 
 
 /*
-給後端的備註
-把註冊後設定頭貼與設定頁連接到同一頁
-需再確認是否與後端連接好 
-
-
+需再確認是否與後端連接好
+使用者按下確定更改後 再送出到資料庫 
 */

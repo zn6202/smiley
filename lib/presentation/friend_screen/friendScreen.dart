@@ -37,3 +37,5 @@ class _friendscreenState extends State<Friendscreen> {
         ));
   }
 }
+
+// 前後端都未處理

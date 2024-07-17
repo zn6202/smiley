@@ -1,3 +1,4 @@
+import 'dart:io'; // Import the 'dart:io' package for the 'File' class
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
@@ -5,6 +6,7 @@ import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄�
 import 'package:http/http.dart' as http; // HTTP請求插件
 import '../setNamePhoto_screen/setNamePhoto_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // 引入 SharedPreferences
+import 'package:image_picker/image_picker.dart';
 
 const TextStyle dialogTitleStyle = TextStyle(
     color: Color(0xFF545453),
@@ -22,11 +24,17 @@ const TextStyle dialogContentStyle = TextStyle(
 
 
 class Defaultavatar extends StatefulWidget {
+  final String? sourcePage;
+
+  Defaultavatar({this.sourcePage});
+
   @override
   _DefaultavatarState createState() => _DefaultavatarState();
 }
 
 class _DefaultavatarState extends State<Defaultavatar> {
+  File? _image; // 選擇的相簿的照片檔
+  final picker = ImagePicker(); // 圖片選擇器實例
   final List<String> avatarImages = [
     'assets/images/default_avatar_1.png',
     'assets/images/default_avatar_2.png',
@@ -39,17 +47,23 @@ class _DefaultavatarState extends State<Defaultavatar> {
     'assets/images/default_avatar_9.png',
   ];
 
-
   // 將選擇的頭像路徑發送到 setNamePhoto
   Future<void> sendAvatarPath(String path) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selected_avatar_path', path.split('/').last);
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SetNamePhoto(),
-      ),
-    );
+    String avatarName = path.split('/').last;
+    await prefs.setString('selected_avatar_path', avatarName);
+  
+    Navigator.pop(context, avatarName);
+  }
+
+
+  Future<void> _pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path); // 更新狀態以顯示選擇的圖片
+      });
+    }
   }
 
   @override
@@ -85,109 +99,57 @@ class _DefaultavatarState extends State<Defaultavatar> {
             crossAxisSpacing: 20.0, // 圖像之間的水平間距
             mainAxisSpacing: 20.0, // 圖像之間的垂直間距
           ),
-          itemCount: avatarImages.length,
+          itemCount: avatarImages.length + 1, // 加一個顯示相機圖標的白底圓形圖
           itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                sendAvatarPath(avatarImages[index]);
-                completeDialog(context);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.7), // 底色#FFFFFF 透明度70%
-                  shape: BoxShape.circle, // 圓形背景
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(10.0), // 圓形容器內的間距
-                  child: Image.asset(
-                    avatarImages[index],
-                    fit: BoxFit.contain, // 圖片的適應方式
+            if (index == avatarImages.length) {
+              // 顯示相機圖標的白底圓形圖
+              return GestureDetector(
+                onTap: _pickImage, // 點擊選擇圖片
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7), // 底色#FFFFFF 透明度70%
+                    shape: BoxShape.circle, // 圓形背景
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0), // 圓形容器內的間距
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Color(0xFFA7BA89), // 圖標顏色 // 設置相機圖標顏色
+                      size: 40, // 設置相機圖標大小
+                    ),
                   ),
                 ),
-              ),
-            );
+              );
+            } else {
+              return GestureDetector(
+                onTap: () {
+                  sendAvatarPath(avatarImages[index]);
+                },
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.7), // 底色#FFFFFF 透明度70%
+                    shape: BoxShape.circle, // 圓形背景
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(10.0), // 圓形容器內的間距
+                    child: Image.asset(
+                      avatarImages[index],
+                      fit: BoxFit.contain, // 圖片的適應方式
+                    ),
+                  ),
+                ),
+              );
+            }
           },
         ),
       ),
     );
   }
-
-   completeDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // 返回一個自定義的 Dialog 小部件
-        return Dialog(
-            // 設置對話框的形狀和圓角
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
-            ),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: Container(
-                width: 304.0, // 設置對話框的寬度
-                height: 121.4, // 設置對話框的高度
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
-                clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
-                decoration: ShapeDecoration(
-                  color: Colors.white, // 設置對話框的背景顏色
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
-                  crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
-                  children: [
-                    const SizedBox(height: 10), // 添加垂直間距
-                    // 設置標題文本
-                    SizedBox(
-                      width: double.infinity, // 寬度設置為充滿父容器
-                      child: Text(
-                        '完成', // 標題文本
-                        textAlign: TextAlign.center, // 文本居中對齊
-                        style: dialogTitleStyle,
-                      ),
-                    ),
-                    const SizedBox(height: 10), // 添加垂直間距
-                    // 添加橫線
-                    Container(
-                      width: 244.50,
-                      decoration: ShapeDecoration(
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                            width: 1,
-                            strokeAlign: BorderSide.strokeAlignCenter,
-                            color: Color(0xFFDADADA),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10), // 添加垂直間距
-                    // 設置提示文本
-                    SizedBox(
-                      width: double.infinity, // 寬度設置為充滿父容器
-                      child: Text(
-                        '頭貼更變完成！', // 提示文本
-                        textAlign: TextAlign.center, // 文本居中對齊
-                        style: dialogContentStyle,
-                      ),
-                    ),
-                    const SizedBox(height: 20), // 添加垂直間距
-                  ],
-                ),
-              ),
-            ));
-      },
-    );
-  }
 }
 
 /*
-選好頭像後 要回傳路徑給後端 
-修改sendAvatarPath
+後端：
+- 本機照片的處理
+- 在這頁選好後 不要直接傳到資料庫更改 等到回saveNamePhoto時 使用者按確定更改再改
+
 */

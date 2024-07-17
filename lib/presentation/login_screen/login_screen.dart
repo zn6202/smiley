@@ -397,3 +397,8 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
   }
 }
+
+
+/*
+前端: FB移除
+*/

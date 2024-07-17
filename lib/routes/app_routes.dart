@@ -10,6 +10,7 @@ import '../presentation/setNamePhoto_screen/setNamePhoto_screen.dart'; //引入�
 import '../presentation/setting_screen/setting_screen.dart'; //引入設定頁面組件
 import '../presentation/analysis_screen/analysis_screen.dart';
 import '../presentation/setNamePhoto_screen/defaultAvatar.dart';
+// import '../presentation/setNamePhoto_screen/edit.dart';
 import '../presentation/friend_screen/friendScreen.dart';
 import '../presentation/postRecord_screen/postRecord.dart';
 import '../presentation/notification_screen/notification.dart';
@@ -28,6 +29,7 @@ class AppRoutes {
   static const String friendScreen = '/friend_screen';
   static const String postRecord = '/post_record';
   static const String notificationScreen = '/notification_screen';
+  // static const String edit = '/edit';
 
   static Map<String, WidgetBuilder> routes = {
     welcomeScreen: (context) => WelcomeScreen(),
@@ -43,6 +45,7 @@ class AppRoutes {
     friendScreen: (context) => Friendscreen(), 
     postRecord: (context) => Postrecord(),
     notificationScreen: (context) => Notificationscreen(),
+    // edit: (context) => EditScreen(),
   };
 }
 

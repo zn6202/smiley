@@ -168,7 +168,7 @@ class NotificationItem {
 
 /*
 前端
-- 太多筆資料 會超過邊界
+- 太多筆資料時 會超過邊界
 
 後端
 - 修改_fetchNotifications
