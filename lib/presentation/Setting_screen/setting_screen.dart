@@ -5,7 +5,12 @@ import 'package:sqflite/sqflite.dart';
 import '../../core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
 import '../../main.dart';
+// 後端需要的套件
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'dart:convert';
+//  
 import '../setNamePhoto_screen/setNamePhoto_screen.dart';
 
 // 主題色彩常數，用於應用程式中的主色調。
@@ -29,6 +34,7 @@ class _SettingScreenState extends State<settingScreen> {
   void initState() {
     super.initState();
     _fetchUserData();
+    loadUserName();
   }
 
   Future<String?> getUserId() async {
@@ -36,17 +42,67 @@ class _SettingScreenState extends State<settingScreen> {
     return prefs.getString('user_id');
   }
 
+  Future<void> loadUserName() async {
+    userName = await getUserName() ?? '';
+    print('預設姓名為: $userName');
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<String?> getUserName() async {
+    final Name = await SharedPreferences.getInstance();
+    return Name.getString('user_name');
+  }
+
   /* 後端這裡要修改!!!!!!!!!!
   這裡是模擬從後端獲取用戶數據的函數 要改成可以從後台抓name 跟照片回來
   */
   Future<void> _fetchUserData() async {
     // 模擬從資料庫獲取數據
-    final id = await getUserId(); // 獲取用戶ID
-    setState(() {
-      userName = '測試用戶';
-      userProfilePic = ''; // 不確定使用者照片是存在哪 先用字串
-      userId = id ?? '22'; // 如果未獲取到用戶ID，使用默認ID 22
-    });
+    final String? id = await getUserId();
+    if (id == null) {
+      // 處理 user_id 為空的情況
+      print('Error: user_id is null');
+      return;
+    }
+
+    print("進入提交日記函式");
+    final response = await http.post(
+      Uri.parse(API.getProfile), // 解析字串變成 URI 對象
+      body: {
+        'id': id,
+      },
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData['success']) {
+        setState(() {
+          userName = responseData['name'];
+          userProfilePic = 'assets/images/'+responseData['photo'];
+          userId = id;
+        });
+        sendAvatarPath();
+        sendName();
+        print('用戶id: $userId 用戶名稱: $userName, 用戶照片路徑: $userProfilePic');
+        // 在這裡處理獲取到的用戶名稱和照片資訊
+      } else {
+        print('設定功能的個資取得失敗: ${responseData['message']}');
+      }
+    } else {
+      print('設定功能的個資取得失敗...');
+    }
+  }
+
+  Future<void> sendAvatarPath() async {
+    final prefs = await SharedPreferences.getInstance();
+    String avatarName = userProfilePic.split('/').last;
+    await prefs.setString('selected_avatar_path', avatarName);
+  }
+
+  Future<void> sendName() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', userName);
   }
 
   @override
@@ -254,7 +310,7 @@ class _SettingScreenState extends State<settingScreen> {
   }
 
   // 處理網格選項點擊事件
-  void _handleGridOptionTap(int index) {
+  void _handleGridOptionTap(int index) async{
     // 根據索引執行不同的操作
     switch (index) {
       case 0:
@@ -265,6 +321,7 @@ class _SettingScreenState extends State<settingScreen> {
         break;
       case 2:
         // 編輯的操作
+        await sendAvatarPath();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -279,9 +336,3 @@ class _SettingScreenState extends State<settingScreen> {
   }
 }
 
-
-/*
-後端修改:
-- 修改fetchUserData()，從這裡抓後端name和圖片
-- 不確定使用者照片用網路存取還是本機的assets 這裡先用NetworkImage 要改 修改103行
-*/

@@ -47,7 +47,7 @@ class _DefaultavatarState extends State<Defaultavatar> {
     'assets/images/default_avatar_9.png',
   ];
 
-  // 將選擇的頭像路徑發送到 setNamePhoto
+  // 點擊頭像-> 將選擇的頭像名稱發送到 setNamePhoto
   Future<void> sendAvatarPath(String path) async {
     final prefs = await SharedPreferences.getInstance();
     String avatarName = path.split('/').last;
@@ -122,7 +122,7 @@ class _DefaultavatarState extends State<Defaultavatar> {
               );
             } else {
               return GestureDetector(
-                onTap: () {
+                onTap: () { // 各個預設頭像
                   sendAvatarPath(avatarImages[index]);
                 },
                 child: Container(
@@ -146,10 +146,3 @@ class _DefaultavatarState extends State<Defaultavatar> {
     );
   }
 }
-
-/*
-後端：
-- 本機照片的處理
-- 在這頁選好後 不要直接傳到資料庫更改 等到回saveNamePhoto時 使用者按確定更改再改
-
-*/

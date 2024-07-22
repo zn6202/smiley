@@ -9,4 +9,7 @@ class API
   static const user = "$hostConnect/user/user.php";
   static const diary = "$hostConnect/diary/diary.php";
   static const getUid = "$hostConnect/user/getUid.php";
+  static const getProfile = "$hostConnect/user/getProfile.php";
+  static const editProfile = "$hostConnect/user/editProfile.php";
+
 }

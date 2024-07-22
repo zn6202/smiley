@@ -29,25 +29,47 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   final picker = ImagePicker(); // 圖片選擇器實例
   String?
       selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
+  String? defaultUserName;
 
   @override
   void initState() {
     super.initState();
     sourcePage = widget.sourcePage;
     loadAvatarPath();
+    loadUserName();
   }
 
   Future<void> loadAvatarPath() async {
     selectedAvatarPath = await getSavedAvatarPath();
+    print("頭貼為: $selectedAvatarPath");
     if (mounted) {
       setState(() {});
     }
   }
 
-
   Future<String?> getSavedAvatarPath() async {
     final Avatar = await SharedPreferences.getInstance();
     return Avatar.getString('selected_avatar_path');
+  }
+
+  Future<void> saveUserName(String userName) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user_name', userName);
+    print("user_name 放入 share_preference: $userName");
+  }
+
+  Future<void> loadUserName() async {
+    defaultUserName = await getDefaultUserName();
+    print('預設姓名為: $defaultUserName');
+    _controller.text = defaultUserName ?? '';
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<String?> getDefaultUserName() async {
+    final Name = await SharedPreferences.getInstance();
+    return Name.getString('user_name');
   }
 
   // 保存用戶ID到本地存儲
@@ -59,8 +81,8 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
 
   // 從本地存儲獲取用戶ID
   Future<String?> getUserId() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('user_id');
+    final userId = await SharedPreferences.getInstance();
+    return userId.getString('user_id');
   }
 
   Future<String?> getFirebaseId() async {
@@ -123,6 +145,42 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       }
     } else {
       print('Failed to upload image, status code: ${response.statusCode}');
+    }
+  }
+  // 從設定進到 編輯
+  void editProfile() async {
+    final String? id = await getUserId();
+    if (id == null) {
+      // 處理 user_id 為空的情況
+      print('Error: user_id is null');
+      return;
+    }
+
+    print("進入修改個資函式 id:$id; name:$_controller.text; photo:$selectedAvatarPath");
+    final response = await http.post(
+      Uri.parse(API.editProfile), // 解析字串變成 URI 對象
+      body: {
+        'id': id,
+        'name': _controller.text,
+        'photo':selectedAvatarPath ?? '',
+      },
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData['success']) {
+        setState(() {
+          defaultUserName = responseData['name'];
+          selectedAvatarPath = responseData['photo'];
+        });
+        await saveUserName(responseData['name']);
+        print('User name: ${responseData['name']}');
+        print('User photo path: ${responseData['photo']}');
+        // 在這裡處理獲取到的用戶名稱和照片資訊
+      } else {
+        print('更新個資取得失敗: ${responseData['message']}');
+      }
+    } else {
+      print('更新個資失敗...');
     }
   }
 /*
@@ -232,7 +290,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                 decoration: InputDecoration(
                   prefixIcon:
                       Icon(Icons.person, color: Color(0xFFA7BA89)), // 左側圖標
-                  hintText: 'me', // 提示文字
+                  hintText:'me', // 提示文字
                   filled: true,
                   fillColor: Colors.white, // 填充顏色
                   contentPadding: EdgeInsets.symmetric(vertical: 0),
@@ -249,12 +307,16 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
               height: 40,
               child: ElevatedButton(
                 onPressed: () async {
+                  // 設定 ->
                   if (sourcePage == 'setting') {
                     FocusScope.of(context).requestFocus(FocusNode());
                     await Future.delayed(Duration(milliseconds: 500));
-                    addComplete();
+                    editProfile();
                     print("用戶名: ${_controller.text}");
-                    Navigator.pop(context); // 返回上一頁
+                    // Navigator.pop(context); // 返回上一頁
+                    Navigator.pushNamed(
+                        context, AppRoutes.setting);
+                  // 註冊 ->
                   } else {
                     FocusScope.of(context).requestFocus(FocusNode());
                     await Future.delayed(Duration(milliseconds: 500));
@@ -287,9 +349,3 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     );
   }
 }
-
-
-/*
-需再確認是否與後端連接好
-使用者按下確定更改後 再送出到資料庫 
-*/
