@@ -46,6 +46,7 @@ flutter:
     - assets/images/default_avatar.png
     - assets/images/Record.png
     - assets/images/friend.png
+    - assets/images/friend_y.png
     - assets/images/edit.png
     - assets/images/notify.png
     - assets/images/add.png
@@ -66,6 +67,12 @@ flutter:
     - assets/images/default_avatar_7.png
     - assets/images/default_avatar_8.png
     - assets/images/default_avatar_9.png
+    - assets/images/addFriend.png
+    - assets/images/addFriend_y.png
+    - assets/images/delFriend.png
+    - assets/images/search.png
+    - assets/images/acceptFriend.png
+    - assets/images/Lightning.png
   fonts: 
     - family: Inter
       fonts: 
