@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../core/app_export.dart'; 
 import '../../widgets/app_bar/appbar_leading_image.dart';
 

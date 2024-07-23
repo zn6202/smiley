@@ -1,6 +1,5 @@
 import 'dart:io'; // Import the 'dart:io' package for the 'File' class
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'package:http/http.dart' as http; // HTTP請求插件

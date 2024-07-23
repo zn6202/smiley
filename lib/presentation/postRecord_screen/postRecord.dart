@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../core/app_export.dart'; 
 import '../../widgets/app_bar/appbar_leading_image.dart'; 
+import 'package:flutter_svg/flutter_svg.dart';
 
 class Postrecord extends StatefulWidget {
   @override
@@ -174,7 +174,7 @@ class PostDetailScreen extends StatelessWidget {
       case 0xFFECA8A4:
         return Color(0xFF29979E);
       case 0xFFA7BA89:
-        return Color(0xFFDCDE76);
+        return Color(0xFF6B6C39);
       case 0xFFFBBC05:
         return Color(0xFF34A853);
       case 0xFFFFFF4E:
@@ -186,32 +186,29 @@ class PostDetailScreen extends StatelessWidget {
       case 0xFF6F5032:
         return Color(0xFFD1BA7E);
       default:
-        return Colors.black; 
+        return Colors.black;
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final textColor = getTextColor(post.colorId);
+@override
+Widget build(BuildContext context) {
+  final textColor = getTextColor(post.colorId);
 
-    return Scaffold(
-      backgroundColor: post.colorId, 
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: Align(
-          child: AppbarLeadingImage(
-            imagePath: 'assets/images/arrow-left-r.png',
-            margin: EdgeInsets.only(
-              top: 19.0,
-              bottom: 19.0,
-            ),
-            onTap: () async {
-              Navigator.pop(context);
-            },
-          ),
+  return Scaffold(
+    backgroundColor: post.colorId,
+    appBar: AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: SvgPicture.asset(
+          'assets/images/img_arrow_left.svg',
+          color: textColor,
         ),
+        onPressed: () async {
+          Navigator.pop(context);
+        },
       ),
+    ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -279,7 +276,6 @@ class PostDetailScreen extends StatelessWidget {
 
 /*
 前端
-- 改12種不同顏色的返回鍵
 - 未處理留言
 
 後端

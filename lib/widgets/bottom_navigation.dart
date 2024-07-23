@@ -39,7 +39,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     } else if (index == 2) {
       Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } else if (index == 3) {
-      // 社群頁面
+      // Navigator.pushNamed(context, AppRoutes.myPost);
     } else if (index == 1) {
       Navigator.pushNamed(context, AppRoutes.analysis);
     } else if (index == 0) {

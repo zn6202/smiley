@@ -1,10 +1,7 @@
 // 構建選項網格小部件。
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:sqflite/sqflite.dart';
 import '../../core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
-import '../../main.dart';
 // 後端需要的套件
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;

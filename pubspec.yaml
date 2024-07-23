@@ -25,6 +25,7 @@ dependencies:
   get: ^4.6.6
   fl_chart: ^0.68.0
   google_fonts: ^4.0.5
+  sliding_up_panel: ^2.0.0+1
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
@@ -73,6 +74,7 @@ flutter:
     - assets/images/search.png
     - assets/images/acceptFriend.png
     - assets/images/Lightning.png
+    - assets/images/img_arrow_left.svg
   fonts: 
     - family: Inter
       fonts: 

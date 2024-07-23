@@ -168,8 +168,10 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                buildEmotionBlock('assets/images/monster_1.png'), //這裡到時候要改成小怪獸演算法函式
-                                buildEmotionBlock('assets/images/monster_2.png'),
+                                buildEmotionBlock(
+                                    'assets/images/monster_1.png'), //這裡到時候要改成小怪獸演算法函式
+                                buildEmotionBlock(
+                                    'assets/images/monster_2.png'),
                               ],
                             ),
                           ],
@@ -220,90 +222,85 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
       ),
     );
   }
+
 /*
 !!!!小怪獸演算法區域!!!!
 目前先顯示figma上的圖片，之後演算法建立好後 只要呼叫這個 並附上圖片網址即可
  */
   Widget buildEmotionBlock(String imageUrl) {
-    return Container(
-      width: 150, // 設置容器寬度
-      height: 246, // 設置容器高度
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20), // 設置容器內邊距
-      clipBehavior: Clip.antiAlias, // 防止內容超出邊界
-      decoration: ShapeDecoration(
-        color: Colors.white, // 設置容器背景顏色
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Color(0xFFC4C4C4)), // 設置邊框顏色和寬度
-          borderRadius: BorderRadius.circular(20), // 設置圓角半徑
-        ),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // 設置列的最小尺寸
-        mainAxisAlignment: MainAxisAlignment.start, // 垂直方向對齊到頂部
-        crossAxisAlignment: CrossAxisAlignment.center, // 水平方向居中對齊
-        children: [
-          SizedBox(
-            width: 106, // 設置文本容器寬度
-            height: 27, // 設置文本容器高度
-            child: Text(
-              '情緒小怪獸', // 顯示標題文本
-              textAlign: TextAlign.center, // 文本居中對齊
-              style: TextStyle(
-                color: Color(0xFFC4C4C4), // 設置文本顏色
-                fontSize: 16, // 設置文本字體大小
-                fontFamily: 'Inter', // 設置字體
-                fontWeight: FontWeight.w700, // 設置字體粗細
-                letterSpacing: -0.32, // 設置字間距
-              ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0), // 根據需要調整邊界大小
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.postPage,arguments: imageUrl);
+        },
+        child: Container(
+          width: 150,
+          height: 246,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
+          clipBehavior: Clip.antiAlias,
+          decoration: ShapeDecoration(
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
-          Container(
-            width: 126, // 設置圖片容器寬度
-            height: 122, // 設置圖片容器高度
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage(imageUrl), // 設置圖片來源
-                fit: BoxFit.fill, // 設置圖片填充方式
-              ),
-            ),
-          ),
-          Container(
-            width: 114, // 設置按鈕容器寬度
-            decoration: ShapeDecoration(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20), // 設置圓角半徑
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min, // 設置行的最小尺寸
-              mainAxisAlignment: MainAxisAlignment.center, // 水平方向居中對齊
-              crossAxisAlignment: CrossAxisAlignment.center, // 垂直方向居中對齊
-              children: [
-                TextButton(
-                  onPressed: () {
-                    // 連到發文頁面
-                  },
-                  child: Text(
-                    '輕觸發文', // 按鈕文本
-                    textAlign: TextAlign.center, // 文本居中對齊
-                    style: TextStyle(
-                      color: Color(0xFFCDCED0), // 設置文本顏色
-                      fontSize: 15, // 設置文本字體大小
-                      fontFamily: 'Inter', // 設置字體
-                      fontWeight: FontWeight.w600, // 設置字體粗細
-                      height: 1.5, // 設置行高
-                    ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 106,
+                height: 27,
+                child: Text(
+                  '情緒小怪獸',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFFC4C4C4),
+                    fontSize: 16,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.32,
                   ),
                 ),
-              ],
-            ),
+              ),
+              Container(
+                width: 126,
+                height: 122,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(imageUrl),
+                    fit: BoxFit.fill,
+                  ),
+                ),
+              ),
+              Container(
+                width: 114,
+                decoration: ShapeDecoration(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                child: Text(
+                  '輕觸發文',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFFCDCED0),
+                    fontSize: 15,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w600,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
-
-
 
 
   showExitConfirmationDialog(BuildContext context) {
@@ -385,7 +382,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                       child: Center(
                         child: TextButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+                            Navigator.pushNamed(
+                                context, AppRoutes.diaryMainScreen);
                           },
                           child: Text(
                             '返回', // 按鈕文本
@@ -700,7 +698,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
       },
     );
   }
-   void showWaitingDialog(BuildContext context) {
+
+  void showWaitingDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -774,5 +773,6 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 /*
 後端需再處理的事項：
 1.連接情緒辨識模型
-2.連接情緒小怪獸結果
+2.連接情緒小怪獸結果 
+資料格式都先用圖片網址:'assets/images/monster_1.png' 按下後會把路徑給postPage去顯示 所以如果這裡改了資料格式 記得修改那部分
 */
