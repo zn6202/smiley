@@ -32,6 +32,17 @@ class _LoginScreenState extends State<LoginScreen> {
   // 錯誤訊息
   String? errorMessage;
   String? firebaseId;
+  String? status;
+
+  Future<void> saveStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('status', status);
+  }
+
+  Future<String?> getStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('status') ?? '';
+  }
 
   void signInWithEmailAndPassword() async {
     try {
@@ -43,6 +54,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // 從伺服器獲取 user_id 並存儲到 SharedPreferences
       await _fetchAndSaveUserId(credential.user?.uid);
+
+      status = 'member';
+      await saveStatus(status!);
 
       Navigator.pushReplacement(
         context,
@@ -73,6 +87,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // 從伺服器獲取 user_id 並存儲到 SharedPreferences
       await _fetchAndSaveUserId(firebaseId);
+
+      status = 'member';
+      await saveStatus(status!);
 
       // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
       Navigator.pushReplacement(

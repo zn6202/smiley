@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'dart:async'; // 計時器插件
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'dart:convert';
 
 class AddFriend extends StatefulWidget {
   @override
@@ -51,12 +54,32 @@ class _AddFriendState extends State<AddFriend> {
 
   Future<void> searchUsers(String query) async { //搜尋用戶後端資料
     // 模擬後端資料
-    setState(() {
-      searchResults = [
-        {'name': 'alex', 'photo': 'assets/images/default_avatar_4.png', 'hasRequested': 'false'},
-        {'name': 'chris', 'photo': 'assets/images/default_avatar_5.png', 'hasRequested': 'false'},
-      ].where((user) => user['name']!.toLowerCase().contains(query.toLowerCase())).toList();
-    });
+    print("進入搜尋好友函式");
+    final response = await http.post(
+      Uri.parse(API.searchUser), // 解析字串變成 URI 對象
+      body: {
+        'id': query,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        setState(() {
+          searchResults = [
+            {
+              'name': result['name'],
+              'photo': result['photo'],
+              'hasRequested': 'false'
+            }
+          ];
+        });
+      } else {
+        print('User not found.');
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
 
 

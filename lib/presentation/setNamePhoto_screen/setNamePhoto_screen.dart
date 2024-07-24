@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:smiley/presentation/Setting_screen/setting_screen.dart';
 import 'dart:io';
 import '../../core/app_export.dart';
 import 'package:http/http.dart' as http;
@@ -11,10 +12,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'defaultAvatar.dart';
 
+
 class SetNamePhoto extends StatefulWidget {
   final String? sourcePage;
+  final File? image;
 
-  SetNamePhoto({this.sourcePage});
+  SetNamePhoto({this.sourcePage, this.image});
 
   @override
   _SetNamePhotoState createState() => _SetNamePhotoState();
@@ -30,13 +33,25 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   String?
       selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
   String? defaultUserName;
+  String? status;
 
   @override
   void initState() {
     super.initState();
+    _image = widget.image; // 初始化 _image 為傳入的 image
+    print("_image是:$_image");
     sourcePage = widget.sourcePage;
     loadAvatarPath();
     loadUserName();
+    loadStatus();
+  }
+
+  Future<void> loadStatus() async {
+    status = await getStatus();
+    print("status 是: $status");
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> loadAvatarPath() async {
@@ -90,6 +105,24 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     return Avatar.getString('firebaseId');
   }
 
+  Future<void> saveStatus(String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('status', status);
+  }
+
+  Future<String?> getStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('status') ?? '';
+  }
+
+
+  // Future<void> saveAlbumPhoto() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   String example = _image!.path;
+  //   await prefs.setString('user_album_photo', _image!.path);
+  //   print("user_album_photo: $example");
+  // }
+
   // 添加完成的處理函數
   void addComplete() async {
     // 獲取導航傳遞過來的Firebase UID
@@ -139,7 +172,11 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       if (result['success'] == true) {
         String userId = result['user_id'].toString();
         await saveUserId(userId);
+        // await saveAlbumPhoto(_image!.path);
+        status = 'member';
+        await saveStatus(status!);
         print("Congratulations, you are SignUp Successfully.");
+        //在此添加保存图片到本地存储的程式
       } else {
         print("Error Occurred: ${result['message']}");
       }
@@ -217,7 +254,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
         elevation: 0, // 設置應用欄的陰影為0
         backgroundColor: Colors.transparent, // 設置背景透明
         // 根據來源頁面決定是否顯示返回按鈕
-        leading: sourcePage == 'setting'
+        leading: status=='member'
             ? AppbarLeadingImage(
                 imagePath: 'assets/images/arrow-left-g.png', // 返回圖標圖片
                 margin: EdgeInsets.only(
@@ -227,7 +264,13 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                 onTap: () async {
                   FocusScope.of(context).requestFocus(FocusNode());
                   await Future.delayed(Duration(milliseconds: 500));
-                  Navigator.pop(context); // 點擊返回按鈕返回上一頁
+                  // Navigator.pop(context); // 點擊返回按鈕返回上一頁
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => settingScreen(), // 这里是你要导航到的页面
+                    ),
+                  );
                 },
               )
             : AppbarLeadingImage(
@@ -256,8 +299,10 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                       backgroundImage: _image != null
                         ? FileImage(_image!)
                         : selectedAvatarPath != null
-                          ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>
-                          : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
+                            ? selectedAvatarPath!.startsWith('default_avatar')
+                                ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>
+                                : NetworkImage('http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath') as ImageProvider<Object>
+                            : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
                     ),  
                   ),
                   /* 
@@ -308,9 +353,10 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
               child: ElevatedButton(
                 onPressed: () async {
                   // 設定 ->
-                  if (sourcePage == 'setting') {
+                  if (status=="member") {
                     FocusScope.of(context).requestFocus(FocusNode());
                     await Future.delayed(Duration(milliseconds: 500));
+                    print("用戶名: ${_controller.text}, 準備回設定");
                     editProfile();
                     print("用戶名: ${_controller.text}");
                     // Navigator.pop(context); // 返回上一頁
@@ -320,6 +366,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                   } else {
                     FocusScope.of(context).requestFocus(FocusNode());
                     await Future.delayed(Duration(milliseconds: 500));
+                    print("用戶名: ${_controller.text}, 準備註冊");
                     addComplete();
                     print("用戶名: ${_controller.text}");
                     Navigator.pushNamed(

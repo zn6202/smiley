@@ -1,11 +1,13 @@
 import 'dart:io'; // Import the 'dart:io' package for the 'File' class
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'package:http/http.dart' as http; // HTTP請求插件
 import '../setNamePhoto_screen/setNamePhoto_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart'; // 引入 SharedPreferences
 import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
 
 const TextStyle dialogTitleStyle = TextStyle(
     color: Color(0xFF545453),
@@ -55,6 +57,13 @@ class _DefaultavatarState extends State<Defaultavatar> {
     Navigator.pop(context, avatarName);
   }
 
+  // 點擊頭像-> 將選擇的頭像名稱發送到 setNamePhoto
+  Future<void> sendAlbumPhotoPath(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    String avatarName = path.split('/').last;
+    await prefs.setString('selected_avatar_path', avatarName);
+  }
+
 
   Future<void> _pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -62,6 +71,15 @@ class _DefaultavatarState extends State<Defaultavatar> {
       setState(() {
         _image = File(pickedFile.path); // 更新狀態以顯示選擇的圖片
       });
+      print('圖庫照片為: $_image');
+      // sendAlbumPhotoPath(_image!.path);
+      sendAlbumPhotoPath(_image!.path);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SetNamePhoto(image: _image), // 将 image 传递到 SetNamePhoto 页面
+        ),
+      );
     }
   }
 

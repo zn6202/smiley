@@ -1,7 +1,10 @@
 // 構建選項網格小部件。
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sqflite/sqflite.dart';
 import '../../core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
+import '../../main.dart';
 // 後端需要的套件
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +29,7 @@ class _SettingScreenState extends State<settingScreen> {
   String userName = '';
   String userProfilePic = '';
   String userId = '';
+  String albumPhoto= '';
 
   @override
   void initState() {
@@ -52,6 +56,19 @@ class _SettingScreenState extends State<settingScreen> {
     return Name.getString('user_name');
   }
 
+  // Future<void> loadUserAlbumPhoto() async {
+  //   albumPhoto = await getUserAlbumPhoto() ?? '';
+  //   print('預設姓名為: $albumPhoto');
+  //   if (mounted) {
+  //     setState(() {});
+  //   }
+  // }
+
+  // Future<String?> getUserAlbumPhoto() async {
+  //   final photo = await SharedPreferences.getInstance();
+  //   return photo.getString('user_album_photo');
+  // }
+
   /* 後端這裡要修改!!!!!!!!!!
   這裡是模擬從後端獲取用戶數據的函數 要改成可以從後台抓name 跟照片回來
   */
@@ -64,7 +81,10 @@ class _SettingScreenState extends State<settingScreen> {
       return;
     }
 
-    print("進入提交日記函式");
+    // await loadUserAlbumPhoto();
+    // print('albumPhoto為: $albumPhoto');
+
+    print("進入設定出現個資函式");
     final response = await http.post(
       Uri.parse(API.getProfile), // 解析字串變成 URI 對象
       body: {
@@ -76,12 +96,12 @@ class _SettingScreenState extends State<settingScreen> {
       if (responseData['success']) {
         setState(() {
           userName = responseData['name'];
-          userProfilePic = 'assets/images/'+responseData['photo'];
+          userProfilePic = responseData['photo'];
           userId = id;
         });
+        print('用戶id: $userId 用戶名稱: $userName, 用戶照片路徑: $userProfilePic');
         sendAvatarPath();
         sendName();
-        print('用戶id: $userId 用戶名稱: $userName, 用戶照片路徑: $userProfilePic');
         // 在這裡處理獲取到的用戶名稱和照片資訊
       } else {
         print('設定功能的個資取得失敗: ${responseData['message']}');
@@ -325,6 +345,7 @@ class _SettingScreenState extends State<settingScreen> {
             builder: (context) => SetNamePhoto(sourcePage: 'setting'),
           ),
         );
+        
         break;
       case 3:
         Navigator.pushNamed(context, AppRoutes.notificationScreen);
@@ -332,4 +353,3 @@ class _SettingScreenState extends State<settingScreen> {
     }
   }
 }
-

@@ -11,5 +11,5 @@ class API
   static const getUid = "$hostConnect/user/getUid.php";
   static const getProfile = "$hostConnect/user/getProfile.php";
   static const editProfile = "$hostConnect/user/editProfile.php";
-
+  static const searchUser = "$hostConnect/user/searchUser.php";
 }
