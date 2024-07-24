@@ -5,6 +5,7 @@ import 'dart:async'; // 計時器插件
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddFriend extends StatefulWidget {
   @override
@@ -14,6 +15,7 @@ class AddFriend extends StatefulWidget {
 class _AddFriendState extends State<AddFriend> {
   List<Map<String, String>> friendRequests = [];
   List<Map<String, String>> searchResults = [];
+  List invitedListMember = [];
   String searchText = '';
   bool showSuccessMessage = false;
   Map<String, String>? acceptedFriend;
@@ -41,24 +43,126 @@ class _AddFriendState extends State<AddFriend> {
     });
   }
 
-  Future<void> fetchFriendRequests() async { //好友邀請後端資料
-    // 模擬後端資料
-    setState(() {
-      friendRequests = [
-        {'name': 'mimi', 'photo': 'assets/images/default_avatar_1.png'},
-        {'name': 'ohoh', 'photo': 'assets/images/default_avatar_2.png'},
-        {'name': 'bbb', 'photo': 'assets/images/default_avatar_3.png'},
-      ];
-    });
+  Future<String?> getUserId() async { // 使用者的 id
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
   }
 
-  Future<void> searchUsers(String query) async { //搜尋用戶後端資料
-    // 模擬後端資料
-    print("進入搜尋好友函式");
+  Future<void> fetchFriendRequests() async {
+    final String? userId = await getUserId();
+    print("進入被邀請好友列表函式 $userId");
+
     final response = await http.post(
-      Uri.parse(API.searchUser), // 解析字串變成 URI 對象
+      Uri.parse(API.invitedList),
       body: {
-        'id': query,
+        'friend_id': userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      final exp=result['users'];
+      print('result是: $exp');
+
+      // 確保 `result` 是 Map 類型，並檢查 `success` 是否為 true
+      if (result['success']) {
+        // 檢查 `users` 是否存在且是 List 類型
+        if (result['users'] is List) {
+          List<Map<String, String>> tempFriendRequests = [];
+          List<String> tempInvitedListMember = [];
+
+          for (var item in result['users']) {
+            // 確保 item 是 Map<String, dynamic>
+            if (item is Map<String, dynamic>) {
+              tempFriendRequests.add({
+                'id': item['id'].toString(),
+                'name': item['name'] as String,
+                'photo': item['photo'] as String,
+              });
+
+              // 将 user_id 添加到 invitedListMember 中
+              tempInvitedListMember.add(item['id'] as String); // assuming 'id' is returned
+            }
+          }
+          
+          setState(() {
+            friendRequests = tempFriendRequests;
+            invitedListMember = tempInvitedListMember;
+          });
+          print("想加的好友列表 有: $friendRequests");
+          print("想加我好友的 id 有: $invitedListMember");
+        } else {
+          print('Invalid format for users');
+          setState(() {
+            friendRequests = [];
+          });
+        }
+      } else {
+        print('User not found or invalid success flag');
+        setState(() {
+          friendRequests = [];
+        });
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
+
+
+
+  Future<void> searchUsers(String query) async { //搜尋用戶後端資料
+    final String? userId = await getUserId();
+    print("進入搜尋好友函式");
+    // 以 aaa 為例: 
+    // 想加 aaa 好友的 id 有: [39, 23]，如果 aaa 在加好友搜尋 39 或 23，右邊顯示的 icon 要換
+    // invitedListMember = [39, 23]
+    if (invitedListMember.contains(query)){
+      setState(() {
+        // 顯示的人
+      });
+    }else if (userId != query){
+      final response = await http.post(
+        Uri.parse(API.searchUser), // 解析字串變成 URI 對象
+        body: {
+          'friend_id': query,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        if (result['success']) {
+          setState(() {
+            searchResults = [
+              {
+                'id': query, // 好友 ID
+                'name': result['name'],
+                'photo': result['photo'],
+                'hasRequested': result['status'],
+              }
+            ];
+          });
+        } else {
+          setState(() {
+            searchResults = [];
+          });
+          print('User not found.');
+        }
+      } else {
+        throw Exception('Failed to load user');
+      }
+    }
+  }
+
+
+  void acceptFriend(int userInvite ,int index) async{
+    final String? userId = await getUserId();
+    print("進入接受好友函式: $userInvite 邀請 $userId");
+
+    final response = await http.post(
+      Uri.parse(API.acceptInvite), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userInvite.toString(),
+        'friend_id': userId!,
       },
     );
 
@@ -66,15 +170,22 @@ class _AddFriendState extends State<AddFriend> {
       final result = json.decode(response.body);
       if (result['success']) {
         setState(() {
-          searchResults = [
-            {
-              'name': result['name'],
-              'photo': result['photo'],
-              'hasRequested': 'false'
-            }
-          ];
+          acceptedFriend = friendRequests[index];
+          showSuccessMessage = true;
         });
+
+        Timer(Duration(seconds: 2), () {
+          setState(() {
+            showSuccessMessage = false;
+            friendRequests.removeAt(index);
+          });
+        });
+        print("接受邀請成功");
+
       } else {
+        setState(() {
+          searchResults = [];
+        });
         print('User not found.');
       }
     } else {
@@ -83,32 +194,56 @@ class _AddFriendState extends State<AddFriend> {
   }
 
 
-  void acceptFriend(int index) {
-    setState(() {
-      acceptedFriend = friendRequests[index];
-      showSuccessMessage = true;
-    });
+  void sendFriendRequest(int index) async{ 
+    final String? userId = await getUserId();
+    final friendId = searchResults[index]['id'];
+    print("進入搜尋好友函式 userId: $userId , friendId: $friendId");
 
-    Timer(Duration(seconds: 2), () {
-      setState(() {
-        showSuccessMessage = false;
-        friendRequests.removeAt(index);
-      });
-    });
-  }
+    if (searchResults[index]['hasRequested'] == 'false'){  // 發送好友請求，並匯進資料庫
+      final response = await http.post(
+        Uri.parse(API.inviteFriend), // 解析字串變成 URI 對象
+        body: {
+          'user_id':userId,
+          'friend_id': friendId,
+        },
+      );
 
-  void sendFriendRequest(int index) { 
-    // 這部分需特別注意!!!! 
-    setState(() {
-      if (searchResults[index]['hasRequested'] == 'true') {
-        // 這裡會撤回好友邀請
-        searchResults[index]['hasRequested'] = 'false';
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        if (result['success']) {
+          setState(() {
+            searchResults[index]['hasRequested'] = 'true'; //已發送邀請
+          });
+          print('好友邀請發送成功!');
+        } else {
+          print('好友邀請發送失敗...');
+        }
       } else {
-        // 這裡是送出好友邀請
-        searchResults[index]['hasRequested'] = 'true';
+        throw Exception('Failed to load user');
       }
-    });
-    // 這裡可以添加發送或撤回好友請求的後端調用代碼
+    }else{ // 撤銷好友邀請，從資料庫移除
+      final response = await http.post(
+        Uri.parse(API.cancelInviteFriend), // 解析字串變成 URI 對象
+        body: {
+          'user_id':userId,
+          'friend_id': friendId,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final result = json.decode(response.body);
+        if (result['success']) {
+          setState(() {
+            searchResults[index]['hasRequested'] = 'false'; //false 為還不是好友(撤銷邀請，對方拒絕)
+          });
+          print('撤銷好友邀請成功!');
+        } else {
+          print('撤銷好友邀請失敗...');
+        }
+      } else {
+        throw Exception('Failed to load user');
+      }
+    }
   }
 
 
@@ -325,7 +460,8 @@ class _AddFriendState extends State<AddFriend> {
                                                             decoration: BoxDecoration(
                                                               shape: BoxShape.circle,
                                                               image: DecorationImage(
-                                                                image: AssetImage(searchResults[index]['photo']!),
+                                                                image: NetworkImage(searchResults[index]['photo']!),
+                                                                // image: AssetImage(searchResults[index]['photo']!),
                                                                 fit: BoxFit.cover,
                                                               ),
                                                             ),
@@ -426,8 +562,7 @@ class _AddFriendState extends State<AddFriend> {
                                                               decoration: BoxDecoration(
                                                                 shape: BoxShape.circle,
                                                                 image: DecorationImage(
-                                                                  image: AssetImage(
-                                                                      friendRequests[index]['photo']!),
+                                                                  image: NetworkImage(friendRequests[index]['photo']!),
                                                                   fit: BoxFit.cover,
                                                                 ),
                                                               ),
@@ -455,7 +590,9 @@ class _AddFriendState extends State<AddFriend> {
                                                     icon: Image.asset(
                                                         'assets/images/acceptFriend.png'),
                                                     onPressed: () {
-                                                      acceptFriend(index);
+                                                      int whoInviteMe = int.parse(friendRequests[index]['id']!);
+                                                      print('whoInviteMe: $whoInviteMe');
+                                                      acceptFriend(whoInviteMe, index);
                                                     },
                                                   ),
                                                   SizedBox(width: 5),
@@ -489,9 +626,12 @@ class _AddFriendState extends State<AddFriend> {
 }
 
 /*
+前端修改:
+- 114，如果對方已加我好友，當我搜尋對方時，icon 要是 "勾勾" 或 "叉叉"
+*/
+
+/*
 後端修改:
-- fetchFriendRequests 44行 抓好友邀請資料
-- searchUsers 52行 搜尋用戶資料
 - acceptFriend 74行 需傳到後端資料庫 同意好友
 - sendFriendRequest 86行 需傳到後端資料庫 發送好友請求
 - 140 305 407行都分別要顯示後端傳來的用戶頭貼 不確定這樣的格式是否可以 需確認

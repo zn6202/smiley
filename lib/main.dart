@@ -8,6 +8,8 @@ import 'core/app_export.dart';
 
 // 導入 Firebase 核心插件和先前產生的設定檔
 import 'package:firebase_core/firebase_core.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 // 建立一個全域的 ScaffoldMessengerState 鍵，以用於顯示通知訊息
 var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
@@ -16,6 +18,11 @@ var globalMessengerKey = GlobalKey<ScaffoldMessengerState>();
 void main() async{
   // 確保在執行框架相關的任何操作之前 Flutter 綁定已經初始化
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 清空 SharedPreferences
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+  
   if(kIsWeb){
     // 初始化 firebase
     await Firebase.initializeApp(

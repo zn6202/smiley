@@ -12,4 +12,9 @@ class API
   static const getProfile = "$hostConnect/user/getProfile.php";
   static const editProfile = "$hostConnect/user/editProfile.php";
   static const searchUser = "$hostConnect/user/searchUser.php";
+  static const inviteFriend = "$hostConnect/user/inviteFriend.php";
+  static const cancelInviteFriend = "$hostConnect/user/cancelInviteFriend.php";
+  static const invitedList = "$hostConnect/user/invitedList.php";
+  static const acceptInvite = "$hostConnect/user/acceptInvite.php";
+
 }
