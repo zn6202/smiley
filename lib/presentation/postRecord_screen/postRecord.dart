@@ -59,31 +59,34 @@ class _PostrecordState extends State<Postrecord> {
       appBar: AppBar(
         elevation: 0, 
         backgroundColor: Colors.transparent,
-        leading: AppbarLeadingImage(
-          imagePath: 'assets/images/arrow-left-g.png', 
-          margin: EdgeInsets.only(
-            top: 19.0,
-            bottom: 19.0,
+        leading: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/images/img_arrow_left.svg',
+              color: Color(0xFFA7BA89),
+            ),
+            onPressed: () async {
+              Navigator.pop(context);
+            },
           ),
-          onTap: () async {
-            Navigator.pop(context); 
-          },
         ),
         title: Image.asset(
           'assets/images/Record.png',
-          height: 30, 
+          height: 30.v, 
         ),
         centerTitle: true, 
       ),
       body: posts.isEmpty
           ? Center(child: CircularProgressIndicator())
           : Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 28.0),
+              padding: EdgeInsets.symmetric(horizontal: 28.h),
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
-                  crossAxisSpacing: 20.0,
-                  mainAxisSpacing: 20.0,
+                  crossAxisSpacing: 20.h,
+                  mainAxisSpacing: 20.v,
                 ),
                 itemCount: posts.length,
                 itemBuilder: (context, index) {
@@ -91,17 +94,17 @@ class _PostrecordState extends State<Postrecord> {
                   return GestureDetector(
                     onTap: () => _navigateToPostDetail(post),
                     child: Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
+                      padding: EdgeInsets.only(top: 10.v),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 6.0),
+                            padding: EdgeInsets.only(bottom: 6.v),
                             child: Text(
                               post.date,
                               style: TextStyle(
-                                fontSize: 18.0,
-                                height: 1.0,
+                                fontSize: 18.fSize,
+                                height: 1.v,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF545453),
@@ -109,12 +112,12 @@ class _PostrecordState extends State<Postrecord> {
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(bottom: 14.0),
+                            padding: EdgeInsets.only(bottom: 14.v),
                             child: Text(
                               post.title,
                               style: TextStyle(
-                                fontSize: 18.0,
-                                height: 1.0,
+                                fontSize: 18.fSize,
+                                height: 1.v,
                                 fontFamily: 'Inter',
                                 fontWeight: FontWeight.w600,
                                 color: Color(0xFF545453),
@@ -123,8 +126,8 @@ class _PostrecordState extends State<Postrecord> {
                           ),
                           Image.asset(
                             'assets/images/${post.emotionImage}',
-                            height: 100.0,
-                            width: 100.0,
+                            height: 90.v,
+                            width: 90.h,
                             fit: BoxFit.contain,
                           ),
                         ],
@@ -215,14 +218,14 @@ Widget build(BuildContext context) {
           children: [
             Padding(
               padding:
-                  const EdgeInsets.only(top: 10.0, left: 16.0, right: 16.0),
+                  EdgeInsets.only(top: 10.v, left: 16.h, right: 16.v),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   post.date,
                   style: TextStyle(
-                    fontSize: 25.0,
-                    height: 1.2,
+                    fontSize: 25.fSize,
+                    height: 1.2.v,
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w600,
                     color: textColor, 
@@ -232,14 +235,14 @@ Widget build(BuildContext context) {
             ),
             Padding(
               padding:
-                  const EdgeInsets.only(top: 10.0, left: 16.0, right: 16.0),
+                  EdgeInsets.only(top: 10.v, left: 16.h, right: 16.h),
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   post.title,
                   style: TextStyle(
-                    fontSize: 50.0,
-                    height: 1.2, 
+                    fontSize: 50.fSize,
+                    height: 1.2.v, 
                     fontFamily: 'Inter',
                     fontWeight: FontWeight.w700,
                     color: textColor, 
@@ -247,20 +250,20 @@ Widget build(BuildContext context) {
                 ),
               ),
             ),
-            SizedBox(height: 120.0),
+            SizedBox(height: 120.v),
             Image.asset(
               'assets/images/${post.emotionImage}',
-              height: 200,
-              width: 200,
+              height: 200.v,
+              width: 200.h,
               fit: BoxFit.contain,
             ),
-            SizedBox(height: 30.0),
+            SizedBox(height: 30.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: EdgeInsets.symmetric(horizontal: 16.h),
               child: Text(
                 post.content,
                 style: TextStyle(
-                  fontSize: 18.0,
+                  fontSize: 18.fSize,
                   fontWeight: FontWeight.bold,
                   color: textColor,
                 ),

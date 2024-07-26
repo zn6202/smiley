@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+import 'package:smiley/core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
 
 const Color backgroundColor = Color(0xFFF4F4E6);
@@ -27,7 +28,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     fetchData();
     updateDateRangeAndTitle();
   }
-  
+
   Future<void> fetchData() async {
     if (isSelected[1] || isSelected[2]) {
       int days = isSelected[1] ? 6 : 27;
@@ -38,7 +39,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       List<double> negativeSums = [];
       //周/月分析從這裡改! map要改成從資料庫取得的值
       for (int i = 0; i <= days; i++) {
-        Map<String, dynamic> dailyData = { //這是我亂生的測試值 要刪
+        Map<String, dynamic> dailyData = {
+          //這是我亂生的測試值 要刪
           'happiness': 40 - i * 5,
           'like': 25 + i * 2,
           'sadness': 15 + i * 3,
@@ -46,8 +48,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           'anger': 10 + i * 1.5,
         };
 
-        double positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) + (dailyData['like']?.toDouble() ?? 0.0);
-        double negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) + (dailyData['disgust']?.toDouble() ?? 0.0) + (dailyData['anger']?.toDouble() ?? 0.0);
+        double positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
+            (dailyData['like']?.toDouble() ?? 0.0);
+        double negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
+            (dailyData['disgust']?.toDouble() ?? 0.0) +
+            (dailyData['anger']?.toDouble() ?? 0.0);
 
         positiveSums.add(positiveSum);
         negativeSums.add(negativeSum);
@@ -62,8 +67,10 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         ];
         haveDiary = true;
       });
-    } else {//本日分析從這裡改! map要改成從資料庫取得的值
-      Map<String, dynamic> testData = {  //這是我亂生的測試值 要刪
+    } else {
+      //本日分析從這裡改! map要改成從資料庫取得的值
+      Map<String, dynamic> testData = {
+        //這是我亂生的測試值 要刪
         'happiness': 40,
         'like': 25,
         'sadness': 15,
@@ -82,13 +89,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF72805C),
-              shadows: [
-                Shadow(
-                  offset: Offset(0.1, 0.1), // Figma中的X和Y偏移量
-                  blurRadius: 2.0, // Figma中的模糊半徑
-                  color: Color.fromRGBO(0, 0, 0, 0.5), // Figma中的顏色和透明度 (黑色，50%透明度)
-                ),
-              ],
             ),
           ),
           PieChartSectionData(
@@ -100,13 +100,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF949551),
-              shadows: [
-                Shadow(
-                  offset: Offset(0.1, 0.1), // Figma中的X和Y偏移量
-                  blurRadius: 2.0, // Figma中的模糊半徑
-                  color: Color.fromRGBO(0, 0, 0, 0.5), // Figma中的顏色和透明度 (黑色，50%透明度)
-                ),
-              ],
             ),
           ),
           PieChartSectionData(
@@ -118,13 +111,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF8F8059),
-              shadows: [
-                Shadow(
-                  offset: Offset(0.1, 0.1),
-                  blurRadius: 2.0, 
-                  color: Color.fromRGBO(0, 0, 0, 0.5), 
-                ),
-              ],
             ),
           ),
           PieChartSectionData(
@@ -136,13 +122,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF546F66),
-              shadows: [
-                Shadow(
-                  offset: Offset(0.1, 0.1), 
-                  blurRadius: 2.0, 
-                  color: Color.fromRGBO(0, 0, 0, 0.5), 
-                ),
-              ],
             ),
           ),
           PieChartSectionData(
@@ -154,18 +133,14 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Color(0xFF6D8E9B),
-              shadows: [
-                Shadow(
-                  offset: Offset(0.1, 0.1), 
-                  blurRadius: 2.0, 
-                  color: Color.fromRGBO(0, 0, 0, 0.5), 
-                ),
-              ],
             ),
           ),
         ];
-        double positiveSum = (testData['happiness']?.toDouble() ?? 0.0) + (testData['like']?.toDouble() ?? 0.0);
-        double negativeSum = (testData['sadness']?.toDouble() ?? 0.0) + (testData['disgust']?.toDouble() ?? 0.0) + (testData['anger']?.toDouble() ?? 0.0);
+        double positiveSum = (testData['happiness']?.toDouble() ?? 0.0) +
+            (testData['like']?.toDouble() ?? 0.0);
+        double negativeSum = (testData['sadness']?.toDouble() ?? 0.0) +
+            (testData['disgust']?.toDouble() ?? 0.0) +
+            (testData['anger']?.toDouble() ?? 0.0);
 
         positiveEmotionData = [FlSpot(0, positiveSum)];
         negativeEmotionData = [FlSpot(0, negativeSum)];
@@ -179,15 +154,18 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     if (isSelected[1]) {
       DateTime endDate = DateTime.now();
       DateTime startDate = endDate.subtract(Duration(days: 6));
-      dateRangeText = '${DateFormat('yyyy.MM.dd').format(startDate)} - ${DateFormat('yyyy.MM.dd').format(endDate)}';
+      dateRangeText =
+          '${DateFormat('yyyy.MM.dd').format(startDate)} - ${DateFormat('yyyy.MM.dd').format(endDate)}';
       titleText = '上一週的正負情緒趨勢';
     } else if (isSelected[2]) {
       DateTime endDate = DateTime.now();
       DateTime startDate = endDate.subtract(Duration(days: 27));
-      dateRangeText = '${DateFormat('yyyy.MM.dd').format(startDate)} - ${DateFormat('yyyy.MM.dd').format(endDate)}';
+      dateRangeText =
+          '${DateFormat('yyyy.MM.dd').format(startDate)} - ${DateFormat('yyyy.MM.dd').format(endDate)}';
       titleText = '上個月的正負情緒趨勢';
     } else {
-      dateRangeText = '${DateFormat('yyyy.MM.dd').format(selectedDate ?? DateTime.now())}';
+      dateRangeText =
+          '${DateFormat('yyyy.MM.dd').format(selectedDate ?? DateTime.now())}';
       titleText = '今日日記的情緒佔比';
     }
   }
@@ -197,21 +175,21 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.adaptSize),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 32),
+              SizedBox(height: 50.v),
               Center(
                 child: Container(
-                  width: 324,
-                  height: 40,
+                  width: 318.h,
+                  height: 40.v,
                   decoration: BoxDecoration(
                     color: Color(0xFFEAEAEA),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  padding: EdgeInsets.all(4),
+                  padding: EdgeInsets.all(4.adaptSize),
                   child: ToggleButtons(
                     isSelected: isSelected,
                     borderRadius: BorderRadius.circular(20),
@@ -222,17 +200,18 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                     selectedColor: Colors.black,
                     children: [
                       Container(
-                        width: 105,
-                        height: 32,
+                        width: 103.h,
+                        height: 32.v,
                         decoration: BoxDecoration(
-                          color: isSelected[0] ? Colors.white : Colors.transparent,
+                          color:
+                              isSelected[0] ? Colors.white : Colors.transparent,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           "今日",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.fSize,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF545453),
                           ),
@@ -240,17 +219,18 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                         ),
                       ),
                       Container(
-                        width: 105,
-                        height: 32,
+                        width: 103.h,
+                        height: 32.v,
                         decoration: BoxDecoration(
-                          color: isSelected[1] ? Colors.white : Colors.transparent,
+                          color:
+                              isSelected[1] ? Colors.white : Colors.transparent,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           "上週",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.fSize,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF545453),
                           ),
@@ -258,17 +238,18 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                         ),
                       ),
                       Container(
-                        width: 105,
-                        height: 32,
+                        width: 103.h,
+                        height: 32.v,
                         decoration: BoxDecoration(
-                          color: isSelected[2] ? Colors.white : Colors.transparent,
+                          color:
+                              isSelected[2] ? Colors.white : Colors.transparent,
                           borderRadius: BorderRadius.circular(20),
                         ),
                         alignment: Alignment.center,
                         child: Text(
                           "上月",
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.fSize,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF545453),
                           ),
@@ -288,312 +269,347 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 32),
+              SizedBox(height: 30.v),
               Center(
                 child: Container(
-                  width: 330,
-                  height: 587,
+                  width: 322.h,
+                  height: 600.v,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  padding: EdgeInsets.all(40),
+                  padding: EdgeInsets.all(40.adaptSize),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
                         dateRangeText,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 20.fSize,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFF545453),
                         ),
                       ),
-                      SizedBox(height: 16),
+                      SizedBox(height: 16.v),
                       Text(
                         titleText,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 20.fSize,
                           fontWeight: FontWeight.w700,
                           color: Color(0xFFC5C5C5),
                         ),
                       ),
-                      SizedBox(height: 32),
-                      haveDiary 
-                        ? isSelected[1] || isSelected[2]
-                          ? Column(
-                              children: [
-                                Container(
-                                  height: 200,
-                                  child: LineChart(
-                                    LineChartData(
-                                      minY: 0,
-                                      maxY: 100,
-                                      gridData: FlGridData(
-                                        show: true,
-                                        getDrawingHorizontalLine: (value) {
-                                          return FlLine(
-                                            color: Color(0xFFD3D3D3),
-                                            strokeWidth: 1,
-                                          );
-                                        },
-                                        drawVerticalLine: false,
-                                        horizontalInterval: 10,
-                                      ),
-                                      titlesData: FlTitlesData(
-                                        leftTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: true,
-                                            reservedSize: 40,
-                                            getTitlesWidget: (value, meta) {
-                                              switch (value.toInt()) {
-                                                case 0:
-                                                  return Text(
-                                                    '0%',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF545453),
-                                                    ),
-                                                    textAlign: TextAlign.right,
-                                                  );
-                                                case 20:
-                                                  return Text(
-                                                    '20%',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF545453),
-                                                    ),
-                                                    textAlign: TextAlign.right,
-                                                  );
-                                                case 40:
-                                                  return Text(
-                                                    '40%',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF545453),
-                                                    ),
-                                                    textAlign: TextAlign.right,
-                                                  );
-                                                case 60:
-                                                  return Text(
-                                                    '60%',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF545453),
-                                                    ),
-                                                    textAlign: TextAlign.right,
-                                                  );
-                                                case 80:
-                                                  return Text(
-                                                    '80%',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF545453),
-                                                    ),
-                                                    textAlign: TextAlign.right,
-                                                  );
-                                                case 100:
-                                                  return Text(
-                                                    '100%',
-                                                    style: TextStyle(
-                                                      fontSize: 15,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Color(0xFF545453),
-                                                    ),
-                                                    textAlign: TextAlign.right,
-                                                  );
-                                                default:
-                                                  return Text('');
-                                              }
-                                            },
-                                            interval: 20,
-                                          ),
-                                        ),
-                                        topTitles: AxisTitles(
-                                          sideTitles: SideTitles(showTitles: false),
-                                        ),
-                                        rightTitles: AxisTitles(
-                                          sideTitles: SideTitles(showTitles: false),
-                                        ),
-                                        bottomTitles: AxisTitles(
-                                          sideTitles: SideTitles(
-                                            showTitles: false, //橫軸標籤未改好 先關閉
-                                            getTitlesWidget: (value, meta) {
-                                              switch (value.toInt()) {
-                                                case 0:
-                                                  return Text('一');
-                                                case 1:
-                                                  return Text('二');
-                                                case 2:
-                                                  return Text('三');
-                                                case 3:
-                                                  return Text('四');
-                                                case 4:
-                                                  return Text('五');
-                                                case 5:
-                                                  return Text('六');
-                                                case 6:
-                                                  return Text('日');
-                                                default:
-                                                  return Text('');
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                      borderData: FlBorderData(show: false),
-                                      lineBarsData: [
-                                        LineChartBarData(
-                                          spots: positiveEmotionData,
-                                          isCurved: true,
-                                          color: Color(0xFF7DA8E8),
-                                          barWidth: 4,
-                                          belowBarData: BarAreaData(show: false),
-                                          dotData: FlDotData(show: false),
-                                        ),
-                                        LineChartBarData(
-                                          spots: negativeEmotionData,
-                                          isCurved: true,
-                                          color: Color(0xFFA7BA89),
-                                          barWidth: 4,
-                                          belowBarData: BarAreaData(show: false),
-                                          dotData: FlDotData(show: false),
-                                        ),
-                                      ],
-                                    )
-                                  ),
-                                ),
-                                SizedBox(height: 45),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                      SizedBox(height: 40.v),
+                      haveDiary
+                          ? isSelected[1] || isSelected[2]
+                              ? Column(
                                   children: [
-                                    Column(
-                                      children: [
-                                        Container(
-                                          width: 60,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xFFA7BA89),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            "正面",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w700,
-                                              color: Color(0xFFFFFFFF),
+                                    Container(
+                                      height: 200.v,
+                                      child: LineChart(LineChartData(
+                                        minY: 0,
+                                        maxY: 100,
+                                        gridData: FlGridData(
+                                          show: true,
+                                          getDrawingHorizontalLine: (value) {
+                                            return FlLine(
+                                              color: Color(0xFFD3D3D3),
+                                              strokeWidth: 1,
+                                            );
+                                          },
+                                          drawVerticalLine: false,
+                                          horizontalInterval: 10,
+                                        ),
+                                        titlesData: FlTitlesData(
+                                          leftTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: true,
+                                              reservedSize: 40,
+                                              getTitlesWidget: (value, meta) {
+                                                switch (value.toInt()) {
+                                                  case 0:
+                                                    return Text(
+                                                      '0%',
+                                                      style: TextStyle(
+                                                        fontSize: 15.fSize,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF545453),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                    );
+                                                  case 20:
+                                                    return Text(
+                                                      '20%',
+                                                      style: TextStyle(
+                                                        fontSize: 15.fSize,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF545453),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                    );
+                                                  case 40:
+                                                    return Text(
+                                                      '40%',
+                                                      style: TextStyle(
+                                                        fontSize: 15.fSize,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF545453),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                    );
+                                                  case 60:
+                                                    return Text(
+                                                      '60%',
+                                                      style: TextStyle(
+                                                        fontSize: 15.fSize,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF545453),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                    );
+                                                  case 80:
+                                                    return Text(
+                                                      '80%',
+                                                      style: TextStyle(
+                                                        fontSize: 15.fSize,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF545453),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                    );
+                                                  case 100:
+                                                    return Text(
+                                                      '100%',
+                                                      style: TextStyle(
+                                                        fontSize: 15.fSize,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFF545453),
+                                                      ),
+                                                      textAlign:
+                                                          TextAlign.right,
+                                                    );
+                                                  default:
+                                                    return Text('');
+                                                }
+                                              },
+                                              interval: 20,
                                             ),
-                                            textAlign: TextAlign.center,
+                                          ),
+                                          topTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          rightTitles: AxisTitles(
+                                            sideTitles:
+                                                SideTitles(showTitles: false),
+                                          ),
+                                          bottomTitles: AxisTitles(
+                                            sideTitles: SideTitles(
+                                              showTitles: false, //橫軸標籤未改好 先關閉
+                                              getTitlesWidget: (value, meta) {
+                                                switch (value.toInt()) {
+                                                  case 0:
+                                                    return Text('一');
+                                                  case 1:
+                                                    return Text('二');
+                                                  case 2:
+                                                    return Text('三');
+                                                  case 3:
+                                                    return Text('四');
+                                                  case 4:
+                                                    return Text('五');
+                                                  case 5:
+                                                    return Text('六');
+                                                  case 6:
+                                                    return Text('日');
+                                                  default:
+                                                    return Text('');
+                                                }
+                                              },
+                                            ),
                                           ),
                                         ),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          "開心\n喜歡",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
+                                        borderData: FlBorderData(show: false),
+                                        lineBarsData: [
+                                          LineChartBarData(
+                                            spots: positiveEmotionData,
+                                            isCurved: true,
+                                            color: Color(0xFF7DA8E8),
+                                            barWidth: 4,
+                                            belowBarData:
+                                                BarAreaData(show: false),
+                                            dotData: FlDotData(show: false),
+                                          ),
+                                          LineChartBarData(
+                                            spots: negativeEmotionData,
+                                            isCurved: true,
                                             color: Color(0xFFA7BA89),
+                                            barWidth: 4,
+                                            belowBarData:
+                                                BarAreaData(show: false),
+                                            dotData: FlDotData(show: false),
                                           ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ],
+                                        ],
+                                      )),
                                     ),
-                                    SizedBox(width: 16),
-                                    Column(
+                                    SizedBox(height: 60.v),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Container(
-                                          width: 60,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            color: Color(0xFF7DA8E8),
-                                            borderRadius: BorderRadius.circular(20),
-                                          ),
-                                          alignment: Alignment.center,
-                                          child: Text(
-                                            "負面",
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              fontWeight: FontWeight.w700,
-                                              color: Color(0xFFFFFFFF),
+                                        Column(
+                                          children: [
+                                            Container(
+                                              width: 60.h,
+                                              height: 32.v,
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFFA7BA89),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                "正面",
+                                                style: TextStyle(
+                                                  fontSize: 20.fSize,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFFFFFFFF),
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ),
-                                            textAlign: TextAlign.center,
-                                          ),
+                                            SizedBox(height: 8.v),
+                                            Text(
+                                              "開心\n喜歡",
+                                              style: TextStyle(
+                                                fontSize: 20.fSize,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFFA7BA89),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
                                         ),
-                                        SizedBox(height: 8),
-                                        Text(
-                                          "悲傷\n噁心\n憤怒",
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.w700,
-                                            color: Color(0xFF7DA8E8),
-                                          ),
-                                          textAlign: TextAlign.center,
+                                        SizedBox(width: 20.h),
+                                        Column(
+                                          children: [
+                                            Container(
+                                              width: 60.h,
+                                              height: 32.v,
+                                              decoration: BoxDecoration(
+                                                color: Color(0xFF7DA8E8),
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                              ),
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                "負面",
+                                                style: TextStyle(
+                                                  fontSize: 20.fSize,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFFFFFFFF),
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            SizedBox(height: 8.v),
+                                            Text(
+                                              "悲傷\n噁心\n憤怒",
+                                              style: TextStyle(
+                                                fontSize: 20.fSize,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF7DA8E8),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
                                         ),
                                       ],
                                     ),
                                   ],
-                                ),
-                              ],
-                            )
+                                )
+                              : Column(
+                                  children: [
+                                    Container(
+                                      height: 200.v,
+                                      child: PieChart(
+                                        PieChartData(
+                                          sections: pieChartSections,
+                                          centerSpaceRadius: 40.adaptSize,
+                                          sectionsSpace: 0.adaptSize,
+                                          borderData: FlBorderData(show: false),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 30.v),
+                                    Center(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Indicator(
+                                              color: Color(0xFFA7BA89),
+                                              text: '開心'),
+                                          SizedBox(height: 8.v),
+                                          Indicator(
+                                              color: Color(0xFFDCDE76),
+                                              text: '喜歡'),
+                                          SizedBox(height: 8.v),
+                                          Indicator(
+                                              color: Color(0xFFD1BA7E),
+                                              text: '悲傷'),
+                                          SizedBox(height: 8.v),
+                                          Indicator(
+                                              color: Color(0xFF7FA99B),
+                                              text: '噁心'),
+                                          SizedBox(height: 8.v),
+                                          Indicator(
+                                              color: Color(0xFF394A51),
+                                              text: '憤怒'),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
                           : Column(
                               children: [
-                                Container(
-                                  height: 200,
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: pieChartSections,
-                                      centerSpaceRadius: 40,
-                                      sectionsSpace: 0,
-                                      borderData: FlBorderData(show: false),
-                                    ),
-                                  ),
+                                Image.asset(
+                                  'assets/images/questionMark.jpg',
+                                  width: 238.h,
+                                  height: 238.v,
+                                  fit: BoxFit.contain,
                                 ),
-                                SizedBox(height: 16),
-                                Center(
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Indicator(color: Color(0xFFA7BA89), text: '開心'),
-                                      SizedBox(height: 8),
-                                      Indicator(color: Color(0xFFDCDE76), text: '喜歡'),
-                                      SizedBox(height: 8),
-                                      Indicator(color: Color(0xFFD1BA7E), text: '悲傷'),
-                                      SizedBox(height: 8),
-                                      Indicator(color: Color(0xFF7FA99B), text: '噁心'),
-                                      SizedBox(height: 8),
-                                      Indicator(color: Color(0xFF394A51), text: '憤怒'),
-                                    ],
+                                SizedBox(height: 16.v),
+                                Text(
+                                  "今日日記尚未完成",
+                                  style: TextStyle(
+                                    fontSize: 20.fSize,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFFC5C5C5),
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
                               ],
-                            )
-                        : Column(
-                            children: [
-                              Image.asset(
-                                'assets/images/questionMark.jpg',
-                                width: 238,
-                                height: 238,
-                                fit: BoxFit.contain,
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                "今日日記尚未完成",
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFFC5C5C5),
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
-                          ),
+                            ),
                     ],
                   ),
                 ),
@@ -627,18 +643,18 @@ class Indicator extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center, // 使指示器在行內水平居中排列
       children: [
         Container(
-          width: 30, // 設置指示器顏色方塊的寬度
-          height: 18, // 設置指示器顏色方塊的高度
+          width: 30.h, // 設置指示器顏色方塊的寬度
+          height: 18.v, // 設置指示器顏色方塊的高度
           decoration: BoxDecoration(
             color: color, // 指示器顏色方塊的顏色
             borderRadius: BorderRadius.circular(20), // 圓角形狀
           ),
         ),
-        SizedBox(width: 8), // 添加水平間距
+        SizedBox(width: 10.h), // 添加水平間距
         Text(
           text, // 顯示指示器的文字
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 20.fSize,
             fontWeight: FontWeight.bold,
             color: color, // 將文字顏色設置為與指示器顏色塊一致
           ),
@@ -647,7 +663,6 @@ class Indicator extends StatelessWidget {
     );
   }
 }
-
 
 // 自定義標籤 Widget
 class CustomLabel extends StatelessWidget {
@@ -658,18 +673,18 @@ class CustomLabel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 92.6,
-      height: 37.04,
+      width: 92.6.h,
+      height: 37.04.v,
       decoration: BoxDecoration(
         color: Color(0x99F3F3F3),
         borderRadius: BorderRadius.circular(20),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      padding: EdgeInsets.symmetric(horizontal: 15.h, vertical: 15.v),
       child: Center(
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 16.fSize,
             fontWeight: FontWeight.bold,
             color: Color(0xFF545453),
           ),

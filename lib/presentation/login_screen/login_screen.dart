@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../../routes/api_connection.dart';
 
+
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
 
@@ -161,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               child: Column(
                 children: [
-                  SizedBox(height: 57.v), // 上方間距
+                  SizedBox(height: 20.v), // 上方間距
                   // Logo 排版區域
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 34.h),
@@ -199,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 57.v), // 上方間距
+                  SizedBox(height: 28.v), // 上方間距
                   // 歡迎標題
                   Text(
                     "Welcome to SMILEY",
@@ -323,18 +324,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           imagePath: ImageConstant.imgGoogle,
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 57.h),
-                        child: CustomIconButton(
-                          height: 50.v,
-                          width: 53.h,
-                          padding: EdgeInsets.all(10.h),
-                          decoration: IconButtonStyleHelper.fillBlueA,
-                          child: CustomImageView(
-                            imagePath: ImageConstant.imgFacebook,
-                          ),
-                        ),
-                      )
                     ],
                   ),
                   SizedBox(height: 64.v), // 上方間距
@@ -414,8 +403,3 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
   }
 }
-
-
-/*
-前端: FB移除
-*/

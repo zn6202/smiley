@@ -43,7 +43,7 @@ class ForgetpwdScreen extends StatelessWidget {
           padding: EdgeInsets.only(
             // 設定內邊距
             left: 30.h,
-            top: 95.v,
+            top: 40.v,
             right: 30.h,
           ),
           // 使用 Column 來排列元件
@@ -52,8 +52,8 @@ class ForgetpwdScreen extends StatelessWidget {
               // 電子郵件輸入欄位
               CustomTextFormField(
                 controller: emailaddressController, // 關聯控制器
-                hintText: "電子郵件地址...", // 提示文字
-                textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色ㄇ
+                hintText: "email...", // 提示文字
+                textStyle: TextStyle(color: Colors.black), // 設定文本顏色為黑色
                 textInputAction: TextInputAction.done, // 輸入完成後的操作
                 // 設定前綴圖標
                 prefix: Container(
@@ -91,29 +91,28 @@ class ForgetpwdScreen extends StatelessWidget {
   }
 
   /// 建立自訂的 App Bar
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return CustomAppBar(
-      leadingWidth: 50.h, // 設定返回圖標的寬度
-      leading: AppbarLeadingImage(
-        imagePath: ImageConstant.imgArrowLeft, // 返回圖標圖片
-        margin: EdgeInsets.only(
-          // 設定內邊距
-          left: 41.h,
-          top: 19.v,
-          bottom: 19.v,
-        ),
-        // 點擊返回按鈕時，呼叫 `onTapArrowleftone` 函數返回上一頁
-        onTap: () {
-          onTapArrowleftone(context);
-        },
+PreferredSizeWidget _buildAppBar(BuildContext context) {
+  return CustomAppBar(
+    height: 80.v, // 增加 AppBar 的高度
+    leadingWidth: 50.h,
+    leading: AppbarLeadingImage(
+      imagePath: ImageConstant.imgArrowLeft,
+      margin: EdgeInsets.only(
+        left: 41.h,
+        top: 30.v, 
+        bottom: 19.v,
       ),
-      centerTitle: true, // 標題居中
-      // 設定 App Bar 標題
-      title: AppbarTitle(
-        text: "密碼找回",
-      ),
-    );
-  }
+      onTap: () {
+        onTapArrowleftone(context);
+      },
+    ),
+    centerTitle: true,
+    title: AppbarTitle(
+      text: "密碼找回",
+      margin: EdgeInsets.only(top: 10.v), // 調整標題的位置
+    ),
+  );
+}
 
   // 返回到上一個畫面
   void onTapArrowleftone(BuildContext context) {

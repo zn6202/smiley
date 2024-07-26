@@ -9,16 +9,16 @@ import 'package:shared_preferences/shared_preferences.dart'; // 引入 SharedPre
 import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 
-const TextStyle dialogTitleStyle = TextStyle(
+TextStyle dialogTitleStyle = TextStyle(
     color: Color(0xFF545453),
-    fontSize: 25,
+    fontSize: 25.fSize,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w100,
     letterSpacing: -0.32);
 
-const TextStyle dialogContentStyle = TextStyle(
+TextStyle dialogContentStyle = TextStyle(
     color: Color(0xFF545453),
-    fontSize: 16,
+    fontSize: 16.fSize,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w100,
     letterSpacing: -0.32);
@@ -93,8 +93,8 @@ class _DefaultavatarState extends State<Defaultavatar> {
         leading: AppbarLeadingImage(
           imagePath: 'assets/images/arrow-left-g.png', // 返回圖標圖片
           margin: EdgeInsets.only(
-            top: 19.0,
-            bottom: 19.0,
+            top: 19.v,
+            bottom: 19.v,
           ),
           onTap: () async {
             FocusScope.of(context).requestFocus(FocusNode());
@@ -104,17 +104,17 @@ class _DefaultavatarState extends State<Defaultavatar> {
         ),
         title: Image.asset(
           'assets/images/default_avatar_icon.png',
-          height: 30, // 您可以根據需要調整圖片的高度
+          height: 30.v, // 您可以根據需要調整圖片的高度
         ),
         centerTitle: true, // 將圖片設置為居中
       ),
       body: Center(
         child: GridView.builder(
-          padding: EdgeInsets.only(top: 50.0, left: 20.0, right: 20.0),
+          padding: EdgeInsets.only(top: 50.v, left: 20.h, right: 20.h),
           gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3, // 每行顯示三個圓形圖像
-            crossAxisSpacing: 20.0, // 圖像之間的水平間距
-            mainAxisSpacing: 20.0, // 圖像之間的垂直間距
+            crossAxisSpacing: 20.h, // 圖像之間的水平間距
+            mainAxisSpacing: 20.v, // 圖像之間的垂直間距
           ),
           itemCount: avatarImages.length + 1, // 加一個顯示相機圖標的白底圓形圖
           itemBuilder: (context, index) {
@@ -128,11 +128,11 @@ class _DefaultavatarState extends State<Defaultavatar> {
                     shape: BoxShape.circle, // 圓形背景
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(10.0), // 圓形容器內的間距
+                    padding: EdgeInsets.all(10.adaptSize), // 圓形容器內的間距
                     child: Icon(
                       Icons.camera_alt,
                       color: Color(0xFFA7BA89), // 圖標顏色 // 設置相機圖標顏色
-                      size: 40, // 設置相機圖標大小
+                      size: 40.adaptSize, // 設置相機圖標大小
                     ),
                   ),
                 ),
@@ -148,7 +148,7 @@ class _DefaultavatarState extends State<Defaultavatar> {
                     shape: BoxShape.circle, // 圓形背景
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(10.0), // 圓形容器內的間距
+                    padding: EdgeInsets.all(10.adaptSize), // 圓形容器內的間距
                     child: Image.asset(
                       avatarImages[index],
                       fit: BoxFit.contain, // 圖片的適應方式

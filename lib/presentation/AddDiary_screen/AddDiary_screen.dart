@@ -9,41 +9,42 @@ import '../../widgets/app_bar/appbar_leading_image.dart';
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
 
 // 日期文字的樣式常數，用於選定日期的顯示。
-const TextStyle selectedDateStyle = TextStyle(
-    fontSize: 24.0, color: Color(0xFF545453), fontWeight: FontWeight.bold);
+TextStyle selectedDateStyle = TextStyle(
+    fontSize: 24.0.fSize, color: Color(0xFF545453), fontWeight: FontWeight.bold);
 
 // 標題文字樣式常數
-const TextStyle dialogTitleStyle = TextStyle(
+TextStyle dialogTitleStyle = TextStyle(
     color: Color(0xFF545453),
-    fontSize: 25,
+    fontSize: 25.fSize,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w100,
     letterSpacing: -0.32);
 
 // 提示文字樣式常數
-const TextStyle dialogContentStyle = TextStyle(
+TextStyle dialogContentStyle = TextStyle(
     color: Color(0xFF545453),
-    fontSize: 16,
+    fontSize: 16.fSize,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w100,
     letterSpacing: -0.32);
 
 // 按鈕文字樣式常數
-const TextStyle buttonTextStyleWhite = TextStyle(
+TextStyle buttonTextStyleWhite = TextStyle(
     color: Colors.white,
-    fontSize: 18,
+    fontSize: 18.fSize,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w600,
     height: 1.0);
 
-const TextStyle buttonTextStylePrimary = TextStyle(
+TextStyle buttonTextStylePrimary = TextStyle(
     color: Color(0xFFA7BA89),
-    fontSize: 18,
+    fontSize: 18.fSize,
     fontFamily: 'Inter',
     fontWeight: FontWeight.w600,
     height: 1.0);
@@ -117,31 +118,25 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
       // 設置主體背景顏色為白色。
       backgroundColor: Colors.white,
       // 應用程式的頂部應用欄。
-      appBar: AppBar(
-        // 設置應用欄的陰影為 0。
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        // 應用欄的返回按鈕。
-        leading: AppbarLeadingImage(
-          imagePath: ImageConstant.imgArrowLeft, // 返回圖標圖片
-          margin: EdgeInsets.only(
-            // 設定內邊距
-            top: 19.v,
-            bottom: 19.v,
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leading: IconButton(
+              icon: SvgPicture.asset(
+                'assets/images/img_arrow_left.svg',
+              ),
+              onPressed: () async {
+                if (isSubmitted) {
+                  Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+                } else {
+                  showExitConfirmationDialog(context);
+                }
+              },
+            ),
           ),
-          // 點擊返回按鈕時，呼叫 `showExitConfirmationDialog` 函數顯示對話框。
-          onTap: () {
-            if (isSubmitted) {
-              Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
-            } else {
-              showExitConfirmationDialog(context);
-            }
-          },
-        ),
-      ),
       // 主體內容，添加內邊距。
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: EdgeInsets.symmetric(horizontal: 24.h),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start, // 內容左對齊排列。
           children: [
@@ -150,7 +145,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               "${DateFormat('yyyy.MM.dd').format(selectedDate ?? DateTime.now())}",
               style: selectedDateStyle, // 日期文字的樣式。
             ),
-            SizedBox(height: 16), // 添加垂直間距。
+            SizedBox(height: 16.v), // 添加垂直間距。
             // 展開多行文本輸入框，以覆蓋整個頁面
             Expanded(
               child: Container(
@@ -162,9 +157,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                           children: [
                             Text(
                               submittedContent, // 顯示已提交的日記內容
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16.fSize),
                             ),
-                            SizedBox(height: 20), // 添加間距
+                            SizedBox(height: 20.v), // 添加間距
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -185,7 +180,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                           border: InputBorder.none, // 無邊框樣式。
                           hintText: '說說你的心情吧...', // 提示文字。
                         ),
-                        style: TextStyle(fontSize: 16), // 文本樣式。
+                        style: TextStyle(fontSize: 16.fSize), // 文本樣式。
                       ),
               ),
             ),
@@ -193,8 +188,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             if (!isSubmitted)
               Center(
                 child: Container(
-                  height: 40,
-                  width: 114,
+                  height: 40.v,
+                  width: 114.h,
                   decoration: ShapeDecoration(
                     color: Color(0xFFA7BA89),
                     shape: RoundedRectangleBorder(
@@ -204,6 +199,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                   child: Center(
                     child: TextButton(
                       onPressed: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
                         showSaveConfirmationDialog(
                             context); // 完成"日記"、"分析"、"小天使小怪獸" 的後端
                       },
@@ -216,7 +212,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                   ),
                 ),
               ),
-            SizedBox(height: 16), // 確保按鈕下方有足夠間距。
+            SizedBox(height: 16.v), // 確保按鈕下方有足夠間距。
           ],
         ),
       ),
@@ -228,80 +224,77 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 目前先顯示figma上的圖片，之後演算法建立好後 只要呼叫這個 並附上圖片網址即可
  */
   Widget buildEmotionBlock(String imageUrl) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0), // 根據需要調整邊界大小
+    return Container(
+      width: 140.h,
+      height: 246.v,
+      padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 20.v),
+      margin: EdgeInsets.symmetric(horizontal: 14.5.h),
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
       child: GestureDetector(
         onTap: () {
-          Navigator.pushNamed(context, AppRoutes.postPage,arguments: imageUrl);
+          Navigator.pushNamed(context, AppRoutes.postPage, arguments: imageUrl);
         },
-        child: Container(
-          width: 150,
-          height: 246,
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 20),
-          clipBehavior: Clip.antiAlias,
-          decoration: ShapeDecoration(
-            color: Colors.white,
-            shape: RoundedRectangleBorder(
-              side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
-              borderRadius: BorderRadius.circular(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 106.h,
+              height: 27.v,
+              child: Text(
+                '情緒小怪獸',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFC4C4C4),
+                  fontSize: 16.fSize,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.32,
+                ),
+              ),
             ),
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(
-                width: 106,
-                height: 27,
-                child: Text(
-                  '情緒小怪獸',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFFC4C4C4),
-                    fontSize: 16,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: -0.32,
-                  ),
+            Container(
+              width: 126.h,
+              height: 122.v,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(imageUrl),
+                  fit: BoxFit.fill,
                 ),
               ),
-              Container(
-                width: 126,
-                height: 122,
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(imageUrl),
-                    fit: BoxFit.fill,
-                  ),
+            ),
+            SizedBox(height: 30.v),
+            Container(
+              width: 114.h,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
               ),
-              Container(
-                width: 114,
-                decoration: ShapeDecoration(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-                child: Text(
-                  '輕觸發文',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Color(0xFFCDCED0),
-                    fontSize: 15,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    height: 1.5,
-                  ),
+              child: Text(
+                '輕觸發文',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFCDCED0),
+                  fontSize: 15.fSize,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  height: 1.5.v / 15.fSize,
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
-
 
   showExitConfirmationDialog(BuildContext context) {
     // 顯示對話框
@@ -315,9 +308,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
           ),
           child: Container(
-            width: 304.0, // 設置對話框的寬度
-            height: 222.4, // 設置對話框的高度
-            padding: const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
+            width: 304.h, // 設置對話框的寬度
+            height: 222.4.v, // 設置對話框的高度
+            padding: EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
             clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
             decoration: ShapeDecoration(
               color: Colors.white, // 設置對話框的背景顏色
@@ -338,21 +331,21 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     style: dialogTitleStyle,
                   ),
                 ),
-                const SizedBox(height: 10), // 添加垂直間距
+                SizedBox(height: 10.v), // 添加垂直間距
                 // 添加橫線
                 Container(
-                  width: 244.50,
+                  width: 244.5.h,
                   decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(
-                        width: 1,
+                        width: 1.h,
                         strokeAlign: BorderSide.strokeAlignCenter,
                         color: Color(0xFFDADADA),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10), // 添加垂直間距
+                SizedBox(height: 10.v), // 添加垂直間距
                 // 設置提示文本
                 SizedBox(
                   width: double.infinity, // 寬度設置為充滿父容器
@@ -362,20 +355,20 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     style: dialogContentStyle,
                   ),
                 ),
-                const SizedBox(height: 20), // 添加垂直間距
+                SizedBox(height: 20.v), // 添加垂直間距
                 // 添加水平排列的按鈕
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 按鈕之間均勻分布
                   children: [
                     // 返回按鈕
                     Container(
-                      height: 40, // 按鈕容器高度
-                      width: 114, // 設置按鈕寬度
+                      height: 42.v, // 按鈕容器高度
+                      width: 114.h, // 設置按鈕寬度
                       decoration: ShapeDecoration(
                         color: Colors.white, // 按鈕背景顏色
                         shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              width: 1, color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
+                              width: 1.h, color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
                           borderRadius: BorderRadius.circular(20), // 設置圓角大小
                         ),
                       ),
@@ -395,8 +388,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     ),
                     // 繼續編輯按鈕
                     Container(
-                      height: 40, // 按鈕容器高度
-                      width: 114, // 設置按鈕寬度
+                      height: 42.v, // 按鈕容器高度
+                      width: 114.h, // 設置按鈕寬度
                       decoration: ShapeDecoration(
                         color: Color(0xFFA7BA89), // 按鈕背景顏色
                         shape: RoundedRectangleBorder(
@@ -438,9 +431,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
           ),
           child: Container(
-            width: 304.0, // 設置對話框的寬度
-            height: 222.4, // 設置對話框的高度
-            padding: const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
+            width: 304.0.h, // 設置對話框的寬度
+            height: 222.4.v, // 設置對話框的高度
+            padding: EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
             clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
             decoration: ShapeDecoration(
               color: Colors.white, // 設置對話框的背景顏色
@@ -461,21 +454,21 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     style: dialogTitleStyle,
                   ),
                 ),
-                const SizedBox(height: 10), // 添加垂直間距
+                SizedBox(height: 10.v), // 添加垂直間距
                 // 添加橫線
                 Container(
-                  width: 244.50,
+                  width: 244.5.h,
                   decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(
-                        width: 1,
+                        width: 1.v,
                         strokeAlign: BorderSide.strokeAlignCenter,
                         color: Color(0xFFDADADA),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10), // 添加垂直間距
+                SizedBox(height: 10.v), // 添加垂直間距
                 // 設置提示文本
                 SizedBox(
                   width: double.infinity, // 寬度設置為充滿父容器
@@ -485,20 +478,20 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     style: dialogContentStyle,
                   ),
                 ),
-                const SizedBox(height: 20), // 添加垂直間距
+                SizedBox(height: 20.v), // 添加垂直間距
                 // 添加水平排列的按鈕
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 按鈕之間均勻分布
                   children: [
                     // 返回按鈕
                     Container(
-                      height: 40, // 按鈕容器高度
-                      width: 114, // 設置按鈕寬度
+                      height: 42.v, // 按鈕容器高度
+                      width: 114.h, // 設置按鈕寬度
                       decoration: ShapeDecoration(
                         color: Colors.white, // 按鈕背景顏色
                         shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              width: 1, color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
+                              width: 1.h, color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
                           borderRadius: BorderRadius.circular(20), // 設置圓角大小
                         ),
                       ),
@@ -516,8 +509,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                       ),
                     ),
                     Container(
-                      height: 40, // 按鈕容器高度
-                      width: 114, // 設置按鈕寬度
+                      height: 42.v, // 按鈕容器高度
+                      width: 114.h, // 設置按鈕寬度
                       decoration: ShapeDecoration(
                         color: Color(0xFFA7BA89), // 按鈕背景顏色
                         shape: RoundedRectangleBorder(
@@ -567,10 +560,10 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                 });
               },
               child: Container(
-                width: 304.0, // 設置對話框的寬度
-                height: 121.4, // 設置對話框的高度
+                width: 304.h, // 設置對話框的寬度
+                height: 131.4.v, // 設置對話框的高度
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
+                    EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
                 clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
                 decoration: ShapeDecoration(
                   color: Colors.white, // 設置對話框的背景顏色
@@ -582,7 +575,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                   mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
                   crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
                   children: [
-                    const SizedBox(height: 10), // 添加垂直間距
+                    SizedBox(height: 20.v), // 添加垂直間距
                     // 設置標題文本
                     SizedBox(
                       width: double.infinity, // 寬度設置為充滿父容器
@@ -592,21 +585,21 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                         style: dialogTitleStyle,
                       ),
                     ),
-                    const SizedBox(height: 10), // 添加垂直間距
+                    SizedBox(height: 10.v), // 添加垂直間距
                     // 添加橫線
                     Container(
-                      width: 244.50,
+                      width: 244.5.h,
                       decoration: ShapeDecoration(
                         shape: RoundedRectangleBorder(
                           side: BorderSide(
-                            width: 1,
+                            width: 1.h,
                             strokeAlign: BorderSide.strokeAlignCenter,
                             color: Color(0xFFDADADA),
                           ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 10), // 添加垂直間距
+                    SizedBox(height: 10.v), // 添加垂直間距
                     // 設置提示文本
                     SizedBox(
                       width: double.infinity, // 寬度設置為充滿父容器
@@ -616,7 +609,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                         style: dialogContentStyle,
                       ),
                     ),
-                    const SizedBox(height: 20), // 添加垂直間距
+                    SizedBox(height: 20.v), // 添加垂直間距
                   ],
                 ),
               ),
@@ -641,9 +634,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               submitDiary(context); // 呼叫提交日記方法
             },
             child: Container(
-              width: 304.0, // 設置對話框的寬度
-              height: 121.4, // 設置對話框的高度
-              padding: const EdgeInsets.symmetric(horizontal: 23), // 設置對話框的內邊距
+              width: 304.h, // 設置對話框的寬度
+              height: 121.4.v, // 設置對話框的高度
+              padding: EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
               clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
               decoration: ShapeDecoration(
                 color: Colors.white, // 設置對話框的背景顏色
@@ -655,7 +648,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                 mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
                 crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
                 children: [
-                  const SizedBox(height: 10), // 添加垂直間距
+                  SizedBox(height: 10.v), // 添加垂直間距
                   // 設置標題文本
                   SizedBox(
                     width: double.infinity, // 寬度設置為充滿父容器
@@ -665,21 +658,21 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                       style: dialogTitleStyle,
                     ),
                   ),
-                  const SizedBox(height: 10), // 添加垂直間距
+                  SizedBox(height: 10.v), // 添加垂直間距
                   // 添加橫線
                   Container(
-                    width: 244.50,
+                    width: 244.5.h,
                     decoration: ShapeDecoration(
                       shape: RoundedRectangleBorder(
                         side: BorderSide(
-                          width: 1,
+                          width: 1.h,
                           strokeAlign: BorderSide.strokeAlignCenter,
                           color: Color(0xFFDADADA),
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10), // 添加垂直間距
+                  SizedBox(height: 10.v), // 添加垂直間距
                   // 設置提示文本
                   SizedBox(
                     width: double.infinity, // 寬度設置為充滿父容器
@@ -689,7 +682,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                       style: dialogContentStyle,
                     ),
                   ),
-                  const SizedBox(height: 20), // 添加垂直間距
+                  SizedBox(height: 20.v), // 添加垂直間距
                 ],
               ),
             ),
@@ -708,9 +701,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
             borderRadius: BorderRadius.circular(24.0),
           ),
           child: Container(
-            width: 304.0,
-            height: 142.4,
-            padding: const EdgeInsets.symmetric(horizontal: 23),
+            width: 304.h,
+            height: 160.0.v,
+            padding: EdgeInsets.symmetric(horizontal: 23.h,vertical: 23.v),
             decoration: ShapeDecoration(
               color: Colors.white,
               shape: RoundedRectangleBorder(
@@ -728,19 +721,19 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     style: dialogTitleStyle,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10.v),
                 Container(
-                  width: 244.50,
+                  width: 244.5.h,
                   decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(
-                        width: 1,
+                        width: 1.h,
                         color: Color(0xFFDADADA),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10.v),
                 SizedBox(
                   width: double.infinity,
                   child: Text(
@@ -749,7 +742,6 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                     style: dialogContentStyle,
                   ),
                 ),
-                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -761,13 +753,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 
 /*
 前端修正:
-1. 捲動畫面最上方會有紫色陰影
-2. 用Navigator.of(context).pop();來關閉前一個dialog時 會回到輸入日記 會彈出鍵盤 看如何修改
-  - 試過每次pop回去後 unfocus() 但是還是會閃
-  - 試過改用GetX管理狀態 但會有例外狀況
-  - flutter_smart_dialog: ^4.9.7+8試試看
-3. 輸入框與提交後日記顯示的起始點有些微不同
-4. dialog太多 不確定會不會例外狀況 需要想更好的方法
+- 捲動畫面最上方會有紫色陰影
+- 輸入框與提交後日記顯示的起始點有些微不同
 */
 
 /*

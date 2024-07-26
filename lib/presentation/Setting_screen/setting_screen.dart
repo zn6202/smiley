@@ -157,16 +157,15 @@ class _SettingScreenState extends State<settingScreen> {
   Widget _buildProfileSection() {
     return Container(
       color: backgroundColor, // 修改背景顏色。
-      padding: const EdgeInsets.only(
-        top: 120.0,
-        bottom: 40.0,
+      padding: EdgeInsets.only(
+        top: 132.v,
+        bottom: 40.v,
       ),
       child: Column(
         children: [
-          SizedBox(height: 28.0), // 增加一個固定高度的空間
           Container(
-            width: 80,
-            height: 80,
+            width: 80.h,
+            height: 80.v,
             decoration: BoxDecoration(
               color: Colors.white, // 背景顏色
               shape: BoxShape.circle, // 圓形
@@ -180,16 +179,16 @@ class _SettingScreenState extends State<settingScreen> {
                       as ImageProvider<Object>?,
             ),
           ),
-          SizedBox(height: 16.0), // 減小這裡的高度
+          SizedBox(height: 16.v), // 減小這裡的高度
           Container(
-            width: 104,
-            height: 28,
+            width: 104.h,
+            height: 28.v,
             decoration: BoxDecoration(
               color: Colors.white, // 背景顏色
               borderRadius: BorderRadius.circular(20.0), // 圓角
-              border: Border.all(color: Color(0xFFFFFFFF), width: 1), // 邊框
+              border: Border.all(color: Color(0xFFFFFFFF), width: 1.h), // 邊框
             ),
-            padding: EdgeInsets.all(2), // 內邊距
+            padding: EdgeInsets.all(2.adaptSize), // 內邊距
             child: Container(
               width: double.infinity,
               height: double.infinity,
@@ -201,7 +200,7 @@ class _SettingScreenState extends State<settingScreen> {
                 child: Text(
                   'name',
                   style: TextStyle(
-                    fontSize: 14.0, // 字體大小
+                    fontSize: 14.fSize, // 字體大小
                     color: Colors.white, // 字體顏色
                     fontWeight: FontWeight.w700,
                   ),
@@ -209,25 +208,25 @@ class _SettingScreenState extends State<settingScreen> {
               ),
             ),
           ),
-          SizedBox(height: 8.0), // 增加一個固定高度的空間
+          SizedBox(height: 8.v), // 增加一個固定高度的空間
           Text(
             userName, // 用戶名
             style: TextStyle(
-              fontSize: 18.0, // 字體大小
+              fontSize: 18.fSize, // 字體大小
               fontWeight: FontWeight.w700,
               color: Color(0xFF545453), // 字體顏色
             ),
           ),
-          SizedBox(height: 16.0), // 減小這裡的高度
+          SizedBox(height: 16.v), // 減小這裡的高度
           Container(
-            width: 104,
-            height: 28,
+            width: 104.h,
+            height: 28.v,
             decoration: BoxDecoration(
               color: Colors.white, // 背景顏色
               borderRadius: BorderRadius.circular(20.0), // 圓角
-              border: Border.all(color: Color(0xFFFFFFFF), width: 1), // 邊框
+              border: Border.all(color: Color(0xFFFFFFFF), width: 1.h), // 邊框
             ),
-            padding: EdgeInsets.all(2), // 內邊距
+            padding: EdgeInsets.all(2.adaptSize), // 內邊距
             child: Container(
               width: double.infinity,
               height: double.infinity,
@@ -239,7 +238,7 @@ class _SettingScreenState extends State<settingScreen> {
                 child: Text(
                   'id',
                   style: TextStyle(
-                    fontSize: 14.0, // 字體大小
+                    fontSize: 14.fSize, // 字體大小
                     color: Colors.white, // 字體顏色
                     fontWeight: FontWeight.w700,
                   ),
@@ -247,11 +246,11 @@ class _SettingScreenState extends State<settingScreen> {
               ),
             ),
           ),
-          SizedBox(height: 8.0), // 增加一個固定高度的空間
+          SizedBox(height: 8.v), // 增加一個固定高度的空間
           Text(
             userId, // 用戶 ID
             style: TextStyle(
-              fontSize: 18.0, // 字體大小
+              fontSize: 18.fSize, // 字體大小
               fontWeight: FontWeight.w700,
               color: Color(0xFF545453), // 字體顏色
             ),
@@ -264,16 +263,16 @@ class _SettingScreenState extends State<settingScreen> {
   // 構建選項網格小部件。
   Widget _buildOptionsGrid() {
     return Padding(
-      padding: const EdgeInsets.only(
-        left: 60.0,
-        right: 60.0,
+      padding: EdgeInsets.only(
+        left: 60.v,
+        right: 60.v,
       ), // 外邊距
       child: GridView.builder(
         itemCount: 4, // 總共4個網格項目
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // 每行顯示兩個網格
-          crossAxisSpacing: 20.0, // 水平間距
-          mainAxisSpacing: 20.0, // 垂直間距
+          crossAxisSpacing: 20.h, // 水平間距
+          mainAxisSpacing: 20.v, // 垂直間距
           childAspectRatio: 117 / 92, // 寬高比
         ),
         itemBuilder: (context, index) {
@@ -297,8 +296,8 @@ class _SettingScreenState extends State<settingScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 117, // 設置寬度為 117
-        height: 92, // 設置高度為 92
+        width: 117.h, // 設置寬度為 117
+        height: 92.v, // 設置高度為 92
         decoration: BoxDecoration(
           color: Colors.white, // 背景顏色
           borderRadius: BorderRadius.circular(15.0), // 圓角
@@ -308,14 +307,14 @@ class _SettingScreenState extends State<settingScreen> {
           children: [
             Image.asset(
               imagePath, // 圖標圖片路徑
-              width: 40.0, // 圖片寬度
-              height: 40.0, // 圖片高度
+              width: 40.h, // 圖片寬度
+              height: 40.v, // 圖片高度
             ),
-            SizedBox(height: 8.0), // 增加一個固定高度的空間
+            SizedBox(height: 8.v), // 增加一個固定高度的空間
             Text(
               label, // 標籤文字
               style: TextStyle(
-                fontSize: 16.0, // 字體大小
+                fontSize: 16.fSize, // 字體大小
                 color: Color(0xFFA7BA89), // 字體顏色
                 fontWeight: FontWeight.w700,
               ),

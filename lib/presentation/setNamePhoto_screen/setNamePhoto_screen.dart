@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:smiley/presentation/Setting_screen/setting_screen.dart';
 import 'dart:io';
@@ -248,149 +249,120 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF4F4E6), // 設置背景顏色
-      // 應用程式的頂部應用欄
+      backgroundColor: Color(0xFFF4F4E6),
       appBar: AppBar(
-        elevation: 0, // 設置應用欄的陰影為0
-        backgroundColor: Colors.transparent, // 設置背景透明
-        // 根據來源頁面決定是否顯示返回按鈕
-        leading: status=='member'
-            ? AppbarLeadingImage(
-                imagePath: 'assets/images/arrow-left-g.png', // 返回圖標圖片
-                margin: EdgeInsets.only(
-                  top: 19.0,
-                  bottom: 19.0,
-                ),
-                onTap: () async {
-                  FocusScope.of(context).requestFocus(FocusNode());
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        leading: status == 'member'
+            ? IconButton(
+            icon: SvgPicture.asset(
+              'assets/images/img_arrow_left.svg',
+              color: Color(0xFFA7BA89),
+            ),
+            onPressed: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
                   await Future.delayed(Duration(milliseconds: 500));
-                  // Navigator.pop(context); // 點擊返回按鈕返回上一頁
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => settingScreen(), // 这里是你要导航到的页面
+                      builder: (context) => settingScreen(),
                     ),
                   );
-                },
-              )
-            : AppbarLeadingImage(
-                imagePath: 'assets/images/null.png', // 返回圖標圖片
+            },
+          ): AppbarLeadingImage(
+                imagePath: 'assets/images/null.png',
               ),
-        // 正中間顯示圖片
         title: Image.asset(
           'assets/images/edit.png',
-          height: 30, // 您可以根據需要調整圖片的高度
+          height: 30.v,
         ),
-        centerTitle: true, // 將圖片設置為居中
+        centerTitle: true,
       ),
-      // 應用的主要內容
-      body: Center(
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 180.0),
-              child: Stack(
-                children: [
-                  GestureDetector(
-                    onTap: navigateToDefaultAvatar,
-                    child: CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Color(0xFFF4F4E6),
-                      backgroundImage: _image != null
-                        ? FileImage(_image!)
-                        : selectedAvatarPath != null
-                            ? selectedAvatarPath!.startsWith('default_avatar')
-                                ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>
-                                : NetworkImage('http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath') as ImageProvider<Object>
-                            : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
-                    ),  
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Center(
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 103.v),
+                  child: Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: navigateToDefaultAvatar,
+                        child: CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Color(0xFFF4F4E6),
+                          backgroundImage: _image != null
+                              ? FileImage(_image!)
+                              : selectedAvatarPath != null
+                                  ? selectedAvatarPath!.startsWith('default_avatar')
+                                      ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>
+                                      : NetworkImage('http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath') as ImageProvider<Object>
+                                  : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
+                        ),  
+                      ),
+                    ],
                   ),
-                  /* 
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: _pickImage, // 點擊選擇圖片
-                      child: CircleAvatar(
-                        radius: 15,
-                        backgroundColor: Colors.white, // 圓形背景顏色
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Color(0xFFA7BA89), // 圖標顏色
-                          size: 20,
-                        ),
+                ),
+                SizedBox(height: 40.v),
+                Container(
+                  width: 254.h,
+                  height: 44.v,
+                  child: TextField(
+                    controller: _controller,
+                    textAlignVertical: TextAlignVertical.center,
+                    decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.person, color: Color(0xFFA7BA89)),
+                      hintText:'me',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: EdgeInsets.symmetric(vertical: 0.v),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                  ), */
-                ],
-              ),
-            ),
-            SizedBox(height: 40), // 增加垂直間距
-            Container(
-              width: 254,
-              height: 44,
-              child: TextField(
-                controller: _controller, // 設置控制器
-                textAlignVertical: TextAlignVertical.center, // 文本垂直居中
-                decoration: InputDecoration(
-                  prefixIcon:
-                      Icon(Icons.person, color: Color(0xFFA7BA89)), // 左側圖標
-                  hintText:'me', // 提示文字
-                  filled: true,
-                  fillColor: Colors.white, // 填充顏色
-                  contentPadding: EdgeInsets.symmetric(vertical: 0),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20), // 圓角邊框
-                    borderSide: BorderSide.none, // 無邊框線
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: 40), // 增加垂直間距
-            Container(
-              width: 114,
-              height: 40,
-              child: ElevatedButton(
-                onPressed: () async {
-                  // 設定 ->
-                  if (status=="member") {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    await Future.delayed(Duration(milliseconds: 500));
-                    print("用戶名: ${_controller.text}, 準備回設定");
-                    editProfile();
-                    print("用戶名: ${_controller.text}");
-                    // Navigator.pop(context); // 返回上一頁
-                    Navigator.pushNamed(
-                        context, AppRoutes.setting);
-                  // 註冊 ->
-                  } else {
-                    FocusScope.of(context).requestFocus(FocusNode());
-                    await Future.delayed(Duration(milliseconds: 500));
-                    print("用戶名: ${_controller.text}, 準備註冊");
-                    addComplete();
-                    print("用戶名: ${_controller.text}");
-                    Navigator.pushNamed(
-                        context, AppRoutes.diaryMainScreen); // 導航到日記主頁
-                  }
-                },
-                child: Text(
-                  '確認更改',
-                  style: TextStyle(
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18,
-                    color: Colors.white,
+                SizedBox(height: 40.v),
+                Container(
+                  width: 114.h,
+                  height: 40.v,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (status == "member") {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        await Future.delayed(Duration(milliseconds: 500));
+                        editProfile();
+                        Navigator.pushNamed(context, AppRoutes.setting);
+                      } else {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        await Future.delayed(Duration(milliseconds: 500));
+                        addComplete();
+                        Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+                      }
+                    },
+                    child: Text(
+                      '確認更改',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18.fSize,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFA7BA89),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                    ),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFA7BA89), // 按鈕背景顏色
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20), // 圓角形狀
-                  ),
-                ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

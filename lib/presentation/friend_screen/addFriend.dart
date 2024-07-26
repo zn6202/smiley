@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class AddFriend extends StatefulWidget {
   @override
@@ -108,8 +109,6 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-
-
   Future<void> searchUsers(String query) async { //搜尋用戶後端資料
     final String? userId = await getUserId();
     print("進入搜尋好友函式");
@@ -153,7 +152,6 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-
   void acceptFriend(int userInvite ,int index) async{
     final String? userId = await getUserId();
     print("進入接受好友函式: $userInvite 邀請 $userId");
@@ -192,7 +190,6 @@ class _AddFriendState extends State<AddFriend> {
       throw Exception('Failed to load user');
     }
   }
-
 
   void sendFriendRequest(int index) async{ 
     final String? userId = await getUserId();
@@ -246,7 +243,6 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -254,21 +250,20 @@ class _AddFriendState extends State<AddFriend> {
       appBar: AppBar(
         elevation: 0, // 設置應用欄的陰影為0
         backgroundColor: Colors.transparent, // 設置背景透明
-        leading: AppbarLeadingImage(
-          imagePath: 'assets/images/arrow-left-g.png', // 返回圖標圖片
-          margin: EdgeInsets.only(
-            top: 19.0,
-            bottom: 19.0,
-          ),
-          onTap: () async {
-            FocusScope.of(context).requestFocus(FocusNode());
-            await Future.delayed(Duration(milliseconds: 500));
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/images/img_arrow_left.svg',
+              color: Color(0xFFA7BA89),
+            ),
+            onPressed: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
+            await Future.delayed(Duration(milliseconds: 300));
             Navigator.pop(context); // 點擊返回按鈕返回上一頁
-          },
-        ),
+            },
+          ),
         title: Image.asset(
           'assets/images/addFriend_y.png',
-          height: 30, // 您可以根據需要調整圖片的高度
+          height: 30.v, // 您可以根據需要調整圖片的高度
         ),
         centerTitle: true, // 將圖片設置為居中
       ),
@@ -281,8 +276,8 @@ class _AddFriendState extends State<AddFriend> {
             ? Center(
                 key: ValueKey<bool>(showSuccessMessage),
                 child: Container(
-                  width: 304,
-                  height: 202,
+                  width: 304.h,
+                  height: 202.v,
                   decoration: BoxDecoration(
                     color: Color(0xFFFCFCFE),
                     borderRadius: BorderRadius.circular(49),
@@ -298,9 +293,9 @@ class _AddFriendState extends State<AddFriend> {
                             backgroundImage: AssetImage(acceptedFriend!['photo']!), //我不確定這樣寫能不能顯示接受者的頭像 需確認
                             radius: 30,
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 10.h),
                           Image.asset('assets/images/Lightning.png', height: 30),
-                          SizedBox(width: 10),
+                          SizedBox(width: 10.h),
                           CircleAvatar(
                             backgroundColor: Color(0xFFF4F4E6), // 設置背景顏色
                             backgroundImage: AssetImage('assets/images/default_avatar_9.png'), //顯示自己的頭像
@@ -308,7 +303,7 @@ class _AddFriendState extends State<AddFriend> {
                           ),
                         ],
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 20.v),
                       Text(
                         '太棒了 ! 成功成為好友',
                         style: TextStyle(
@@ -325,24 +320,24 @@ class _AddFriendState extends State<AddFriend> {
               )
             : Padding(
                 key: ValueKey<bool>(showSuccessMessage),
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(16.adaptSize),
                 child: Column(
                   children: [
                     Container(
-                      width: 330,
-                      height: 44,
+                      width: 376.h,
+                      height: 44.v,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                      padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 10.v),
                       child: Row(
                         children: [
                           Image.asset(
                             'assets/images/search.png',
-                            height: 20,
+                            height: 20.v,
                           ),
-                          SizedBox(width: 10),
+                          SizedBox(width: 10.h),
                           Expanded(
                             child: TextField(
                               controller: searchController, 
@@ -366,8 +361,8 @@ class _AddFriendState extends State<AddFriend> {
                               decoration: InputDecoration(
                                 hintText: '輸入 ID',
                                 hintStyle: TextStyle(
-                                  fontSize: 20,
-                                  height: 1.2,
+                                  fontSize: 20.fSize,
+                                  height: 1.2.v,
                                   fontFamily: 'Inter',
                                   fontWeight: FontWeight.w100,
                                   color: Color(0xFFC5C5C5),
@@ -390,7 +385,7 @@ class _AddFriendState extends State<AddFriend> {
                               child: Text(
                                 '取消',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 16.fSize,
                                   color: Color(0xFF545453),
                                 ),
                               ),
@@ -398,7 +393,7 @@ class _AddFriendState extends State<AddFriend> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 20.v),
                     isSearching
                         ? Expanded(
                             child: Column(
@@ -406,7 +401,7 @@ class _AddFriendState extends State<AddFriend> {
                                 Text(
                                   '搜尋用戶',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 20.fSize,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF545453),
                                   ),
@@ -417,8 +412,8 @@ class _AddFriendState extends State<AddFriend> {
                                           child: Text(
                                             '無搜尋結果',
                                             style: TextStyle(
-                                              fontSize: 25,
-                                              height: 1.2,
+                                              fontSize: 25.fSize,
+                                              height: 1.2.v,
                                               fontFamily: 'Inter',
                                               fontWeight: FontWeight.w600,
                                               color: Color(0xFFA7BA89),
@@ -426,27 +421,27 @@ class _AddFriendState extends State<AddFriend> {
                                           ),
                                         )
                                       : ListView.builder(
-                                        padding: EdgeInsets.symmetric(horizontal: 20),
+                                        padding: EdgeInsets.symmetric(horizontal: 20.h),
                                         itemCount: searchResults.length,
                                         itemBuilder: (context, index) {
                                           return Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 10),
+                                            padding: EdgeInsets.symmetric(vertical: 10.v),
                                             child: Row(
                                               children: [
                                                 Stack(
                                                   alignment: Alignment.centerLeft,
                                                   children: [
                                                     Container(
-                                                      width: 67,
-                                                      height: 67,
+                                                      width: 67.h,
+                                                      height: 67.v,
                                                       decoration: BoxDecoration(
                                                         color: Colors.white,
                                                         shape: BoxShape.circle,
                                                       ),
                                                     ),
                                                     Container(
-                                                      width: 285,
-                                                      height: 50,
+                                                      width: 285.h,
+                                                      height: 50.v,
                                                       decoration: BoxDecoration(
                                                         color: Colors.white,
                                                         borderRadius: BorderRadius.circular(25),
@@ -454,9 +449,9 @@ class _AddFriendState extends State<AddFriend> {
                                                       child: Row(
                                                         children: [
                                                           Container(
-                                                            width: 45,
-                                                            height: 45,
-                                                            margin: EdgeInsets.only(left: 10),
+                                                            width: 45.h,
+                                                            height: 45.v,
+                                                            margin: EdgeInsets.only(left: 10.h),
                                                             decoration: BoxDecoration(
                                                               shape: BoxShape.circle,
                                                               image: DecorationImage(
@@ -471,7 +466,7 @@ class _AddFriendState extends State<AddFriend> {
                                                               child: Text(
                                                                 searchResults[index]['name']!,
                                                                 style: TextStyle(
-                                                                  fontSize: 20,
+                                                                  fontSize: 20.fSize,
                                                                   fontWeight: FontWeight.w700,
                                                                   color: Color(0xFF545453),
                                                                 ),
@@ -483,12 +478,12 @@ class _AddFriendState extends State<AddFriend> {
                                                     ),
                                                   ],
                                                 ),
-                                                SizedBox(width: 5),
+                                                SizedBox(width: 5.h),
                                                 IconButton(
                                                   icon: searchResults[index]['hasRequested'] == 'true'
                                                       ? Image.asset('assets/images/delFriend.png')
                                                       : Icon(Icons.person_add, color: Color(0xFFA7BA89)),
-                                                  iconSize: 30,
+                                                  iconSize: 30.adaptSize,
                                                   onPressed: () {
                                                     sendFriendRequest(index);
                                                   },
@@ -508,7 +503,7 @@ class _AddFriendState extends State<AddFriend> {
                                 Text(
                                   '好友邀請',
                                   style: TextStyle(
-                                    fontSize: 20,
+                                    fontSize: 20.fSize,
                                     fontWeight: FontWeight.bold,
                                     color: Color(0xFF545453),
                                   ),
@@ -519,8 +514,8 @@ class _AddFriendState extends State<AddFriend> {
                                           child: Text(
                                             '無好友邀請',
                                             style: TextStyle(
-                                              fontSize: 25,
-                                              height: 1.2,
+                                              fontSize: 25.fSize,
+                                              height: 1.2.v,
                                               fontFamily: 'Inter',
                                               fontWeight: FontWeight.w600,
                                               color: Color(0xFFA7BA89),
@@ -528,27 +523,28 @@ class _AddFriendState extends State<AddFriend> {
                                           ),
                                         )
                                       : ListView.builder(
-                                          padding: EdgeInsets.symmetric(horizontal: 20),
+                                          padding: EdgeInsets.symmetric(horizontal: 10.h),
                                           itemCount: friendRequests.length,
                                           itemBuilder: (context, index) {
                                             return Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 10),
+                                              padding: EdgeInsets.symmetric(vertical: 10.v),
                                               child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                 children: [
                                                   Stack(
                                                     alignment: Alignment.centerLeft,
                                                     children: [
                                                       Container(
-                                                        width: 67,
-                                                        height: 67,
+                                                        width: 67.h,
+                                                        height: 67.v,
                                                         decoration: BoxDecoration(
                                                           color: Colors.white,
                                                           shape: BoxShape.circle,
                                                         ),
                                                       ),
                                                       Container(
-                                                        width: 230,
-                                                        height: 50,
+                                                        width: 210.h,
+                                                        height: 50.v,
                                                         decoration: BoxDecoration(
                                                           color: Colors.white,
                                                           borderRadius: BorderRadius.circular(25),
@@ -556,9 +552,9 @@ class _AddFriendState extends State<AddFriend> {
                                                         child: Row(
                                                           children: [
                                                             Container(
-                                                              width: 45,
-                                                              height: 45,
-                                                              margin: EdgeInsets.only(left: 10),
+                                                              width: 45.h,
+                                                              height: 45.v,
+                                                              margin: EdgeInsets.only(left: 10.h),
                                                               decoration: BoxDecoration(
                                                                 shape: BoxShape.circle,
                                                                 image: DecorationImage(
@@ -572,7 +568,7 @@ class _AddFriendState extends State<AddFriend> {
                                                                 child: Text(
                                                                   friendRequests[index]['name']!,
                                                                   style: TextStyle(
-                                                                    fontSize: 20,
+                                                                    fontSize: 20.fSize,
                                                                     fontWeight: FontWeight.w700,
                                                                     color: Color(0xFF545453),
                                                                   ),
@@ -584,9 +580,9 @@ class _AddFriendState extends State<AddFriend> {
                                                       ),
                                                     ],
                                                   ),
-                                                  SizedBox(width: 5),
+                                                  SizedBox(width: 5.h),
                                                   IconButton(
-                                                    padding: EdgeInsets.only(left: 12),
+                                                    padding: EdgeInsets.only(left: 12.h),
                                                     icon: Image.asset(
                                                         'assets/images/acceptFriend.png'),
                                                     onPressed: () {
@@ -595,9 +591,9 @@ class _AddFriendState extends State<AddFriend> {
                                                       acceptFriend(whoInviteMe, index);
                                                     },
                                                   ),
-                                                  SizedBox(width: 5),
+                                                  SizedBox(width: 5.h),
                                                   IconButton(
-                                                    padding: EdgeInsets.only(left: 12),
+                                                    padding: EdgeInsets.only(left: 12.h),
                                                     icon: Image.asset(
                                                         'assets/images/delFriend.png'),
                                                     onPressed: () {

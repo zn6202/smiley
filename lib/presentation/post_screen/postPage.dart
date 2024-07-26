@@ -63,37 +63,37 @@ class _PostPageState extends State<PostPage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          padding: EdgeInsets.symmetric(horizontal: 20.h),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 10),
+              SizedBox(height: 10.v),
               Text(
                 currentDate,
                 style: TextStyle(
-                  fontSize: 25,
-                  height: 20 / 25,
+                  fontSize: 25.fSize,
+                  height: 20 / 25 ,
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,
                   color: textColor,
                 ),
               ),
-              SizedBox(height: 40),
+              SizedBox(height: 20.v),
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Container(
-                      width: 400,
-                      height: 44,
+                      width: 330.h,
+                      height: 44.v,
                       decoration: BoxDecoration(
                         color: Color(0x80FFFFFF),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 20.h),
                       child: TextField(
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 18.fSize,
                           height: 12 / 18,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
@@ -102,7 +102,7 @@ class _PostPageState extends State<PostPage> {
                         decoration: InputDecoration(
                           hintText: "輸入情緒名稱 ...",
                           hintStyle: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.fSize,
                             height: 12 / 18,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
@@ -112,10 +112,10 @@ class _PostPageState extends State<PostPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 40),
+                    SizedBox(height: 16.v),
                     Container(
-                      width: 254,
-                      height: 280,
+                      width: 280.h,
+                      height: 280.v,
                       decoration: BoxDecoration(
                         image: DecorationImage(
                           image: AssetImage(imageUrl),
@@ -123,10 +123,10 @@ class _PostPageState extends State<PostPage> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 40),
+                    SizedBox(height: 16.v),
                     Container(
-                      width: 350,
-                      height: 80,
+                      width: 292.h,
+                      height: 68.v,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -135,19 +135,19 @@ class _PostPageState extends State<PostPage> {
                         ],
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 8.v),
                     Container(
-                      width: 400,
-                      height: 220,
+                      width: 330.h,
+                      height: 167.v,
                       decoration: BoxDecoration(
                         color: Color(0x80FFFFFF),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          EdgeInsets.symmetric(horizontal: 20.h, vertical: 10.v),
                       child: TextField(
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 18.fSize,
                           height: 23 / 18,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w700,
@@ -156,7 +156,7 @@ class _PostPageState extends State<PostPage> {
                         decoration: InputDecoration(
                           hintText: "輸入情緒貼文內容...",
                           hintStyle: TextStyle(
-                            fontSize: 18,
+                            fontSize: 18.fSize,
                             height: 12 / 18,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w700,
@@ -167,7 +167,7 @@ class _PostPageState extends State<PostPage> {
                         maxLines: null,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    SizedBox(height: 16.v),
                     TextButton(
                       onPressed: () {
                         submitPost();
@@ -179,18 +179,18 @@ class _PostPageState extends State<PostPage> {
                           borderRadius: BorderRadius.circular(30),
                           side: BorderSide(
                             color: Color(0xFFC5C5C5),
-                            width: 1,
+                            width: 1.h,
                           ),
                         ),
                       ),
                       child: Container(
-                        width: 100,
-                        height: 30,
+                        width: 100.h,
+                        height: 30.v,
                         alignment: Alignment.center,
                         child: Text(
                           "發布",
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 20.fSize,
                             fontFamily: 'Inter',
                             fontWeight: FontWeight.w600,
                             color: Color(0xFFC5C5C5),
@@ -224,10 +224,10 @@ class _PostPageState extends State<PostPage> {
         return GestureDetector(
           onTap: () => updateColors(color),
           child: Padding(
-            padding: EdgeInsets.all(1),
+            padding: EdgeInsets.all(1.adaptSize),
             child: Container(
-              width: 30,
-              height: 30,
+              width: 30.h,
+              height: 30.v,
               decoration: BoxDecoration(
                 color: Color(color),
                 shape: BoxShape.circle,
@@ -235,7 +235,7 @@ class _PostPageState extends State<PostPage> {
                   color: color == selectedColor
                       ? Colors.black
                       : Colors.transparent,
-                  width: 2,
+                  width: 2.h,
                 ),
               ),
             ),
@@ -261,10 +261,10 @@ class _PostPageState extends State<PostPage> {
         return GestureDetector(
           onTap: () => updateColors(color),
           child: Padding(
-            padding: EdgeInsets.all(1),
+            padding: EdgeInsets.all(1.adaptSize),
             child: Container(
-              width: 30,
-              height: 30,
+              width: 30.h,
+              height: 30.v,
               decoration: BoxDecoration(
                 color: Color(color),
                 shape: BoxShape.circle,
@@ -272,7 +272,7 @@ class _PostPageState extends State<PostPage> {
                   color: color == selectedColor
                       ? Colors.black
                       : Colors.transparent,
-                  width: 2,
+                  width: 2.h,
                 ),
               ),
             ),

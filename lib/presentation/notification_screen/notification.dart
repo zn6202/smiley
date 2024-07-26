@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart'; 
-import '../../widgets/app_bar/appbar_leading_image.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+
 
 class Notificationscreen extends StatefulWidget {
   @override
@@ -29,37 +31,6 @@ class _NotificationscreenState extends State<Notificationscreen> {
             inform: '在您的貼文留言',
             friendImage: 'default_avatar_4.png',
             friendName: 'bbb'),
-        NotificationItem(
-            date: '2024.04.15',
-            inform: '在您的貼文留言',
-            friendImage: 'default_avatar_4.png',
-            friendName: 'bbb'),
-        NotificationItem(
-            date: '2024.04.15',
-            inform: '在您的貼文留言',
-            friendImage: 'default_avatar_4.png',
-            friendName: 'bbb'),
-        NotificationItem(
-            date: '2024.04.15',
-            inform: '在您的貼文留言',
-            friendImage: 'default_avatar_4.png',
-            friendName: 'bbb'),
-        NotificationItem(
-            date: '2024.04.15',
-            inform: '在您的貼文留言',
-            friendImage: 'default_avatar_4.png',
-            friendName: 'bbb'),
-        NotificationItem(
-            date: '2024.04.15',
-            inform: '在您的貼文留言',
-            friendImage: 'default_avatar_4.png',
-            friendName: 'bbb'),
-        NotificationItem(
-            date: '2024.04.15',
-            inform: '在您的貼文留言',
-            friendImage: 'default_avatar_4.png',
-            friendName: 'bbb'),
-
       ];
     });
   }
@@ -71,53 +42,52 @@ class _NotificationscreenState extends State<Notificationscreen> {
       appBar: AppBar(
         elevation: 0, 
         backgroundColor: Colors.transparent, 
-        leading: AppbarLeadingImage(
-          imagePath: 'assets/images/arrow-left-g.png',
-          margin: EdgeInsets.only(
-            top: 19.0,
-            bottom: 19.0,
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/images/img_arrow_left.svg',
+              color: Color(0xFFA7BA89),
+            ),
+            onPressed: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
+            await Future.delayed(Duration(milliseconds: 300));
+            Navigator.pop(context); // 點擊返回按鈕返回上一頁
+            },
           ),
-          onTap: () async {
-            Navigator.pop(context);
-          },
-        ),
         title: Image.asset(
           'assets/images/notify.png',
-          height: 30, 
+          height: 30.v, 
         ),
         centerTitle: true, 
       ),
-      body: Center(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Text(
-              "通知中心",
-              style: TextStyle(
-                fontSize: 25,
-                height: 1.2,
-                fontFamily: 'Inter',
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF545453),
-              ),
+      body: Column(
+        children: [
+          SizedBox(height: 20.v),
+          Text(
+            "通知中心",
+            style: TextStyle(
+              fontSize: 25.fSize,
+              height: 1.2.v,
+              fontFamily: 'Inter',
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF545453),
             ),
-            SizedBox(height: 25),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
+          ),
+          SizedBox(height: 25.v),
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20.h),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.all(20),
+                  padding: EdgeInsets.all(20.adaptSize),
                   itemCount: notifications.length,
                   itemBuilder: (context, index) {
                     final notification = notifications[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                      padding: EdgeInsets.symmetric(vertical: 10.v),
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -125,12 +95,12 @@ class _NotificationscreenState extends State<Notificationscreen> {
                             backgroundColor: Colors.white, 
                             backgroundImage: AssetImage('assets/images/${notification.friendImage}'),
                           ),
-                          SizedBox(width: 30),
+                          SizedBox(width: 30.h),
                           Expanded(
                             child: Text(
                               '${notification.friendName} ${notification.inform}',
                               style: TextStyle(
-                                fontSize: 18,
+                                fontSize: 18.fSize,
                                 fontFamily: 'Inter',
                                 color: Color(0xFF545453),
                                 fontWeight: FontWeight.w700,
@@ -144,8 +114,9 @@ class _NotificationscreenState extends State<Notificationscreen> {
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+          SizedBox(height: 25.v),
+        ],
       ),
     );
   }

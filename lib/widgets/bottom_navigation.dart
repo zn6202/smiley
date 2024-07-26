@@ -39,7 +39,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
     } else if (index == 2) {
       Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
     } else if (index == 3) {
-      // Navigator.pushNamed(context, AppRoutes.myPost);
+      Navigator.pushNamed(context, AppRoutes.browsePage);
     } else if (index == 1) {
       Navigator.pushNamed(context, AppRoutes.analysis);
     } else if (index == 0) {
@@ -62,8 +62,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           icon: Padding(
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: SizedBox(
-              height: 32.0,
-              width: 32.0,
+              height: 32.v,
+              width: 32.h,
               child: Image.asset(
                 _currentIndex == 0
                     ? 'assets/images/chatRobot_on.png'
@@ -75,10 +75,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         ),
         BottomNavigationBarItem(
           icon: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: EdgeInsets.symmetric(vertical: 8.v),
             child: SizedBox(
-              height: 32.0,
-              width: 32.0,
+              height: 32.v,
+              width: 32.h,
               child: Image.asset(
                 _currentIndex == 1
                     ? 'assets/images/analyze_on.png'
@@ -89,26 +89,19 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: SizedBox(
-              height: 32.0,
-              width: 32.0,
-              child: Image.asset(
-                _currentIndex == 2
-                    ? 'assets/images/diary_on.png'
-                    : 'assets/images/diary_off.png',
-              ),
-            ),
+          icon: Icon(
+            Icons.home,
+            color: _currentIndex == 2 ? Color(0xFFA7BA89) : Color(0xFFC5C5C5),
+            size: 32.adaptSize, 
           ),
           label: '',
         ),
         BottomNavigationBarItem(
           icon: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: EdgeInsets.symmetric(vertical: 8.v),
             child: SizedBox(
-              height: 32.0,
-              width: 32.0,
+              height: 32.v,
+              width: 32.h,
               child: Image.asset(
                 _currentIndex == 3
                     ? 'assets/images/social_on.png'
@@ -120,10 +113,10 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
         ),
         BottomNavigationBarItem(
           icon: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            padding: EdgeInsets.symmetric(vertical: 8.v),
             child: SizedBox(
-              height: 32.0,
-              width: 32.0,
+              height: 32.v,
+              width: 32.h,
               child: Image.asset(
                 _currentIndex == 4
                     ? 'assets/images/setting_on.png'

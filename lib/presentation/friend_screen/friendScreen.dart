@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 class Friendscreen extends StatefulWidget {
@@ -51,28 +52,27 @@ class _FriendscreenState extends State<Friendscreen> {
       appBar: AppBar(
         elevation: 0, // 設置應用欄的陰影為0
         backgroundColor: Colors.transparent, // 設置背景透明
-        leading: AppbarLeadingImage(
-          imagePath: 'assets/images/arrow-left-g.png', // 返回圖標圖片
-          margin: EdgeInsets.only(
-            top: 19.0,
-            bottom: 19.0,
-          ),
-          onTap: () async {
-            FocusScope.of(context).requestFocus(FocusNode());
+        leading: IconButton(
+            icon: SvgPicture.asset(
+              'assets/images/img_arrow_left.svg',
+              color: Color(0xFFA7BA89),
+            ),
+            onPressed: () async {
+              FocusScope.of(context).requestFocus(FocusNode());
             await Future.delayed(Duration(milliseconds: 300));
             Navigator.pop(context); // 點擊返回按鈕返回上一頁
-          },
-        ),
+            },
+          ),
         title: Image.asset(
           'assets/images/friend_y.png',
-          height: 30, // 您可以根據需要調整圖片的高度
+          height: 30.v, // 您可以根據需要調整圖片的高度
         ),
         centerTitle: true, // 將圖片設置為居中
         actions: [
           IconButton(
             icon: Image.asset(
               'assets/images/addFriend.png', // addFriend圖標圖片
-              height: 30.0, // 您可以根據需要調整圖片的高度
+              height: 30.v, // 您可以根據需要調整圖片的高度
             ),
             onPressed: () {
               Navigator.pushNamed(context, AppRoutes.addFriend);
@@ -81,24 +81,24 @@ class _FriendscreenState extends State<Friendscreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.adaptSize),
         child: Column(
           children: [
             Container(
-              width: 330,
-              height: 44,
+              width: 376.h,
+              height: 44.v,
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 10.v),
               child: Row(
                 children: [
                   Image.asset(
                     'assets/images/search.png',
-                    height: 20,
+                    height: 20.v,
                   ),
-                  SizedBox(width: 10),
+                  SizedBox(width: 10.h),
                   Expanded(
                     child: TextField(
                       onChanged: (value) {
@@ -110,8 +110,8 @@ class _FriendscreenState extends State<Friendscreen> {
                       decoration: InputDecoration(
                         hintText: '輸入好友名稱',
                         hintStyle: TextStyle(
-                          fontSize: 20,
-                          height: 1.2,
+                          fontSize: 20.fSize,
+                          height: 1.2.v,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w100,
                           color: Color(0xFFC5C5C5),
@@ -123,15 +123,15 @@ class _FriendscreenState extends State<Friendscreen> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 20.v),
             Expanded(
               child: filteredFriends.isEmpty
                   ? Center(
                       child: Text(
                         '查無用戶',
                         style: TextStyle(
-                          fontSize: 25,
-                          height: 1.2,
+                          fontSize: 25.fSize,
+                          height: 1.2.v,
                           fontFamily: 'Inter',
                           fontWeight: FontWeight.w600,
                           color: Color(0xFFA7BA89),
@@ -139,27 +139,28 @@ class _FriendscreenState extends State<Friendscreen> {
                       ),
                     )
                   : ListView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      padding: EdgeInsets.symmetric(horizontal: 10.h),
                       itemCount: filteredFriends.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: EdgeInsets.symmetric(vertical: 10.v),
                           child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Stack(
                                 alignment: Alignment.centerLeft,
                                 children: [
                                   Container(
-                                    width: 67,
-                                    height: 67,
+                                    width: 67.h,
+                                    height: 67.v,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
                                   Container(
-                                    width: 285,
-                                    height: 50,
+                                    width: 280.h,
+                                    height: 50.v,
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(25),
@@ -167,9 +168,9 @@ class _FriendscreenState extends State<Friendscreen> {
                                     child: Row(
                                       children: [
                                         Container(
-                                          width: 45,
-                                          height: 45,
-                                          margin: EdgeInsets.only(left: 10),
+                                          width: 45.h,
+                                          height: 45.v,
+                                          margin: EdgeInsets.only(left: 10.h),
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
@@ -185,7 +186,7 @@ class _FriendscreenState extends State<Friendscreen> {
                                             child: Text(
                                               filteredFriends[index]['name']!,
                                               style: TextStyle(
-                                                fontSize: 20,
+                                                fontSize: 20.fSize,
                                                 fontWeight: FontWeight.w700,
                                                 color: Color(0xFF545453),
                                               ),
@@ -197,9 +198,9 @@ class _FriendscreenState extends State<Friendscreen> {
                                   ),
                                 ],
                               ),
-                              SizedBox(width: 5),
+                              SizedBox(width: 5.h),
                               IconButton(
-                                padding: EdgeInsets.only(left: 12),
+                                padding: EdgeInsets.only(left: 12.h),
                                 icon: Image.asset(
                                     'assets/images/delFriend.png'),
                                 onPressed: () {

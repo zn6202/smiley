@@ -154,7 +154,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Column(
                 children: [
                   // 應用程式 Logo
-                  SizedBox(height: 57.v),
+                  SizedBox(height: 20.v),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 34.h),
                     child: Row(
@@ -188,7 +188,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(height: 57.v),
+                  SizedBox(height: 28.v),
                   Column(
                     children: [
                       // 歡迎訊息
@@ -239,18 +239,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           imagePath: ImageConstant.imgGoogle,
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.only(left: 57.h),
-                        child: CustomIconButton(
-                          height: 50.v,
-                          width: 53.h,
-                          padding: EdgeInsets.all(10.h),
-                          decoration: IconButtonStyleHelper.fillBlueA,
-                          child: CustomImageView(
-                            imagePath: ImageConstant.imgFacebook,
-                          ),
-                        ),
-                      )
                     ],
                   ),
                   SizedBox(height: 40.v),
@@ -414,7 +402,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
         Text(
           "OR",
-          style: CustomTextStyles.titleMediumGray700,
+          style: CustomTextStyles.titleMediumLightgreen300,
         ),
         Padding(
           padding: EdgeInsets.symmetric(vertical: 10.v),
