@@ -191,6 +191,37 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
+  void rejectFriend(int userInvite ,int index) async{ 
+    final String? userId = await getUserId();
+    print("進入拒絕好友函式: $userId 要拒絕 $userInvite 的邀請");
+
+    final response = await http.post(
+      Uri.parse(API.rejectInvite), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userInvite.toString(),
+        'friend_id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        setState(() {
+          friendRequests.removeAt(index);
+        });
+        print("拒絕邀請成功");
+
+      } else {
+        setState(() {
+          searchResults = [];
+        });
+        print('User not found.');
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
+
   void sendFriendRequest(int index) async{ 
     final String? userId = await getUserId();
     final friendId = searchResults[index]['id'];
@@ -597,11 +628,9 @@ class _AddFriendState extends State<AddFriend> {
                                                     icon: Image.asset(
                                                         'assets/images/delFriend.png'),
                                                     onPressed: () {
-                                                      setState(() {
-                                                        // 模擬刪除好友請求的行為
-                                                        friendRequests.removeAt(index);
-                                                        // 現在的刪除只是頁面上的行為，後端需做相應的處理
-                                                      });
+                                                      int whoInviteMe = int.parse(friendRequests[index]['id']!);
+                                                      print('whoInviteMe: $whoInviteMe');
+                                                      rejectFriend(whoInviteMe, index);
                                                     },
                                                   ),
                                                 ],

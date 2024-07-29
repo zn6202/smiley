@@ -16,5 +16,9 @@ class API
   static const cancelInviteFriend = "$hostConnect/user/cancelInviteFriend.php";
   static const invitedList = "$hostConnect/user/invitedList.php";
   static const acceptInvite = "$hostConnect/user/acceptInvite.php";
+  static const rejectInvite = "$hostConnect/user/rejectInvite.php";
+  static const getFriends = "$hostConnect/user/getFriends.php";
+  static const delFriend = "$hostConnect/user/delFriend.php";
+
 
 }

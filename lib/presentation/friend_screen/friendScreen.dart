@@ -2,6 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../core/app_export.dart'; // 應用程式導出模組
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
+
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Friendscreen extends StatefulWidget {
   @override
   _FriendscreenState createState() => _FriendscreenState();
@@ -10,6 +16,7 @@ class Friendscreen extends StatefulWidget {
 class _FriendscreenState extends State<Friendscreen> {
   List<Map<String, String>> friends = [];
   List<Map<String, String>> filteredFriends = [];
+  List invitedListMember = [];
   String searchText = '';
 
   @override
@@ -18,16 +25,98 @@ class _FriendscreenState extends State<Friendscreen> {
     fetchData();
   }
 
+  Future<String?> getUserId() async { // 使用者的 id
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
   Future<void> fetchData() async {
-    // 模擬後端資料
-    setState(() {
-      friends = [
-        {'name': 'mimi', 'photo': 'assets/images/default_avatar_1.png'},
-        {'name': 'ohoh', 'photo': 'assets/images/default_avatar_2.png'},
-        {'name': 'bbb', 'photo': 'assets/images/default_avatar_3.png'},
-      ];
-      filteredFriends = friends;
-    });
+    final String? userId = await getUserId();
+    print("進入呈現好友列表函式 $userId");
+
+    final response = await http.post(
+      Uri.parse(API.getFriends),
+      body: {
+        'user_id':userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      final exp=result['users'];
+      print('result是: $exp');
+
+      // 確保 `result` 是 Map 類型，並檢查 `success` 是否為 true
+      if (result['success']) {
+        // 檢查 `users` 是否存在且是 List 類型
+        if (result['users'] is List) {
+          List<Map<String, String>> tempFriendRequests = [];
+          List<String> tempInvitedListMember = [];
+
+          for (var item in result['users']) {
+            // 確保 item 是 Map<String, dynamic>
+            if (item is Map<String, dynamic>) {
+              tempFriendRequests.add({
+                'id': item['id'].toString(),
+                'name': item['name'] as String,
+                'photo': item['photo'] as String,
+              });
+
+              // 将 user_id 添加到 invitedListMember 中
+              tempInvitedListMember.add(item['id'] as String); // assuming 'id' is returned
+            }
+          }
+          
+          setState(() {
+            friends = tempFriendRequests;
+            invitedListMember = tempInvitedListMember;
+          });
+          filteredFriends = friends;
+          print("想加的好友列表 有: $friends");
+          print("想加我好友的 id 有: $invitedListMember");
+        } else {
+          print('Invalid format for users');
+          setState(() {
+            friends = [];
+          });
+        }
+      } else {
+        print('User not found or invalid success flag');
+        setState(() {
+          friends = [];
+        });
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
+
+  void delFriend(int friendId ,int index) async{ 
+    final String? userId = await getUserId();
+    print("進入刪除好友函式: $userId 要刪除 $friendId");
+
+    final response = await http.post(
+      Uri.parse(API.delFriend), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userId!,
+        'friend_id': friendId.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        setState(() {
+          friends.removeAt(index);
+        });
+        print("拒絕邀請成功");
+
+      } else {
+        print('User not found.');
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
 
   void filterFriends(String query) {
@@ -174,7 +263,7 @@ class _FriendscreenState extends State<Friendscreen> {
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
-                                              image: AssetImage(
+                                              image: NetworkImage(
                                                   filteredFriends[index]
                                                       ['photo']!),
                                               fit: BoxFit.cover,
@@ -205,8 +294,10 @@ class _FriendscreenState extends State<Friendscreen> {
                                     'assets/images/delFriend.png'),
                                 onPressed: () {
                                   setState(() {
-                                    friends.removeAt(index);
                                     filterFriends(searchText);
+                                    int whoInviteMe = int.parse(friends[index]['id']!);
+                                    print('whoInviteMe: $whoInviteMe');
+                                    delFriend(whoInviteMe, index);
                                     // 現在的刪除只是頁面上的 要再加上後端的刪除
                                   });
                                 },
