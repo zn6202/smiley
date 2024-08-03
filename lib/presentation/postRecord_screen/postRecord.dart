@@ -124,11 +124,11 @@ class _PostrecordState extends State<Postrecord> {
                               ),
                             ),
                           ),
-                          Image.asset(
-                            'assets/images/${post.emotionImage}',
-                            height: 90.v,
-                            width: 90.h,
-                            fit: BoxFit.contain,
+                          Expanded(
+                            child: Image.asset(
+                              'assets/images/${post.emotionImage}',
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ],
                       ),

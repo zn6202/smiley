@@ -34,7 +34,7 @@ class _PostPageState extends State<PostPage> {
     print('Title: $title');
     print('Date: $date');
     print('Content: $content');
-
+    Navigator.pushNamed(context, AppRoutes.browsePage);
     // 在這裡可以使用 HTTP 請求將資料傳遞給後端
     // 例如: http.post('https://yourapi.com/posts', body: {'color_id': colorId, 'title': title, 'date': date, 'content': content});
   }
@@ -171,7 +171,6 @@ class _PostPageState extends State<PostPage> {
                     TextButton(
                       onPressed: () {
                         submitPost();
-                        // Navigator.pushNamed(context, AppRoutes.myPost);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Color(0x80FFFFFF),

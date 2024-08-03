@@ -1,59 +1,24 @@
 
 # smiley
-### Table of contents
-- [System requirements](#system-requirements)
-- [Figma design guidelines for better UI accuracy](#figma-design-guideline-for-better-accuracy)
-- [Check the UI of the entire app](#app-navigations)
-- [Application structure](#project-structure)
-- [How to format your code?](#how-you-can-do-code-formatting)
-- [How you can improve code readability?](#how-you-can-improve-the-readability-of-code)
-- [Libraries and tools used](#libraries-and-tools-used)
-- [Support](#support)
-
-### System requirements
-
-Dart SDK Version 3.3.2 or greater.
-Flutter SDK Version 3.19.4 or greater.
-
-### Figma design guidelines for better UI accuracy
-
-Read our guidelines to increase the accuracy of design-to-code conversion by optimizing Figma designs.
-https://docs.dhiwise.com/docs/Designguidelines/intro
-
-### Check the UI of the entire app
-
-Check the UI of all the app screens from a single place by setting up the 'initialRoute'  to AppNavigation in the AppRoutes.dart file.
-
-### Application structure
-After successful build, your application structure should look like this:
-                    
-```
-.
-├── android                         - It contains files required to run the application on an Android platform.
-├── assets                          - It contains all images and fonts of your application.
-├── ios                             - It contains files required to run the application on an iOS platform.
-├── lib                             - Most important folder in the application, used to write most of the Dart code..
-    ├── main.dart                   - Starting point of the application
-    ├── core
-    │   ├── app_export.dart         - It contains commonly used file imports
-    │   ├── constants               - It contains static constant class file
-    │   └── utils                   - It contains common files and utilities of the application
-    ├── presentation                - It contains widgets of the screens
-    ├── routes                      - It contains all the routes of the application
-    └── theme                       - It contains app theme and decoration classes
-    └── widgets                     - It contains all custom widget classes
-```
-### How to format your code?
-
-- if your code is not formatted then run following command in your terminal to format code
-  ```
-  dart format .
-  ```
-
-### How you can improve code readability?
-
-Resolve the errors and warnings that are shown in the application.
-
-### Support
-
-If you have any problems or questions, go to our Discord channel, where we will help you as quickly as possible: https://discord.com/invite/rFMnCG5MZ7
+### 適應性size
+- C:\project\smiley\lib\core\utils\size_utils.dart 寫撰寫此APP的適應性設計
+-  因為手機的尺寸有很多種，在不同裝置跑出來的效果就不一樣。
+- 此文件會它會自動換算尺寸，去匹配每一支手機的螢幕大小。
+- 原則：
+- left,right,Width等水平垂直使用 .h
+- top,bottom,Height等垂直方向 .v
+- EdgeInsets.all這種用(.adaptSize),
+- 字體用.fsize
+- 例如:如Width:10.0。要改成Width:10.0.h
+### 增加字體與照片
+- 將文件丟到 assets
+- 至pubspec.yaml新增
+- 終端機輸入指令：flutter pub get
+### 新增依賴包
+- 至pubspec.yaml新增
+- 終端機輸入指令：flutter pub get
+### 路由表
+- app_routes.dart 新增頁面
+1. import檔案
+2. 新增static const String、routes
+3. routes的取名與新增的頁面class需相同

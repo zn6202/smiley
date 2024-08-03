@@ -127,9 +127,13 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               ),
               onPressed: () async {
                 if (isSubmitted) {
-                  Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+                  Navigator.of(context).pop();
                 } else {
-                  showExitConfirmationDialog(context);
+                  if (_textController.text.trim().isEmpty) {
+                    Navigator.of(context).pop();
+                  } else {
+                    showExitConfirmationDialog(context);
+                  }
                 }
               },
             ),

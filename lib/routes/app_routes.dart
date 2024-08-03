@@ -17,6 +17,7 @@ import '../presentation/notification_screen/notification.dart';
 import '../presentation/friend_screen/addFriend.dart';
 import '../presentation/post_screen/postPage.dart'; 
 import '../presentation/post_screen/browsePage.dart';
+import '../presentation/home_screen/home_screen.dart'; 
 
 class AppRoutes {
   static const String welcomeScreen = '/welcome_screen';
@@ -35,6 +36,7 @@ class AppRoutes {
   static const String addFriend = '/add_friend';
   static const String postPage = '/post_page';
   static const String browsePage = '/browse_page';
+  static const String homeScreen = '/home_screen'; 
   // static const String edit = '/edit';
 
   static Map<String, WidgetBuilder> routes = {
@@ -54,6 +56,7 @@ class AppRoutes {
     addFriend: (context) => AddFriend(),
     postPage: (context) => PostPage(),
     browsePage: (context) => BrowsePage(),
+    homeScreen: (context) => HomeScreen(),
     // edit: (context) => EditScreen(),
   };
 }

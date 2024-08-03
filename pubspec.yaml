@@ -27,6 +27,7 @@ dependencies:
   google_fonts: ^4.0.5
   sliding_up_panel: ^2.0.0+1
   path: ^1.9.0
+  url_launcher: ^6.1.10
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
@@ -35,16 +36,12 @@ flutter:
   assets: 
     - assets/
     - assets/images/
-    - assets/images/diary_on.png
-    - assets/images/diary_off.png
-    - assets/images/setting_on.png
-    - assets/images/setting_off.png
-    - assets/images/social_on.png
-    - assets/images/social_off.png
-    - assets/images/analyze_on.png
-    - assets/images/analyze_off.png
-    - assets/images/chatRobot_on.png
-    - assets/images/chatRobot_off.png
+    - assets/images/setting.svg
+    - assets/images/social.svg
+    - assets/images/analyze.svg
+    - assets/images/chatRobot.svg
+    - assets/images/home.svg
+    - assets/images/diary.svg
     - assets/images/default_avatar.png
     - assets/images/Record.png
     - assets/images/friend.png
@@ -76,6 +73,27 @@ flutter:
     - assets/images/acceptFriend.png
     - assets/images/Lightning.png
     - assets/images/img_arrow_left.svg
+    - assets/images/home/background_1.jpg
+    - assets/images/home/background_2.png
+    - assets/images/home/background_3.jpg
+    - assets/images/home/audio.png
+    - assets/images/home/calendar.png
+    - assets/images/home/chair.png
+    - assets/images/home/diary.png
+    - assets/images/home/flower.png
+    - assets/images/home/people.png
+    - assets/images/home/roulette.png
+    - assets/images/home/table.png
+    - assets/images/home/table_2.png
+    - assets/images/home/tea.png
+    - assets/images/home/window.png
+    - assets/images/home/music.png
+    - assets/images/comments_1.png
+    - assets/images/comments_2.png
+    - assets/images/comments_3.png
+    - assets/images/comments_4.png
+    - assets/images/comments_5.png
+    - assets/images/comments_6.png
   fonts: 
     - family: Inter
       fonts: 

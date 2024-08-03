@@ -1,5 +1,6 @@
 import 'dart:convert'; //jsonDecode
 import 'package:flutter/material.dart';
+import 'package:smiley/presentation/home_screen/home_screen.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_elevated_button.dart';
 import '../../widgets/custom_icon_button.dart';
@@ -11,7 +12,6 @@ import '../diarymain_screen/diarymain_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import '../../../routes/api_connection.dart';
-
 
 class LoginScreen extends StatefulWidget {
   LoginScreen({Key? key}) : super(key: key);
@@ -95,7 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
       // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } catch (e) {
       print('Google sign in error: $e');
@@ -118,7 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
         var responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
           int userId = responseData['user_id'];
-          
+
           // 存儲 user_id 到 SharedPreferences
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('user_id', userId.toString());
@@ -265,8 +265,10 @@ class _LoginScreenState extends State<LoginScreen> {
                             30.h, 7.v, 19.h, 7.v), // 左、上、右、下間距
                         child: CustomImageView(
                           imagePath: _isPasswordVisible
-                              ? ImageConstant.imgEyeopenfilledsvgrepocom // 可視狀態的圖示
-                              : ImageConstant.imgEyecancelledfilledsvgrepocom1, // 不可視狀態的圖示
+                              ? ImageConstant
+                                  .imgEyeopenfilledsvgrepocom // 可視狀態的圖示
+                              : ImageConstant
+                                  .imgEyecancelledfilledsvgrepocom1, // 不可視狀態的圖示
                           height: 30.adaptSize,
                           width: 30.adaptSize,
                         ),
@@ -396,10 +398,5 @@ class _LoginScreenState extends State<LoginScreen> {
   /// 當觸發該操作時，導航至 registerScreen。
   onTapsignup(BuildContext context) {
     Navigator.pushNamed(context, AppRoutes.registerScreen);
-  }
-
-  /// 預留的登入函數
-  void login(BuildContext context) {
-    Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
   }
 }

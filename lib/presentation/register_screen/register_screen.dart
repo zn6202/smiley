@@ -113,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         print("使用者已經註冊過");
         // 已註冊過的用戶，導航到 diaryMainScreen
-        Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+        Navigator.pushNamed(context, AppRoutes.homeScreen);
       }
     } catch (e) {
       print('Google sign in error: $e');
