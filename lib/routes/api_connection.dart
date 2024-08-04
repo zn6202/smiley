@@ -1,7 +1,7 @@
 class API
 {
-  // static const hostConnect = "http://192.168.56.1/smiley_backend";
-  static const hostConnect = "http://127.0.0.1:8080/smiley_backend";
+  static const hostConnect = "http://192.168.56.1/smiley_backend";
+  // static const hostConnect = "http://127.0.0.1:8080/smiley_backend";
   // static const hostConnect = "http://163.22.32.24/smiley_backend";
 
   static const hostConnectUser = "$hostConnect/user";
@@ -20,6 +20,6 @@ class API
   static const rejectInvite = "$hostConnect/user/rejectInvite.php";
   static const getFriends = "$hostConnect/user/getFriends.php";
   static const delFriend = "$hostConnect/user/delFriend.php";
-
+  static const getAnalysis = "$hostConnect/analysis/getAnalysis.php";
 
 }

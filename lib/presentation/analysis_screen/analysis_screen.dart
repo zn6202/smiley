@@ -3,6 +3,10 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:smiley/core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 const Color backgroundColor = Color(0xFFF4F4E6);
 
@@ -21,6 +25,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   String titleText = '今日日記的情緒佔比';
   List<FlSpot> positiveEmotionData = [];
   List<FlSpot> negativeEmotionData = [];
+  Map<String, dynamic> testData = {}; // 日
+  Map<String, dynamic> dailyData = {}; // 週月
+  List<double> positiveSums = [];
+  List<double> negativeSums = [];
+
 
   @override
   void initState() {
@@ -29,33 +38,133 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     updateDateRangeAndTitle();
   }
 
+  Future<String?> getUserId() async { // 使用者的 id
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
+  Future<Map<String, dynamic>> analysisResult(DateTime date) async{ 
+    final String? userId = await getUserId();
+    // 只取日期部分，格式化為 YYYY-MM-DD
+    final formattedDate = DateFormat('yyyy-MM-dd').format(date);
+
+    print("進入顯示分析圖表函式 userId: $userId, formattedDate: $formattedDate");
+
+    final response = await http.post(
+      Uri.parse(API.getAnalysis), // 解析字串變成 URI 對象
+      body: {
+        'user_id':userId,
+        'date': formattedDate, // 將日期轉成ISO 8601
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        print('分析圖表成功! 結果為 $result');
+        return {
+          'happiness': result['happiness'],
+          'like': result['like'],
+          'sadness': result['sadness'],
+          'disgust': result['disgust'],
+          'anger': result['anger'],
+        };
+      } else {
+        print('分析圖表失敗...');
+        return {};
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
+
   Future<void> fetchData() async {
-    if (isSelected[1] || isSelected[2]) {
-      int days = isSelected[1] ? 6 : 27;
-      DateTime endDate = DateTime.now();
+    // 今日日期
+    DateTime endDate = DateTime.now();
+    // 判斷是否月初
+    bool isStartOfMonth = endDate.day == 1;
+    // 當月第一天
+    DateTime firstDayOfThisMonth = DateTime(endDate.year, endDate.month, 1);
+    // 上個月的第一天
+    DateTime firstDayOfLastMonth = DateTime(firstDayOfThisMonth.year, firstDayOfThisMonth.month - 1, 1);
+    // 上個月的最後一天
+    DateTime lastDayOfLastMonth = DateTime(firstDayOfLastMonth.year, firstDayOfLastMonth.month + 1, 0);
+    // 計算上個月有幾天
+    int daysDifference = lastDayOfLastMonth.difference(firstDayOfLastMonth).inDays;
+    // 今日星期幾
+    int weekDay = endDate.weekday;
+    String weekDayName;
+    switch (weekDay) {
+      case DateTime.monday:
+        weekDayName = '星期一';
+        break;
+      case DateTime.tuesday:
+        weekDayName = '星期二';
+        break;
+      case DateTime.wednesday:
+        weekDayName = '星期三';
+        break;
+      case DateTime.thursday:
+        weekDayName = '星期四';
+        break;
+      case DateTime.friday:
+        weekDayName = '星期五';
+        break;
+      case DateTime.saturday:
+        weekDayName = '星期六';
+        break;
+      case DateTime.sunday:
+        weekDayName = '星期日';
+        break;
+      default:
+        weekDayName = '未知';
+        break;
+    }
+    print('今天是: $weekDayName');
+    print('是否為月初: $isStartOfMonth');
+    // 上週的星期一
+    DateTime lastMonday = endDate.subtract(Duration(days: weekDay + 6));
+    // 上週的星期天
+    DateTime lastSunday = lastMonday.add(Duration(days: 6));
+
+    positiveSums = []; // 正面情緒數值陣列
+    negativeSums = []; // 負面情緒數值陣列
+    double positiveSum = 0;
+    double negativeSum = 0;
+    double mul = 0;
+    double positiveResult = 0;
+    double negativeResult = 0;
+
+
+    // 為星期一，顯示新的上週折線圖；為月初，顯示新的上個月折線圖
+    if ((isSelected[1] && weekDayName=="星期一") || (isSelected[2] && isStartOfMonth)) {
+      int days = isSelected[1] ? 6 : 28;
       DateTime startDate = endDate.subtract(Duration(days: days));
 
-      List<double> positiveSums = [];
-      List<double> negativeSums = [];
-      //周/月分析從這裡改! map要改成從資料庫取得的值
+      // 週、月分析
       for (int i = 0; i <= days; i++) {
-        Map<String, dynamic> dailyData = {
-          //這是我亂生的測試值 要刪
-          'happiness': 40 - i * 5,
-          'like': 25 + i * 2,
-          'sadness': 15 + i * 3,
-          'disgust': 10 - i,
-          'anger': 10 + i * 1.5,
-        };
+        DateTime currentDate = startDate.add(Duration(days: i));
+        dailyData = await analysisResult(currentDate); // 去後端拿資料
+        if(dailyData['happiness']!='null'){
+          positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
+              (dailyData['like']?.toDouble() ?? 0.0);
+          negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
+              (dailyData['disgust']?.toDouble() ?? 0.0) +
+              (dailyData['anger']?.toDouble() ?? 0.0);
+          mul = 100.0/(positiveSum + negativeSum);
 
-        double positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
-            (dailyData['like']?.toDouble() ?? 0.0);
-        double negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
-            (dailyData['disgust']?.toDouble() ?? 0.0) +
-            (dailyData['anger']?.toDouble() ?? 0.0);
+          positiveResult = positiveSum * mul;
+          negativeResult = negativeSum * mul;
 
-        positiveSums.add(positiveSum);
-        negativeSums.add(negativeSum);
+          // 取到小數點後一位
+          positiveResult = double.parse(positiveResult.toStringAsFixed(1));
+          negativeResult = double.parse(negativeResult.toStringAsFixed(1));
+        }else{ // 如果那一天無分析結果的話，正負值為?
+          positiveResult = 50;
+          negativeResult = 50;
+        }
+        positiveSums.add(positiveResult);
+        negativeSums.add(negativeResult);
       }
 
       setState(() {
@@ -67,101 +176,195 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         ];
         haveDiary = true;
       });
-    } else {
-      //本日分析從這裡改! map要改成從資料庫取得的值
-      Map<String, dynamic> testData = {
-        //這是我亂生的測試值 要刪
-        'happiness': 40,
-        'like': 25,
-        'sadness': 15,
-        'disgust': 10,
-        'anger': 10,
-      };
+    } else if (isSelected[1]){ // 不是星期一，顯示舊的上週的折線圖
+      print("不是星期一，顯示舊的上週的折線圖");
+      print('上一週的星期一: $lastMonday');
+      print('上一週的星期天: $lastSunday');
+
+      //週分析
+      for (int i = 0; i < 7; i++) {
+        DateTime currentDate = lastMonday.add(Duration(days: i));
+        dailyData = await analysisResult(currentDate); // 去後端拿資料
+
+        if (dailyData['happiness']!=null){
+          positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
+              (dailyData['like']?.toDouble() ?? 0.0);
+          negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
+              (dailyData['disgust']?.toDouble() ?? 0.0) +
+              (dailyData['anger']?.toDouble() ?? 0.0);
+          mul = 100.0/(positiveSum + negativeSum);
+
+          positiveResult = positiveSum * mul;
+          negativeResult = negativeSum * mul;
+
+          // 取到小數點後一位
+          positiveResult = double.parse(positiveResult.toStringAsFixed(1));
+          negativeResult = double.parse(negativeResult.toStringAsFixed(1));
+        }else{ // 如果那一天無分析結果的話，正負值為?
+          positiveResult = 50.0;
+          negativeResult = 50.0;
+        }
+        positiveSums.add(positiveResult);
+        negativeSums.add(negativeResult);
+      }
+      print(positiveSums);
+      print(negativeSums);
 
       setState(() {
-        pieChartSections = [
-          PieChartSectionData(
-            color: Color(0xFFA7BA89),
-            value: testData['happiness']?.toDouble() ?? 0.0,
-            title: '${testData['happiness']}%',
-            radius: 50,
-            titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF72805C),
-            ),
-          ),
-          PieChartSectionData(
-            color: Color(0xFFDCDE76),
-            value: testData['like']?.toDouble() ?? 0.0,
-            title: '${testData['like']}%',
-            radius: 50,
-            titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF949551),
-            ),
-          ),
-          PieChartSectionData(
-            color: Color(0xFFD1BA7E),
-            value: testData['sadness']?.toDouble() ?? 0.0,
-            title: '${testData['sadness']}%',
-            radius: 50,
-            titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF8F8059),
-            ),
-          ),
-          PieChartSectionData(
-            color: Color(0xFF7FA99B),
-            value: testData['disgust']?.toDouble() ?? 0.0,
-            title: '${testData['disgust']}%',
-            radius: 50,
-            titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF546F66),
-            ),
-          ),
-          PieChartSectionData(
-            color: Color(0xFF394A51),
-            value: testData['anger']?.toDouble() ?? 0.0,
-            title: '${testData['anger']}%',
-            radius: 50,
-            titleStyle: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF6D8E9B),
-            ),
-          ),
+        positiveEmotionData = [
+          for (int i = 0; i < 7; i++) FlSpot(i.toDouble(), positiveSums[i])
         ];
-        double positiveSum = (testData['happiness']?.toDouble() ?? 0.0) +
-            (testData['like']?.toDouble() ?? 0.0);
-        double negativeSum = (testData['sadness']?.toDouble() ?? 0.0) +
-            (testData['disgust']?.toDouble() ?? 0.0) +
-            (testData['anger']?.toDouble() ?? 0.0);
-
-        positiveEmotionData = [FlSpot(0, positiveSum)];
-        negativeEmotionData = [FlSpot(0, negativeSum)];
-
+        negativeEmotionData = [
+          for (int i = 0; i < 7; i++) FlSpot(i.toDouble(), negativeSums[i])
+        ];
         haveDiary = true;
       });
+    } else if (isSelected[2]){ // 不是月初，顯示舊的上個月的折線圖
+      print("不是月底，顯示上個月的折線圖");
+      print('上個月的第一天: $firstDayOfLastMonth');
+      print('上個月的最後一天: $lastDayOfLastMonth');
+      print('上個月的天數: $daysDifference');
+
+      //月分析
+      for (int i = 0; i <= daysDifference; i++) {
+        DateTime currentDate = firstDayOfLastMonth.add(Duration(days: i));
+        dailyData = await analysisResult(currentDate); // 去後端拿資料
+
+        if (dailyData['happiness']!= null){
+          positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
+              (dailyData['like']?.toDouble() ?? 0.0);
+          negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
+              (dailyData['disgust']?.toDouble() ?? 0.0) +
+              (dailyData['anger']?.toDouble() ?? 0.0);
+          mul = 100.0/(positiveSum + negativeSum);
+
+          positiveResult = positiveSum * mul;
+          negativeResult = negativeSum * mul;
+
+          // 取到小數點後一位
+          positiveResult = double.parse(positiveResult.toStringAsFixed(1));
+          negativeResult = double.parse(negativeResult.toStringAsFixed(1));
+        }else{ // 如果那一天無分析結果的話，正負值為?
+          positiveResult = 50.0;
+          negativeResult = 50.0;
+        }
+        positiveSums.add(positiveResult);
+        negativeSums.add(negativeResult);
+      }
+
+      setState(() {
+        positiveEmotionData = [
+          for (int i = 0; i <= daysDifference; i++) FlSpot(i.toDouble(), positiveSums[i])
+        ];
+        negativeEmotionData = [
+          for (int i = 0; i <= daysDifference; i++) FlSpot(i.toDouble(), negativeSums[i])
+        ];
+        haveDiary = true;
+      });
+    }else { // 今日
+      DateTime currentDate = DateTime.now();
+      testData = await analysisResult(currentDate); // 去後端拿資料
+
+      if (testData['happiness']!=null){
+        setState(() {
+          pieChartSections = [
+            PieChartSectionData(
+              color: Color(0xFFA7BA89),
+              value: testData['happiness']?.toDouble() ?? 0.0,
+              title: '${testData['happiness']}%',
+              radius: 50,
+              titleStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF72805C),
+              ),
+            ),
+            PieChartSectionData(
+              color: Color(0xFFDCDE76),
+              value: testData['like']?.toDouble() ?? 0.0,
+              title: '${testData['like']}%',
+              radius: 50,
+              titleStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF949551),
+              ),
+            ),
+            PieChartSectionData(
+              color: Color(0xFFD1BA7E),
+              value: testData['sadness']?.toDouble() ?? 0.0,
+              title: '${testData['sadness']}%',
+              radius: 50,
+              titleStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF8F8059),
+              ),
+            ),
+            PieChartSectionData(
+              color: Color(0xFF7FA99B),
+              value: testData['disgust']?.toDouble() ?? 0.0,
+              title: '${testData['disgust']}%',
+              radius: 50,
+              titleStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF546F66),
+              ),
+            ),
+            PieChartSectionData(
+              color: Color(0xFF394A51),
+              value: testData['anger']?.toDouble() ?? 0.0,
+              title: '${testData['anger']}%',
+              radius: 50,
+              titleStyle: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF6D8E9B),
+              ),
+            ),
+          ];
+          double positiveSum = (testData['happiness']?.toDouble() ?? 0.0) +
+              (testData['like']?.toDouble() ?? 0.0);
+          double negativeSum = (testData['sadness']?.toDouble() ?? 0.0) +
+              (testData['disgust']?.toDouble() ?? 0.0) +
+              (testData['anger']?.toDouble() ?? 0.0);
+
+          positiveEmotionData = [FlSpot(0, positiveSum)];
+          negativeEmotionData = [FlSpot(0, negativeSum)];
+
+          haveDiary = true;
+        });
+      }else{
+        setState(() {
+          haveDiary = false;
+        });
+      }
     }
   }
 
   void updateDateRangeAndTitle() {
+    DateTime endDate = DateTime.now();
+    // 當月第一天
+    DateTime firstDayOfThisMonth = DateTime(endDate.year, endDate.month, 1);
+    // 上個月的第一天
+    DateTime firstDayOfLastMonth = DateTime(firstDayOfThisMonth.year, firstDayOfThisMonth.month - 1, 1);
+    // 上個月的最後一天
+    DateTime lastDayOfLastMonth = DateTime(firstDayOfLastMonth.year, firstDayOfLastMonth.month + 1, 0);
+    // 獲取星期幾
+    int weekDay = endDate.weekday;
+    // 上週的星期一
+    DateTime lastMonday = endDate.subtract(Duration(days: weekDay + 6));
+    // 上週的星期天
+    DateTime lastSunday = lastMonday.add(Duration(days: 6));
+
     if (isSelected[1]) {
-      DateTime endDate = DateTime.now();
-      DateTime startDate = endDate.subtract(Duration(days: 6));
       dateRangeText =
-          '${DateFormat('yyyy.MM.dd').format(startDate)} - ${DateFormat('yyyy.MM.dd').format(endDate)}';
+          '${DateFormat('yyyy.MM.dd').format(lastMonday)} - ${DateFormat('yyyy.MM.dd').format(lastSunday)}';
       titleText = '上一週的正負情緒趨勢';
     } else if (isSelected[2]) {
-      DateTime endDate = DateTime.now();
-      DateTime startDate = endDate.subtract(Duration(days: 27));
       dateRangeText =
-          '${DateFormat('yyyy.MM.dd').format(startDate)} - ${DateFormat('yyyy.MM.dd').format(endDate)}';
+          '${DateFormat('yyyy.MM.dd').format(firstDayOfLastMonth)} - ${DateFormat('yyyy.MM.dd').format(lastDayOfLastMonth)}';
       titleText = '上個月的正負情緒趨勢';
     } else {
       dateRangeText =
@@ -700,9 +903,23 @@ class CustomLabel extends StatelessWidget {
 - 折線圖
   * 沒有0/100的灰線
   * 縱軸距離圖表太近
-  * 橫軸標籤未改好 
+  * 橫軸標籤未改好 -> new! 圖的畫面可以左右滑動(x 軸寫 1~當月最後一天)
   * 以月 橫軸顯示區間 資料標籤標日期
+  * new! 數值是對的，但線的位置怪怪的
+  * 月的日期範圍怪怪的 -> new! 剛好變數有用到，就順便改好了 xd
 - 無資料時要顯示對應文字
-後端
-1. 未連接資料庫
+
+疑問
+1. other 要顯示在今日分析圓餅圖嗎？ (目前是除了 other 以外的情緒，乘上 100，再除以 other )
+  ex:
+    happiness = 5, like = 0            >>> 正面總數: 5
+    sad = 20, disgust = 0, angry = 15  >>> 正面總數: 35
+    other = 60                         >>> 中立總數: 60
+
+    happiness like sad disgust angry 分別乘以 100/(5+35) 後，
+
+    happiness = 12.5, like = 0, sad = 50.0, disgust = 0, angry = 37.5 >>> 總和 100
+    other(不顯示在今日圖表)
+
+2. 當那一天沒有寫日記，正負情緒數值為 ?? (162 203 247 行，先暫時寫各 50.0)
 */
