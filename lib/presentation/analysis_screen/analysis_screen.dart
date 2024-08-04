@@ -922,4 +922,5 @@ class CustomLabel extends StatelessWidget {
     other(不顯示在今日圖表)
 
 2. 當那一天沒有寫日記，正負情緒數值為 ?? (162 203 247 行，先暫時寫各 50.0)
+3. 月分析跑比較久，有沒有需要"等待畫面"?
 */
