@@ -264,6 +264,21 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     }else { // 今日
       DateTime currentDate = DateTime.now();
       testData = await analysisResult(currentDate); // 去後端拿資料
+      // ex:
+      //   happiness = 5, like = 0            >>> 正面總數: 5
+      //   sad = 20, disgust = 0, angry = 15  >>> 正面總數: 35
+      //   other = 60                         >>> 中立總數: 60
+
+      //   happiness like sad disgust angry 分別乘以 100/(5+35) 後，
+
+      //   happiness = 12.5, like = 0, sad = 50.0, disgust = 0, angry = 37.5 >>> 總和 100
+      //   other(不顯示在今日圖表)
+      int emoSum = testData['happiness'] + testData['like'] + testData['sadness']+ testData['disgust'] + testData['anger'];
+      testData['happiness'] = double.parse((testData['happiness'] * 100 / emoSum).toStringAsFixed(1));
+      testData['like'] = double.parse((testData['like'] * 100 / emoSum).toStringAsFixed(1));
+      testData['sadness'] = double.parse((testData['sadness'] * 100 / emoSum).toStringAsFixed(1));
+      testData['disgust'] = double.parse((testData['disgust'] * 100 / emoSum).toStringAsFixed(1));
+      testData['anger'] = double.parse((testData['anger'] * 100 / emoSum).toStringAsFixed(1));
 
       if (testData['happiness']!=null){
         setState(() {
