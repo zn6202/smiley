@@ -140,12 +140,14 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     if ((isSelected[1] && weekDayName=="星期一") || (isSelected[2] && isStartOfMonth)) {
       int days = isSelected[1] ? 6 : 28;
       DateTime startDate = endDate.subtract(Duration(days: days));
+      int time = 0;
 
       // 週、月分析
       for (int i = 0; i <= days; i++) {
         DateTime currentDate = startDate.add(Duration(days: i));
         dailyData = await analysisResult(currentDate); // 去後端拿資料
         if(dailyData['happiness']!='null'){
+          time++;
           positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
               (dailyData['like']?.toDouble() ?? 0.0);
           negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
@@ -160,26 +162,34 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           positiveResult = double.parse(positiveResult.toStringAsFixed(1));
           negativeResult = double.parse(negativeResult.toStringAsFixed(1));
         }else{ // 如果那一天無分析結果的話，正負值為?
-          positiveResult = 50;
-          negativeResult = 50;
+          // positiveResult = 50;
+          // negativeResult = 50;
+          continue;
         }
         positiveSums.add(positiveResult);
         negativeSums.add(negativeResult);
       }
-
-      setState(() {
-        positiveEmotionData = [
-          for (int i = 0; i <= days; i++) FlSpot(i.toDouble(), positiveSums[i])
-        ];
-        negativeEmotionData = [
-          for (int i = 0; i <= days; i++) FlSpot(i.toDouble(), negativeSums[i])
-        ];
-        haveDiary = true;
-      });
+      print('有寫日記的天數: $time positiveSums: $positiveSums negativeSums: $negativeSums');
+      if (time == 0 ){
+        setState(() {
+          haveDiary = false;
+        });
+      }else{
+        setState(() {
+          positiveEmotionData = [
+            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), positiveSums[i])
+          ];
+          negativeEmotionData = [
+            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), negativeSums[i])
+          ];
+          haveDiary = true;
+        });
+      }
     } else if (isSelected[1]){ // 不是星期一，顯示舊的上週的折線圖
       print("不是星期一，顯示舊的上週的折線圖");
       print('上一週的星期一: $lastMonday');
       print('上一週的星期天: $lastSunday');
+      int time = 0;
 
       //週分析
       for (int i = 0; i < 7; i++) {
@@ -187,6 +197,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         dailyData = await analysisResult(currentDate); // 去後端拿資料
 
         if (dailyData['happiness']!=null){
+          time++;
           positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
               (dailyData['like']?.toDouble() ?? 0.0);
           negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
@@ -201,29 +212,35 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           positiveResult = double.parse(positiveResult.toStringAsFixed(1));
           negativeResult = double.parse(negativeResult.toStringAsFixed(1));
         }else{ // 如果那一天無分析結果的話，正負值為?
-          positiveResult = 50.0;
-          negativeResult = 50.0;
+          // positiveResult = 50.0;
+          // negativeResult = 50.0;
+          continue;
         }
         positiveSums.add(positiveResult);
         negativeSums.add(negativeResult);
       }
-      print(positiveSums);
-      print(negativeSums);
-
-      setState(() {
-        positiveEmotionData = [
-          for (int i = 0; i < 7; i++) FlSpot(i.toDouble(), positiveSums[i])
-        ];
-        negativeEmotionData = [
-          for (int i = 0; i < 7; i++) FlSpot(i.toDouble(), negativeSums[i])
-        ];
-        haveDiary = true;
-      });
+      print('有寫日記的天數: $time positiveSums: $positiveSums negativeSums: $negativeSums');
+      if (time == 0 ){
+        setState(() {
+          haveDiary = false;
+        });
+      }else{
+        setState(() {
+          positiveEmotionData = [
+            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), positiveSums[i])
+          ];
+          negativeEmotionData = [
+            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), negativeSums[i])
+          ];
+          haveDiary = true;
+        });
+      }
     } else if (isSelected[2]){ // 不是月初，顯示舊的上個月的折線圖
       print("不是月底，顯示上個月的折線圖");
       print('上個月的第一天: $firstDayOfLastMonth');
       print('上個月的最後一天: $lastDayOfLastMonth');
       print('上個月的天數: $daysDifference');
+      int time = 0;
 
       //月分析
       for (int i = 0; i <= daysDifference; i++) {
@@ -231,6 +248,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         dailyData = await analysisResult(currentDate); // 去後端拿資料
 
         if (dailyData['happiness']!= null){
+          time++;
           positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
               (dailyData['like']?.toDouble() ?? 0.0);
           negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
@@ -245,22 +263,29 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
           positiveResult = double.parse(positiveResult.toStringAsFixed(1));
           negativeResult = double.parse(negativeResult.toStringAsFixed(1));
         }else{ // 如果那一天無分析結果的話，正負值為?
-          positiveResult = 50.0;
-          negativeResult = 50.0;
+          // positiveResult = 50.0;
+          // negativeResult = 50.0;
+          continue;
         }
         positiveSums.add(positiveResult);
         negativeSums.add(negativeResult);
       }
-
-      setState(() {
-        positiveEmotionData = [
-          for (int i = 0; i <= daysDifference; i++) FlSpot(i.toDouble(), positiveSums[i])
-        ];
-        negativeEmotionData = [
-          for (int i = 0; i <= daysDifference; i++) FlSpot(i.toDouble(), negativeSums[i])
-        ];
-        haveDiary = true;
-      });
+      print('有寫日記的天數: $time positiveSums: $positiveSums negativeSums: $negativeSums');
+      if (time == 0 ){
+        setState(() {
+          haveDiary = false;
+        });
+      }else{
+        setState(() {
+          positiveEmotionData = [
+            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), positiveSums[i])
+          ];
+          negativeEmotionData = [
+            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), negativeSums[i])
+          ];
+          haveDiary = true;
+        });
+      }
     }else { // 今日
       DateTime currentDate = DateTime.now();
       testData = await analysisResult(currentDate); // 去後端拿資料
@@ -918,24 +943,14 @@ class CustomLabel extends StatelessWidget {
 - 折線圖
   * 沒有0/100的灰線
   * 縱軸距離圖表太近
-  * 橫軸標籤未改好 -> new! 要不要變成圖的畫面可以左右滑動(x 軸寫 1~當月最後一天)
+  * 橫軸標籤未改好 -> new! 要不要變成圖表的畫面可以左右滑動(x 軸寫 1~當月最後一天)?
   * 以月 橫軸顯示區間 資料標籤標日期
   * new! 數值是對的，但線的位置怪怪的
-  * new! 月跟週的 title 日期範圍怪怪的，剛好變數有用到，就順便改好了~ 麻煩確認一下ㄌ
+  * new! 當上週或上月只有寫過一篇日記，要標示出點點。
+  * new!(done) 月跟週的 title 日期範圍怪怪的，剛好變數有用到，就順便改好了~ 麻煩確認一下ㄌ
 - 無資料時要顯示對應文字
+  * new! 當上週或上月都沒寫日記的話，問號下面的文字看要不要改成 "上一週無日記記錄" / "上個月無日記記錄"~
 
-疑問
-1. other 要顯示在今日分析圓餅圖嗎？ (目前是除了 other 以外的情緒，乘上 100，再除以 other )
-  ex:
-    happiness = 5, like = 0            >>> 正面總數: 5
-    sad = 20, disgust = 0, angry = 15  >>> 正面總數: 35
-    other = 60                         >>> 中立總數: 60
-
-    happiness like sad disgust angry 分別乘以 100/(5+35) 後，
-
-    happiness = 12.5, like = 0, sad = 50.0, disgust = 0, angry = 37.5 >>> 總和 100
-    other(不顯示在今日圖表)
-
-2. 當那一天沒有寫日記，正負情緒數值為 ?? (162 203 247 行，先暫時寫各 50.0)
-3. 月分析跑比較久，有沒有需要"等待畫面"?
+疑問：
+跑月分析需要一點點時間，看有沒有需要先跑等待畫面~
 */
