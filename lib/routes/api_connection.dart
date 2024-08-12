@@ -1,8 +1,10 @@
 class API
 {
-  static const hostConnect = "http://192.168.56.1/smiley_backend";
-  // static const hostConnect = "http://127.0.0.1:8080/smiley_backend";
+  static const hostConnect = "http://10.0.2.2/smiley_backend"; // 針對 Android 模擬器
+  // static const hostConnect = "http://localhost/smiley_backend"; // 針對 iOS 模擬器
+  // static const hostConnect = "http://192.168.56.1/smiley_backend";
   // static const hostConnect = "http://163.22.32.24/smiley_backend";
+  // static const hostConnect = "http://127.0.0.1/smiley_backend"; // 為模擬器，不是主機電腦，所以 API 連接會失敗。
 
   static const hostConnectUser = "$hostConnect/user";
 
