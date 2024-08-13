@@ -759,6 +759,11 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 前端修正:
 - 捲動畫面最上方會有紫色陰影
 - 輸入框與提交後日記顯示的起始點有些微不同
+
+- new! 左邊標題是情緒小天使
+- new! 點小天使或小怪獸要導航到下一頁時 arguments 多加一個變數 angelOrMonster
+       - 如果點小天使，angelOrMonster = "angel"
+       - 如果點小怪獸，angelOrMonster = "monster"
 */
 
 /*

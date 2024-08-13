@@ -23,5 +23,6 @@ class API
   static const getFriends = "$hostConnect/user/getFriends.php";
   static const delFriend = "$hostConnect/user/delFriend.php";
   static const getAnalysis = "$hostConnect/analysis/getAnalysis.php";
+  static const submitPost = "$hostConnect/post/submitPost.php";
 
 }

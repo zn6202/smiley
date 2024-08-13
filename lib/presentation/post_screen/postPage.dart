@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:intl/intl.dart';
 import '../../core/app_export.dart';
+// http
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PostPage extends StatefulWidget {
   @override
@@ -23,20 +28,46 @@ class _PostPageState extends State<PostPage> {
     });
   }
 
-  void submitPost() {
-    String colorId = selectedColor.toRadixString(16);
+  // 抓取當前 user_id
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
+  void submitPost(imageUrl) async {
+    final String? userId = await getUserId();
+    String color = selectedColor.toRadixString(16);
     String title = titleController.text;
     String date = DateFormat('yyyy.MM.dd').format(DateTime.now());
     String content = contentController.text;
 
-    // 這裡是傳遞資料給後端的地方
-    print('Color ID: $colorId');
-    print('Title: $title');
-    print('Date: $date');
-    print('Content: $content');
-    Navigator.pushNamed(context, AppRoutes.browsePage);
-    // 在這裡可以使用 HTTP 請求將資料傳遞給後端
-    // 例如: http.post('https://yourapi.com/posts', body: {'color_id': colorId, 'title': title, 'date': date, 'content': content});
+    print("進入提交貼文函式");
+    print('user_id: $userId');
+    print('color: $color');
+    print('monster_id: $imageUrl');
+    print('angel_id: $imageUrl');
+    print('title: $title');
+    print('date: $date');
+    print('content: $content');
+
+    final response = await http.post(
+      Uri.parse(API.submitPost),
+      body:{
+        'user_id': userId,
+        'color': color,
+        'monster': imageUrl, //
+        'angel': imageUrl,   //
+        'title': title,
+        'date': date,
+        'content': content,
+      },
+    );
+    if (response.statusCode == 200) {
+      Navigator.pushNamed(context, AppRoutes.browsePage);
+      print('貼文提交成功!');
+    } else {
+      print('貼文提交失敗...');
+    }
   }
 
   @override
@@ -92,6 +123,7 @@ class _PostPageState extends State<PostPage> {
                       ),
                       padding: EdgeInsets.symmetric(horizontal: 20.h),
                       child: TextField(
+                        controller: titleController,
                         style: TextStyle(
                           fontSize: 18.fSize,
                           height: 12 / 18,
@@ -146,6 +178,7 @@ class _PostPageState extends State<PostPage> {
                       padding:
                           EdgeInsets.symmetric(horizontal: 20.h, vertical: 10.v),
                       child: TextField(
+                        controller: contentController,
                         style: TextStyle(
                           fontSize: 18.fSize,
                           height: 23 / 18,
@@ -170,7 +203,7 @@ class _PostPageState extends State<PostPage> {
                     SizedBox(height: 16.v),
                     TextButton(
                       onPressed: () {
-                        submitPost();
+                        submitPost(imageUrl);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Color(0x80FFFFFF),
@@ -314,5 +347,6 @@ class _PostPageState extends State<PostPage> {
 }
 
 /**
-後端確認submitPost的資料格式是否可以
+後端:
+- monster 跟 angel 路徑要修改(58)
  */
