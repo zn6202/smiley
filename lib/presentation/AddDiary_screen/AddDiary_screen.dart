@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:convert';
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
@@ -100,6 +101,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     );
     Navigator.of(context).pop();
     if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      print("result = $result");
+
       completeDialog(context);
       setState(() {
         isSubmitted = true;
