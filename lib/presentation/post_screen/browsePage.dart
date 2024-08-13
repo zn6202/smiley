@@ -297,3 +297,8 @@ class Post {
     required this.emotionImage,
   });
 }
+
+/*
+後端:
+- 後端抓取自己的貼文跟朋友的貼文
+ */
