@@ -80,17 +80,15 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     final String content = _formatContent(_textController.text);
     final String date =
         DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
-
-    // 獲取 user_id
     final String? userId = await getUserId();
 
-    if (userId == null) {
-      // 處理 user_id 為空的情況
-      print('Error: user_id is null');
-      return;
-    }
+    print("進入提交日記函式 content: $content date:$date userId:$userId");
 
-    print("進入提交日記函式");
+    Navigator.of(context).pop(); // 在這裡 pop context
+
+    // 使用 Future.delayed 給 context 充分的時間處理 pop 事件
+    await Future.delayed(Duration(milliseconds: 100));
+
     final response = await http.post(
       Uri.parse(API.diary), // 解析字串變成 URI 對象
       body: {
@@ -99,23 +97,31 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
         'date': date,
       },
     );
-    Navigator.of(context).pop();
+    
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
       print("result = $result");
 
-      completeDialog(context);
+      // 此處重新獲得新的 context 來顯示 dialog
+      if (context.mounted) {
+        completeDialog(context);
+      }
+      
       setState(() {
         isSubmitted = true;
         submittedContent = content;
       });
       print('日記提交成功!');
     } else {
-      Navigator.of(context).pop();
-      failDialog(context);
+      // 此處重新獲得新的 context 來顯示 dialog
+      if (context.mounted) {
+        failDialog(context);
+      }
       print('日記提交失敗...');
     }
-  }
+  } 
+
+
 
   Widget build(BuildContext context) {
     return Scaffold(
