@@ -36,14 +36,18 @@ class _PostPageState extends State<PostPage> {
 
   void submitPost(imageUrl) async {
     final String? userId = await getUserId();
-    String color = selectedColor.toRadixString(16);
+    String backgroundColorString = backgroundColor.toString();
+    String PostBackgroundColor = backgroundColorString.split('(')[1].split(')')[0];
+    String textColorString = textColor.toString();
+    String PostTextColor = textColorString.split('(')[1].split(')')[0];
     String title = titleController.text;
     String date = DateFormat('yyyy.MM.dd').format(DateTime.now());
     String content = contentController.text;
 
     print("進入提交貼文函式");
     print('user_id: $userId');
-    print('color: $color');
+    print('textColor: $PostTextColor');
+    print('backgroundColor: $PostBackgroundColor');
     print('monster_id: $imageUrl');
     print('angel_id: $imageUrl');
     print('title: $title');
@@ -54,7 +58,8 @@ class _PostPageState extends State<PostPage> {
       Uri.parse(API.submitPost),
       body:{
         'user_id': userId,
-        'color': color,
+        'text_color':PostTextColor,
+        'background_color': PostBackgroundColor,
         'monster': imageUrl, //
         'angel': imageUrl,   //
         'title': title,

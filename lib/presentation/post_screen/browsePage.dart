@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smiley/core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
+// http
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BrowsePage extends StatefulWidget {
   @override
@@ -31,6 +35,34 @@ class _BrowsePageState extends State<BrowsePage> {
     _friendsPostsController.dispose();
     super.dispose();
   }
+
+  // Future<String?> getUserId() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   return prefs.getString('user_id');
+  // }
+  
+  // void submitPost(imageUrl) async {
+  //   final String? userId = await getUserId();
+  //   String date = DateFormat('yyyy.MM.dd').format(DateTime.now());
+
+  //   print("進入提交貼文函式");
+  //   print('user_id: $userId');
+  //   print('date: $date');
+
+  //   final response = await http.post(
+  //     Uri.parse(API.submitPost),
+  //     body:{
+  //       'user_id': userId,
+  //       'date': date,
+  //     },
+  //   );
+  //   if (response.statusCode == 200) {
+  //     Navigator.pushNamed(context, AppRoutes.browsePage);
+  //     print('貼文提交成功!');
+  //   } else {
+  //     print('貼文提交失敗...');
+  //   }
+  // }
 
   Future<List<Post>> fetchMyPosts() async {
     return [
