@@ -208,7 +208,7 @@ class _PostPageState extends State<PostPage> {
                     SizedBox(height: 16.v),
                     TextButton(
                       onPressed: () {
-                        submitPost(imageUrl);
+                        submitPost(imageUrl.split('/').last);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Color(0x80FFFFFF),

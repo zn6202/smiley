@@ -294,10 +294,10 @@ class _BrowsePageState extends State<BrowsePage> {
               ),
             ),
             SizedBox(height: 120.v),
-            Image.asset(
+            Image.network(
               post.monster != null && post.monster!.isNotEmpty
-              ? post.monster!
-              : post.angel!,
+              ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
+              : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
               height: 200.v,
               width: 200.h,
               fit: BoxFit.contain,
@@ -356,5 +356,6 @@ class Post {
 
 /*
 後端:
-- 照片 asset 改成 network
+- 照片 network ip 要改(299)
+- 好友貼文
  */
