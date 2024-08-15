@@ -6,6 +6,7 @@ import '../../widgets/bottom_navigation.dart';
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class BrowsePage extends StatefulWidget {
   @override
@@ -36,100 +37,109 @@ class _BrowsePageState extends State<BrowsePage> {
     super.dispose();
   }
 
-  // Future<String?> getUserId() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   return prefs.getString('user_id');
-  // }
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
   
-  // void submitPost(imageUrl) async {
-  //   final String? userId = await getUserId();
-  //   String date = DateFormat('yyyy.MM.dd').format(DateTime.now());
+  Future<List<Post>> getPost() async {
+    final String? userId = await getUserId();
 
-  //   print("進入提交貼文函式");
-  //   print('user_id: $userId');
-  //   print('date: $date');
+    print("進入瀏覽貼文函式");
+    print('user_id: $userId');
 
-  //   final response = await http.post(
-  //     Uri.parse(API.submitPost),
-  //     body:{
-  //       'user_id': userId,
-  //       'date': date,
-  //     },
-  //   );
-  //   if (response.statusCode == 200) {
-  //     Navigator.pushNamed(context, AppRoutes.browsePage);
-  //     print('貼文提交成功!');
-  //   } else {
-  //     print('貼文提交失敗...');
-  //   }
-  // }
+    final response = await http.post(
+      Uri.parse(API.getPost),
+      body: {
+        'user_id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        List<dynamic> postsJson = data['posts'];
+        print("data['posts'] 是 : ${postsJson.toString()}");
+        return postsJson.map((json) => Post.fromJson(json)).toList();
+      } else {
+        print('貼文瀏覽失敗... ${data['message']}');
+        return [];
+      }
+    } else {
+      print('貼文瀏覽失敗...');
+      return [];
+    }
+  }
+
 
   Future<List<Post>> fetchMyPosts() async {
-    return [
-      Post(
-        colorId: Color(0xFFF4F4E6),
-        monsterId: 1,
-        angelId: null,
-        title: "測試標題1",
-        date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 1))),
-        content: "這是測試的貼文內容1。",
-        emotionImage: "monster_1.png",
-      ),
-      Post(
-        colorId: Color(0xFFDDCCC0),
-        monsterId: 2,
-        angelId: null,
-        title: "測試標題2",
-        date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 3))),
-        content: "這是測試的貼文內容2。",
-        emotionImage: "monster_2.png",
-      ),
-      Post(
-        colorId: Color(0xFFA7BA89),
-        monsterId: 3,
-        angelId: null,
-        title: "測試標題3",
-        date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 5))),
-        content: "這是測試的貼文內容3。",
-        emotionImage: "monster_3.png",
-      ),
-    ];
+    return await getPost();
+    // return [
+    //   Post(
+    //     textColor: Color(0xffffff53),
+    //     backgroundColor: Color(0xff222222),
+    //     monster: "",
+    //     angel: null,
+    //     title: "測試標題1",
+    //     date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 1))),
+    //     content: "這是測試的貼文內容1。",
+    //   ),
+    //   Post(
+    //     textColor: Color(0xffeca8a4),
+    //     backgroundColor: Color(0xff374295),
+    //     monster: "",
+    //     angel: null,
+    //     title: "測試標題2",
+    //     date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 3))),
+    //     content: "這是測試的貼文內容2。",
+    //   ),
+    //   Post(
+    //     textColor: Color(0xffffff53),
+    //     backgroundColor: Color(0xff222222),
+    //     monster: "",
+    //     angel: null,
+    //     title: "測試標題3",
+    //     date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 5))),
+    //     content: "這是測試的貼文內容3。",
+    //   ),
+    // ];
   }
 
   Future<List<Post>> fetchFriendsPosts() async {
     return [
       Post(
-        colorId: Color(0xFF6F5032),
-        monsterId: 4,
-        angelId: null,
+        textColor: Color(0xffffff53),
+        backgroundColor: Color(0xff222222),
+        monster: "",
+        angel: null,
         title: "好友貼文1",
         date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 2))),
         content: "這是好友的貼文內容1。",
-        emotionImage: "monster_4.png",
       ),
       Post(
-        colorId: Color(0xFFFBBC05),
-        monsterId: 1,
-        angelId: null,
+        textColor: Color(0xffffff53),
+        backgroundColor: Color(0xff222222),
+        monster: "",
+        angel: null,
         title: "好友貼文2",
         date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 4))),
         content: "這是好友的貼文內容2。",
-        emotionImage: "monster_1.png",
       ),
       Post(
-        colorId: Color(0xFF374295),
-        monsterId: 2,
-        angelId: null,
+        textColor: Color(0xffffff53),
+        backgroundColor: Color(0xff222222),
+        monster: "",
+        angel: null,
         title: "好友貼文3",
         date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 6))),
         content: "這是好友的貼文內容3。",
-        emotionImage: "monster_2.png",
       ),
     ];
   }
 
-  Color getTextColor(Color colorId) {
-    switch (colorId.value) {
+  Color getTextColor(Color color) {
+    switch (color.value) {
       case 0xFF222222:
         return Color(0xFFFFFF53);
       case 0xFFAF333A:
@@ -243,10 +253,10 @@ class _BrowsePageState extends State<BrowsePage> {
   }
 
   Widget _buildPostItem(Post post) {
-    final textColor = getTextColor(post.colorId);
+    final textColor = getTextColor(post.backgroundColor);
 
     return Container(
-      color: post.colorId,
+      color: post.backgroundColor,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
@@ -285,7 +295,9 @@ class _BrowsePageState extends State<BrowsePage> {
             ),
             SizedBox(height: 120.v),
             Image.asset(
-              'assets/images/${post.emotionImage}',
+              post.monster != null && post.monster!.isNotEmpty
+              ? post.monster!
+              : post.angel!,
               height: 200.v,
               width: 200.h,
               fit: BoxFit.contain,
@@ -311,26 +323,38 @@ class _BrowsePageState extends State<BrowsePage> {
 }
 
 class Post {
-  final Color colorId;
-  final int? monsterId;
-  final int? angelId;
+  final Color textColor;
+  final Color backgroundColor;
+  final String? monster;
+  final String? angel;
   final String title;
   final String date;
   final String content;
-  final String emotionImage;
 
   Post({
-    required this.colorId,
-    required this.monsterId,
-    required this.angelId,
+    required this.textColor,
+    required this.backgroundColor,
+    this.monster,
+    this.angel,
     required this.title,
     required this.date,
     required this.content,
-    required this.emotionImage,
   });
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      textColor: Color(int.parse(json['text_color'])),
+      backgroundColor: Color(int.parse(json['background_color'])),
+      monster: json['monster'] ?? '', // 可以是 null
+      angel: json['angel'] ?? '', // 可以是 null
+      title: json['title'],
+      date: json['date'],
+      content: json['content'],
+    );
+  }
 }
 
 /*
 後端:
-- 後端抓取自己的貼文跟朋友的貼文
+- 照片 asset 改成 network
  */

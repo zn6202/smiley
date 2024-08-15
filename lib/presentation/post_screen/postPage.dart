@@ -325,8 +325,8 @@ class _PostPageState extends State<PostPage> {
         return Color(0xFFFFFF53);
       case 0xFFAF333A:
         return Color(0xFFFFFF00);
-      case 0xFF374295:
-        return Color(0xFFECA8A4);
+      case 0xFF374295:              // 背景
+        return Color(0xFFECA8A4); // 字
       case 0xFFA1E0E4:
         return Color(0xFF4285F4);
       case 0xFFCD95BC:
