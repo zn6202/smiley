@@ -77,7 +77,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 
   void submitDiary(BuildContext context) async {
     showWaitingDialog(context);
-    final String content = _formatContent(_textController.text);
+    final String content = _formatContent(_textController.text).trimRight();
     final String date =
         DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
     final String? userId = await getUserId();
