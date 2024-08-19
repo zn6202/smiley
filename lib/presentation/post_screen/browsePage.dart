@@ -42,10 +42,10 @@ class _BrowsePageState extends State<BrowsePage> {
     return prefs.getString('user_id');
   }
   
-  Future<List<Post>> getPost() async {
+  Future<List<Post>> fetchMyPosts() async {
     final String? userId = await getUserId();
 
-    print("進入瀏覽貼文函式");
+    print("進入瀏覽自己的貼文函式");
     print('user_id: $userId');
 
     final response = await http.post(
@@ -72,70 +72,37 @@ class _BrowsePageState extends State<BrowsePage> {
     }
   }
 
-
-  Future<List<Post>> fetchMyPosts() async {
-    return await getPost();
-    // return [
-    //   Post(
-    //     textColor: Color(0xffffff53),
-    //     backgroundColor: Color(0xff222222),
-    //     monster: "",
-    //     angel: null,
-    //     title: "測試標題1",
-    //     date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 1))),
-    //     content: "這是測試的貼文內容1。",
-    //   ),
-    //   Post(
-    //     textColor: Color(0xffeca8a4),
-    //     backgroundColor: Color(0xff374295),
-    //     monster: "",
-    //     angel: null,
-    //     title: "測試標題2",
-    //     date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 3))),
-    //     content: "這是測試的貼文內容2。",
-    //   ),
-    //   Post(
-    //     textColor: Color(0xffffff53),
-    //     backgroundColor: Color(0xff222222),
-    //     monster: "",
-    //     angel: null,
-    //     title: "測試標題3",
-    //     date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 5))),
-    //     content: "這是測試的貼文內容3。",
-    //   ),
-    // ];
-  }
-
   Future<List<Post>> fetchFriendsPosts() async {
-    return [
-      Post(
-        textColor: Color(0xffffff53),
-        backgroundColor: Color(0xff222222),
-        monster: "",
-        angel: null,
-        title: "好友貼文1",
-        date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 2))),
-        content: "這是好友的貼文內容1。",
-      ),
-      Post(
-        textColor: Color(0xffffff53),
-        backgroundColor: Color(0xff222222),
-        monster: "",
-        angel: null,
-        title: "好友貼文2",
-        date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 4))),
-        content: "這是好友的貼文內容2。",
-      ),
-      Post(
-        textColor: Color(0xffffff53),
-        backgroundColor: Color(0xff222222),
-        monster: "",
-        angel: null,
-        title: "好友貼文3",
-        date: DateFormat('yyyy.MM.dd').format(DateTime.now().subtract(Duration(hours: 6))),
-        content: "這是好友的貼文內容3。",
-      ),
-    ];
+    final String? userId = await getUserId();
+
+    print("進入瀏覽好友貼文函式");
+    print('user_id: $userId');
+
+    final response = await http.post(
+      Uri.parse(API.getFriendsPost),
+      body: {
+        'user_id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        List<dynamic> postsJson = data['posts'];
+        print("data['posts'] 是 : ${postsJson.toString()}");
+        return postsJson.map((json) => Post.fromJson(json)).toList();
+      }else if (data['success'] == false && data['message']=="No posts found for the given user and date."){
+        print('無好友發布貼文... ${data['message']}');
+        return [];
+      } else {
+        print('貼文瀏覽失敗... ${data['message']}');
+        return [];
+      }
+    } else {
+      print('貼文瀏覽失敗...');
+      return [];
+    }
   }
 
   Color getTextColor(Color color) {
