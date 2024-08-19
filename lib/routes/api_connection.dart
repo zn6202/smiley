@@ -26,4 +26,6 @@ class API
   static const submitPost = "$hostConnect/post/submitPost.php";
   static const getPost = "$hostConnect/post/getPost.php";
   static const getFriendsPost = "$hostConnect/post/getFriendsPost.php";
+  static const getDiary = "$hostConnect/diary/getDiary.php";
+
 }

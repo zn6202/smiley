@@ -6,7 +6,6 @@ import '../../core/app_export.dart';
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class PostPage extends StatefulWidget {
   @override
@@ -353,5 +352,5 @@ class _PostPageState extends State<PostPage> {
 
 /**
 後端:
-- monster 跟 angel 路徑要修改(58)
+- monster 跟 angel 路徑要修改(50 51 62 63)
  */
