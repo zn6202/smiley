@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart'; 
 import '../../widgets/app_bar/appbar_leading_image.dart'; 
 import 'package:flutter_svg/flutter_svg.dart';
+// http
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class Postrecord extends StatefulWidget {
   @override
@@ -17,31 +22,66 @@ class _PostrecordState extends State<Postrecord> {
     _fetchUserData();
   }
 
-  Future<void> _fetchUserData() async {
-    setState(() {
-      posts = [
-        Post(
-            date: '2024.04.14',
-            title: '酸酸檸檬',
-            emotionImage: 'monster_4.png',
-            colorId: Color(0xFFFFFF4E),
-            content: '哼 沒關係ㄚ 我就是愛吃醋 怎麼樣~'),
-        Post(
-            date: '2024.04.15',
-            title: '椒躁龐克',
-            emotionImage: 'monster_3.png',
-            colorId: Color(0xFFAF333A),
-            content: '宿舍洗衣機真的超破，怎麼有辦法把衣服越洗越髒啦 是在哭ㄛ'),
-        Post(
-            date: '2024.04.16',
-            title: '酸酸檸檬',
-            emotionImage: 'monster_4.png',
-            colorId: Color(0xFFCD95BC),
-            content:
-                '嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨'),
-      ];
-    });
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
   }
+  
+  Future<void> _fetchUserData() async {
+    final String? userId = await getUserId();
+
+    print("進入貼文紀錄函式");
+    print('user_id: $userId');
+
+    final response = await http.post(
+      Uri.parse(API.getPostRecord),
+      body: {
+        'user_id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        List<dynamic> postsJson = data['posts'];
+        print("data['posts'] 是 : ${postsJson.toString()}");
+        setState(() {
+          posts = postsJson.map((json) => Post.fromJson(json)).toList();
+        });
+      } else {
+        print('貼文瀏覽失敗... ${data['message']}');
+      }
+    } else {
+      print('貼文瀏覽失敗...');
+    }
+  }
+
+  // Future<void> _fetchUserData() async {
+  //   setState(() {
+  //     posts = [
+  //       Post(
+  //           date: '2024.04.14',
+  //           title: '酸酸檸檬',
+  //           emotionImage: 'monster_4.png',
+  //           colorId: Color(0xFFFFFF4E),
+  //           content: '哼 沒關係ㄚ 我就是愛吃醋 怎麼樣~'),
+  //       Post(
+  //           date: '2024.04.15',
+  //           title: '椒躁龐克',
+  //           emotionImage: 'monster_3.png',
+  //           colorId: Color(0xFFAF333A),
+  //           content: '宿舍洗衣機真的超破，怎麼有辦法把衣服越洗越髒啦 是在哭ㄛ'),
+  //       Post(
+  //           date: '2024.04.16',
+  //           title: '酸酸檸檬',
+  //           emotionImage: 'monster_4.png',
+  //           colorId: Color(0xFFCD95BC),
+  //           content:
+  //               '嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨嗨'),
+  //     ];
+  //   });
+  // }
 
   void _navigateToPostDetail(Post post) {
     Navigator.push(
@@ -125,8 +165,10 @@ class _PostrecordState extends State<Postrecord> {
                             ),
                           ),
                           Expanded(
-                            child: Image.asset(
-                              'assets/images/${post.emotionImage}',
+                            child: Image.network(
+                              post.monster != null && post.monster!.isNotEmpty
+                              ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
+                              : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
                               fit: BoxFit.contain,
                             ),
                           ),
@@ -140,22 +182,53 @@ class _PostrecordState extends State<Postrecord> {
     );
   }
 }
-
 class Post {
-  final String date;
+  final Color textColor;
+  final Color backgroundColor;
+  final String? monster;
+  final String? angel;
   final String title;
-  final String emotionImage;
-  final Color colorId;
+  final String date;
   final String content;
 
   Post({
-    required this.date,
+    required this.textColor,
+    required this.backgroundColor,
+    this.monster,
+    this.angel,
     required this.title,
-    required this.emotionImage,
-    required this.colorId,
+    required this.date,
     required this.content,
   });
+
+  factory Post.fromJson(Map<String, dynamic> json) {
+    return Post(
+      textColor: Color(int.parse(json['text_color'])),
+      backgroundColor: Color(int.parse(json['background_color'])),
+      monster: json['monster'] ?? '', // 可以是 null
+      angel: json['angel'] ?? '', // 可以是 null
+      title: json['title'],
+      date: json['date'],
+      content: json['content'],
+    );
+  }
 }
+
+// class Post {
+//   final String date;
+//   final String title;
+//   final String emotionImage;
+//   final Color colorId;
+//   final String content;
+
+//   Post({
+//     required this.date,
+//     required this.title,
+//     required this.emotionImage,
+//     required this.colorId,
+//     required this.content,
+//   });
+// }
 
 class PostDetailScreen extends StatelessWidget {
   final Post post;
@@ -195,10 +268,10 @@ class PostDetailScreen extends StatelessWidget {
 
 @override
 Widget build(BuildContext context) {
-  final textColor = getTextColor(post.colorId);
+  final textColor = getTextColor(post.backgroundColor);
 
   return Scaffold(
-    backgroundColor: post.colorId,
+    backgroundColor: post.backgroundColor,
     appBar: AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -251,8 +324,10 @@ Widget build(BuildContext context) {
               ),
             ),
             SizedBox(height: 120.v),
-            Image.asset(
-              'assets/images/${post.emotionImage}',
+            Image.network(
+              post.monster != null && post.monster!.isNotEmpty
+              ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
+              : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
               height: 200.v,
               width: 200.h,
               fit: BoxFit.contain,
