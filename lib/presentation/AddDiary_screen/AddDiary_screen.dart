@@ -775,9 +775,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 
 /*
 後端需再處理的事項：
-1.連接情緒辨識模型
-2.連接情緒小怪獸結果 
-  - 資料格式都先用圖片網址:'assets/images/monster_1.png' 按下後會把路徑給postPage去顯示 所以如果這裡改了資料格式 記得修改那部分
-3. response 會接收小怪獸路徑，待處理 (102)
-
+1. 連接情緒辨識模型
+2. response 會接收小怪獸路徑，待處理 (102)
+3. 顯示情緒小怪獸結果 (180 ，從 2. 找到圖像路徑)
 */
