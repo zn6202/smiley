@@ -89,6 +89,32 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     // 使用 Future.delayed 給 context 充分的時間處理 pop 事件
     await Future.delayed(Duration(milliseconds: 100));
 
+    // BERT 分析請求
+    final responseBERT = await http.post(
+      Uri.parse('http://10.0.2.2:5000/analyze'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({"uid": userId, "article": content})
+    );
+
+    if (responseBERT.statusCode == 200) {
+      final resultBERT = json.decode(responseBERT.body);
+      print("BERT result = $resultBERT");
+
+      if (context.mounted) {
+        completeDialog(context);
+      }
+      setState(() {
+        isSubmitted = true;
+        submittedContent = content;
+      });
+      print('BERT分析成功!');
+    } else {
+      if (context.mounted) {
+        failDialog(context);
+      }
+      print('BERT分析失敗... 狀態碼: ${responseBERT.statusCode}, 響應: ${responseBERT.body}');
+    }
+
     final response = await http.post(
       Uri.parse(API.diary), // 解析字串變成 URI 對象
       body: {
