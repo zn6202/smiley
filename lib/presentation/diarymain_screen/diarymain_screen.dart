@@ -351,7 +351,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
               height: 122.v,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(imageUrl),
+                  image: NetworkImage(imageUrl),
                   fit: BoxFit.fill,
                 ),
               ),

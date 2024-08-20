@@ -75,8 +75,10 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     return content.replaceAll('\n', ' ');
   }
 
-  void submitDiary(BuildContext context) async {
+  Future<void> submitDiary(BuildContext context) async {
+    // 顯示等待對話框
     showWaitingDialog(context);
+
     final String content = _formatContent(_textController.text).trimRight();
     final String date =
         DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
@@ -84,37 +86,34 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 
     print("進入提交日記函式 content: $content date:$date userId:$userId");
 
-    Navigator.of(context).pop(); // 在這裡 pop context
-
-    // 使用 Future.delayed 給 context 充分的時間處理 pop 事件
-    await Future.delayed(Duration(milliseconds: 100));
-
     // BERT 分析請求
     final responseBERT = await http.post(
       Uri.parse('http://10.0.2.2:5000/analyze'),
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({"uid": userId, "article": content})
+      body: jsonEncode({"uid": userId, "article": content}),
     );
+
+    // 關閉等待對話框
+    if (context.mounted) {
+      print('Closing waiting dialog');
+      Navigator.of(context).pop(); // 關閉等待對話框
+    }
 
     if (responseBERT.statusCode == 200) {
       final resultBERT = json.decode(responseBERT.body);
       print("BERT result = $resultBERT");
-
-      if (context.mounted) {
-        completeDialog(context);
-      }
-      setState(() {
-        isSubmitted = true;
-        submittedContent = content;
-      });
       print('BERT分析成功!');
-    } else {
       if (context.mounted) {
-        failDialog(context);
+        completeDialog(context); // 顯示成功對話框
       }
+    } else {
       print('BERT分析失敗... 狀態碼: ${responseBERT.statusCode}, 響應: ${responseBERT.body}');
+      if (context.mounted) {
+        failDialog(context); // 顯示失敗對話框
+      }
     }
 
+    // 日記提交請求
     final response = await http.post(
       Uri.parse(API.diary), // 解析字串變成 URI 對象
       body: {
@@ -123,29 +122,21 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
         'date': date,
       },
     );
-    
+
     if (response.statusCode == 200) {
       final result = json.decode(response.body); // response 會接收小怪獸路徑，待處理
       print("result = $result");
 
-      // 此處重新獲得新的 context 來顯示 dialog
-      if (context.mounted) {
-        completeDialog(context);
-      }
-      
       setState(() {
         isSubmitted = true;
         submittedContent = content;
       });
       print('日記提交成功!');
     } else {
-      // 此處重新獲得新的 context 來顯示 dialog
-      if (context.mounted) {
-        failDialog(context);
-      }
       print('日記提交失敗...');
     }
-  } 
+  }
+
 
 
 
@@ -204,9 +195,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 buildEmotionBlock(
-                                    'assets/images/monster_1.png'), //這裡到時候要改成小怪獸演算法函式
+                                  'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png'), //這裡到時候要改成小怪獸演算法函式
                                 buildEmotionBlock(
-                                    'assets/images/monster_2.png'),
+                                  'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png'),
                               ],
                             ),
                           ],
@@ -305,7 +296,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               height: 122.v,
               decoration: BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage(imageUrl),
+                  image: NetworkImage(imageUrl),
                   fit: BoxFit.fill,
                 ),
               ),
@@ -735,6 +726,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   void showWaitingDialog(BuildContext context) {
     showDialog(
       context: context,
+      // barrierDismissible: false, // 不允許用戶點擊對話框外部關閉
       builder: (BuildContext context) {
         return Dialog(
           shape: RoundedRectangleBorder(
@@ -803,5 +795,5 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 後端需再處理的事項：
 1. 連接情緒辨識模型
 2. response 會接收小怪獸路徑，待處理 (102)
-3. 顯示情緒小怪獸結果 (180 ，從 2. 找到圖像路徑)
+3. 顯示情緒小怪獸結果 (180 205，從 2. 找到圖像路徑)
 */
