@@ -298,9 +298,13 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
     if (_isToday(selectedDate)) {
       setState(() {
         emotionImages = [
-          'http://192.168.56.1/smiley_backend/img/angel_monster/monster_1.png',
-          'http://192.168.56.1/smiley_backend/img/angel_monster/monster_2.png',
+          'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png',
+          'http://163.22.32.24/smiley_backend/img/angel_monster/monster_2.png',
         ];
+        // emotionImages = [
+        //   'http://192.168.56.1/smiley_backend/img/angel_monster/monster_1.png',
+        //   'http://192.168.56.1/smiley_backend/img/angel_monster/monster_2.png',
+        // ];
       });
     }
   }
@@ -415,6 +419,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 
 /*
 後端:
-- 297 _fetchEmotionData 從資料庫抓取正確的小天使小怪獸
+- 297 _fetchEmotionData 從資料庫抓取正確的小天使小怪獸 -> 163.22.32.24
+
 */
 

@@ -167,10 +167,16 @@ class _PostrecordState extends State<Postrecord> {
                           Expanded(
                             child: Image.network(
                               post.monster != null && post.monster!.isNotEmpty
-                              ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
-                              : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
+                              ? 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.monster!}'
+                              : 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.angel!}',
                               fit: BoxFit.contain,
                             ),
+                            // child: Image.network(
+                            //   post.monster != null && post.monster!.isNotEmpty
+                            //   ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
+                            //   : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
+                            //   fit: BoxFit.contain,
+                            // ),
                           ),
                         ],
                       ),
@@ -326,12 +332,20 @@ Widget build(BuildContext context) {
             SizedBox(height: 120.v),
             Image.network(
               post.monster != null && post.monster!.isNotEmpty
-              ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
-              : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
+              ? 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.monster!}'
+              : 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.angel!}',
               height: 200.v,
               width: 200.h,
               fit: BoxFit.contain,
             ),
+            // Image.network(
+            //   post.monster != null && post.monster!.isNotEmpty
+            //   ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
+            //   : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
+            //   height: 200.v,
+            //   width: 200.h,
+            //   fit: BoxFit.contain,
+            // ),
             SizedBox(height: 30.h),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.h),
@@ -357,5 +371,5 @@ Widget build(BuildContext context) {
 - 未處理留言
 
 後端
-- 圖片路徑 ip 要改 (http://192.168.56.1/smiley_backend/...)
+- 圖片路徑 ip 要改 (http://192.168.56.1/smiley_backend/...) -> 163.22.32.24
  */

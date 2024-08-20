@@ -13,7 +13,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../widgets/app_bar/appbar_leading_image.dart'; // 自定義應用欄返回按鈕
 import 'defaultAvatar.dart';
 
-
 class SetNamePhoto extends StatefulWidget {
   final String? sourcePage;
   final File? image;
@@ -116,7 +115,6 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     return prefs.getString('status') ?? '';
   }
 
-
   // Future<void> saveAlbumPhoto() async {
   //   final prefs = await SharedPreferences.getInstance();
   //   String example = _image!.path;
@@ -185,6 +183,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       print('Failed to upload image, status code: ${response.statusCode}');
     }
   }
+
   // 從設定進到 編輯
   void editProfile() async {
     final String? id = await getUserId();
@@ -200,7 +199,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       body: {
         'id': id,
         'name': _controller.text,
-        'photo':selectedAvatarPath ?? '',
+        'photo': selectedAvatarPath ?? '',
       },
     );
     if (response.statusCode == 200) {
@@ -221,6 +220,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       print('更新個資失敗...');
     }
   }
+
 /*
   // 選擇圖片的函數
   Future<void> _pickImage() async {
@@ -246,6 +246,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -255,12 +256,12 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
         backgroundColor: Colors.transparent,
         leading: status == 'member'
             ? IconButton(
-            icon: SvgPicture.asset(
-              'assets/images/img_arrow_left.svg',
-              color: Color(0xFFA7BA89),
-            ),
-            onPressed: () async {
-              FocusScope.of(context).requestFocus(FocusNode());
+                icon: SvgPicture.asset(
+                  'assets/images/img_arrow_left.svg',
+                  color: Color(0xFFA7BA89),
+                ),
+                onPressed: () async {
+                  FocusScope.of(context).requestFocus(FocusNode());
                   await Future.delayed(Duration(milliseconds: 500));
                   Navigator.pushReplacement(
                     context,
@@ -268,8 +269,9 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                       builder: (context) => settingScreen(),
                     ),
                   );
-            },
-          ): AppbarLeadingImage(
+                },
+              )
+            : AppbarLeadingImage(
                 imagePath: 'assets/images/null.png',
               ),
         title: Image.asset(
@@ -280,7 +282,8 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          padding:
+              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Center(
             child: Column(
               children: [
@@ -296,11 +299,21 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                           backgroundImage: _image != null
                               ? FileImage(_image!)
                               : selectedAvatarPath != null
-                                  ? selectedAvatarPath!.startsWith('default_avatar')
-                                      ? AssetImage('assets/images/$selectedAvatarPath') as ImageProvider<Object>
-                                      : NetworkImage('http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath') as ImageProvider<Object>
-                                  : AssetImage('assets/images/default_avatar_9.png') as ImageProvider<Object>,
-                        ),  
+                                  ? selectedAvatarPath!
+                                          .startsWith('default_avatar')
+                                      ? AssetImage(
+                                              'assets/images/$selectedAvatarPath')
+                                          as ImageProvider<Object>
+                                      : NetworkImage(
+                                              'http://163.22.32.24/smiley_backend/img/photo/$selectedAvatarPath')
+                                          as ImageProvider<Object>
+                                      // : NetworkImage(
+                                      //         'http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath')
+                                      //     as ImageProvider<Object>
+                                  : AssetImage(
+                                          'assets/images/default_avatar_9.png')
+                                      as ImageProvider<Object>,
+                        ),
                       ),
                     ],
                   ),
@@ -314,7 +327,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                     textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.person, color: Color(0xFFA7BA89)),
-                      hintText:'me',
+                      hintText: 'me',
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: EdgeInsets.symmetric(vertical: 0.v),
@@ -368,3 +381,4 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
     );
   }
 }
+// 後端: 301 改 ip 位址 163.22.32.24

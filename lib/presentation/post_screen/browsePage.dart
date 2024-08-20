@@ -263,12 +263,20 @@ class _BrowsePageState extends State<BrowsePage> {
             SizedBox(height: 120.v),
             Image.network(
               post.monster != null && post.monster!.isNotEmpty
-              ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
-              : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
+              ? 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.monster!}'
+              : 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.angel!}',
               height: 200.v,
               width: 200.h,
               fit: BoxFit.contain,
             ),
+            // Image.network(
+            //   post.monster != null && post.monster!.isNotEmpty
+            //   ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
+            //   : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
+            //   height: 200.v,
+            //   width: 200.h,
+            //   fit: BoxFit.contain,
+            // ),
             SizedBox(height: 30.v),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16.h),
@@ -329,5 +337,5 @@ class Post {
 
 /*
 後端:
-- 照片 network ip 要改(266)
+- 照片 network ip 要改(266)  -> 163.22.32.24
  */
