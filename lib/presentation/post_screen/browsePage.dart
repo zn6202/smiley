@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smiley/core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
+import 'FallingEmojiComment.dart';
 
 class BrowsePage extends StatefulWidget {
   @override
@@ -16,7 +19,11 @@ class _BrowsePageState extends State<BrowsePage> {
   bool _isViewingFriendsPosts = false;
   int? _selectedCommentIcon;
   String _commentText = '';
-  late Future<List<Comment>> _futureComments;
+  int _currentPostId = -1;
+  
+  final StreamController<List<Comment>> _commentsController = StreamController<List<Comment>>.broadcast();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _commentFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -24,11 +31,31 @@ class _BrowsePageState extends State<BrowsePage> {
     _mainPageController = PageController();
     _futureMyPosts = fetchMyPosts();
     _futureFriendsPosts = fetchFriendsPosts();
+
+    _futureMyPosts.then((posts) {
+      if (posts.isNotEmpty) {
+        _currentPostId = posts.first.id;
+        fetchComments(_currentPostId);
+      }
+    });
+
+    _commentFocusNode.addListener(() {
+      if (_commentFocusNode.hasFocus) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     _mainPageController.dispose();
+    _commentsController.close();
+    _scrollController.dispose();
+    _commentFocusNode.dispose();
     super.dispose();
   }
 
@@ -41,6 +68,21 @@ class _BrowsePageState extends State<BrowsePage> {
           setState(() {
             _isViewingFriendsPosts = index == 1;
           });
+          if (index == 1) {
+            _futureFriendsPosts.then((posts) {
+              if (posts.isNotEmpty) {
+                _currentPostId = posts.first.id;
+                fetchComments(_currentPostId);
+              }
+            });
+          } else {
+            _futureMyPosts.then((posts) {
+              if (posts.isNotEmpty) {
+                _currentPostId = posts.first.id;
+                fetchComments(_currentPostId);
+              }
+            });
+          }
         },
         children: [
           _buildPostsPage(_futureMyPosts, isMyPosts: true),
@@ -53,6 +95,23 @@ class _BrowsePageState extends State<BrowsePage> {
           setState(() {
             _currentIndex = index;
           });
+          if (_currentIndex == 3) {
+            if (_isViewingFriendsPosts) {
+              _futureFriendsPosts.then((posts) {
+                if (posts.isNotEmpty) {
+                  _currentPostId = posts.first.id;
+                  fetchComments(_currentPostId);
+                }
+              });
+            } else {
+              _futureMyPosts.then((posts) {
+                if (posts.isNotEmpty) {
+                  _currentPostId = posts.first.id;
+                  fetchComments(_currentPostId);
+                }
+              });
+            }
+          }
         },
       ),
     );
@@ -74,8 +133,14 @@ class _BrowsePageState extends State<BrowsePage> {
         return PageView.builder(
           scrollDirection: Axis.vertical,
           itemCount: posts.length,
+          onPageChanged: (index) {
+            final postId = posts[index].id;
+            if (postId != _currentPostId) {
+              _currentPostId = postId;
+              fetchComments(postId);
+            }
+          },
           itemBuilder: (context, index) {
-            _futureComments = fetchComments(posts[index].id);
             return _buildPostItem(posts[index], isMyPosts);
           },
         );
@@ -86,185 +151,232 @@ class _BrowsePageState extends State<BrowsePage> {
   Widget _buildPostItem(Post post, bool isMyPost) {
     Color textColor = getTextColor(post.colorId);
 
-    return Container(
-      color: post.colorId,
-      child: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
-                child: Text(
-                  post.date,
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
-                child: Text(
-                  post.title,
-                  style: TextStyle(
-                    fontSize: 50,
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 10, left: 16),
-                child: Container(
-                  width: 146,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  child: Row(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          color: post.colorId,
+          child: SafeArea(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: const Color(0x80FFFFFF),
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: AssetImage(post.userPhoto),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
                         child: Text(
-                          post.userName,
+                          post.date,
                           style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
                           ),
-                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        child: Text(
+                          post.title,
+                          style: TextStyle(
+                            fontSize: 50,
+                            fontWeight: FontWeight.w700,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 16),
+                        child: Container(
+                          width: 146,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: const Color(0x80FFFFFF),
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: AssetImage(post.userPhoto),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  post.userName,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Center(
+                        child: Image.asset(
+                          'assets/images/${post.emotionImage}',
+                          height: 200,
+                          width: 200,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Center(
+                          child: Text(
+                            post.content,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      if (!isMyPost) ...[
+                        SizedBox(height: 90),
+                        _buildCommentSection(textColor),
+                      ],
+                      SizedBox(height: 56),
                     ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 40),
-              Center(
-                child: Image.asset(
-                  'assets/images/${post.emotionImage}',
-                  height: 200,
-                  width: 200,
-                  fit: BoxFit.contain,
+                StreamBuilder<List<Comment>>(
+                  stream: _commentsController.stream,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) return Container();
+                    final comments = snapshot.data!;
+                    final random = Random();
+
+                    return Stack(
+                      children: comments.map((comment) {
+                        final horizontalPosition = random.nextDouble() * constraints.maxWidth;
+                        return FallingEmojiComment(
+                          emojiId: comment.emojiId ?? 1,
+                          screenHeight: constraints.maxHeight,
+                          horizontalPosition: horizontalPosition,
+                        );
+                      }).toList(),
+                    );
+                  },
                 ),
-              ),
-              const SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Center(
-                  child: Text(
-                    post.content,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: textColor,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-              if (!isMyPost) ...[
-                SizedBox(height: 90),
-                _buildCommentSection(textColor),
               ],
-              SizedBox(height: 56),
-            ],
+            ),
           ),
-        ),
+        );
+      },
+    );
+  }
+  Widget _buildCommentSection(Color textColor) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Column(
+        children: [
+          Center(
+            child: Container(
+              width: 230,
+              height: 33,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(6, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCommentIcon = index;
+                      });
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (_selectedCommentIcon == index)
+                          Container(
+                            width: 35,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: textColor, width: 2.0),
+                            ),
+                          ),
+                        Image.asset(
+                          'assets/images/comments_${index + 1}.png',
+                          width: 31.7705,
+                          height: 28.71112,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          Center(
+            child: Container(
+              width: 254,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      focusNode: _commentFocusNode,
+                      decoration: InputDecoration(
+                        hintText: "輸入回覆",
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                          fontSize: 18,
+                          height: 1.2,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFC5C5C5),
+                        ),
+                      ),
+                      controller: TextEditingController(text: _commentText),
+                      onChanged: (value) {
+                        setState(() {
+                          _commentText = value;
+                        });
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send, color: textColor),
+                    onPressed: () {
+                      submitComment();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildCommentSection(Color textColor) {
-    return Column(
-      children: [
-        Center(
-          child: Container(
-            width: 230,
-            height: 33,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(6, (index) {
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      _selectedCommentIcon = index;
-                    });
-                  },
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      if (_selectedCommentIcon == index)
-                        Container(
-                          width: 35,
-                          height: 32,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(color: textColor, width: 2.0),
-                          ),
-                        ),
-                      Image.asset(
-                        'assets/images/comments_${index + 1}.png',
-                        width: 31.7705,
-                        height: 28.71112,
-                        fit: BoxFit.contain,
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ),
-          ),
-        ),
-        SizedBox(height: 5),
-        Center(
-          child: Container(
-            width: 254,
-            height: 44,
-            decoration: BoxDecoration(
-              color: Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "輸入回覆",
-                border: InputBorder.none,
-                hintStyle: TextStyle(
-                  fontSize: 18,
-                  height: 1.2,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xFFC5C5C5),
-                ),
-              ),
-              controller: TextEditingController(text: _commentText),
-              onChanged: (value) {
-                setState(() {
-                  _commentText = value;
-                });
-              },
-            ),
-          ),
-        ),
-      ],
-    );
+  void submitComment() {
+    // TODO: 將評論內容傳送到後端
+    print("提交評論: $_commentText");
   }
-
 
   final List<User> users = const [
     User(id: 1, name: "AliceAliceAliceAliceAliceAlice", photo: "assets/images/default_avatar_1.png"),
@@ -331,7 +443,7 @@ class _BrowsePageState extends State<BrowsePage> {
         userName: getUserNameById(2),
       ),
       Post(
-        id: 4,
+        id: 5,
         userId: 2,
         colorId: Color(0xFF374295),
         monsterId: 4,
@@ -346,17 +458,14 @@ class _BrowsePageState extends State<BrowsePage> {
     ];
   }
 
-  Future<List<Comment>> fetchComments(int postId) async {
-    await Future.delayed(Duration(seconds: 1)); // Simulate network delay
+  Future<void> fetchComments(int postId) async {
     List<Comment> comments = [
-      Comment(userId: 1, emojiId: 1, content: "這是評論1。"),
-      Comment(userId: 2, emojiId: 2, content: "這是評論2。"),
-      Comment(userId: 1, emojiId: 3, content: "這是評論3。"),
+      Comment(userId: 1, emojiId: 1, content: "這是評論3。"),
+      Comment(userId: 1, emojiId: 2, content: "這是評論3。"),
     ];
-    print("Fetched comments for post $postId: ${comments.map((c) => c.content).toList()}");
-    return comments;
+    _commentsController.add(comments);
   }
-
+  
   String getUserPhotoById(int userId) {
     try {
       return users.firstWhere((user) => user.id == userId).photo;

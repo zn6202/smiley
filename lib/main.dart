@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
 
           // 設定應用的初始路徑
-          initialRoute: AppRoutes.browsePage,
+          initialRoute: AppRoutes.loginScreen,
 
           // 設定應用程式的路由
           routes: AppRoutes.routes,
