@@ -232,13 +232,19 @@ class _BrowsePageState extends State<BrowsePage> {
                       ),
                       const SizedBox(height: 40),
                       Center(
-                        child: Image.network(
-                          post.monster != null && post.monster!.isNotEmpty
-                              ? 'http://163.22.32.24/smiley_backend/img/monster/${post.monster!}'
-                              : 'http://163.22.32.24/smiley_backend/img/angel/${post.angel!}',
-                          height: 200,
-                          width: 200,
-                          fit: BoxFit.contain,
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.pushNamed(context, AppRoutes.commentPage);
+                          },
+                        
+                          child: Image.network(
+                            post.monster != null && post.monster!.isNotEmpty
+                                ? 'http://163.22.32.24/smiley_backend/img/monster/${post.monster!}'
+                                : 'http://163.22.32.24/smiley_backend/img/angel/${post.angel!}',
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 30),
