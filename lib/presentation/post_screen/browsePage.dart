@@ -26,7 +26,7 @@ class _BrowsePageState extends State<BrowsePage> {
   String _commentText = '';
   int _currentPostId = -1;
 
-  TextEditingController commentsController = TextEditingController();
+  TextEditingController commentsController = TextEditingController(); // 新增的
 
   final StreamController<List<Comment>> _commentsController = StreamController<List<Comment>>.broadcast();
   final ScrollController _scrollController = ScrollController();
@@ -359,7 +359,7 @@ class _BrowsePageState extends State<BrowsePage> {
                           color: Color(0xFFC5C5C5),
                         ),
                       ),
-                      controller: commentsController,
+                      controller: commentsController,  // 原本是這個 controller: TextEditingController(text: _commentText), 如果用原本的，字彙從右到左出現，且留言框不會隨著鍵盤上升
                       onChanged: (value) {
                         setState(() {
                           _commentText = value;
@@ -624,7 +624,18 @@ class Comment {
 - 原設計是自己貼文垂直滑動 好友貼文左右滑動 自己貼文左滑能進入好友貼文，但一直無法實現區塊來回切換。
 因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現
 - 調整貼圖大小(放大)
-- 369 send icon 會跑位
-- 回覆欄不會隨著鍵盤往上而往上 --> controller 已改成 commentsController
-- submitComment() 要傳當前 post id
+- send icon 會跑位 369
+
+- 先修改以下鳩好了~
+  - 我更改了留言輸入欄的 _commentsController -> 不確定可不可以這樣改，但改了之後字方向正常，輸入欄也會隨鍵盤上升 29 362
+  - submitComment() 要傳當前的 post id 進 submitComment 裡面
+  - 尚未有留言對話的畫面
+  - 按表情貼跟傳留言的成功與失敗畫面
+*/
+/*
+後端:
+留言聊天室
+傳留言
+傳表情貼
+通知中心
 */
