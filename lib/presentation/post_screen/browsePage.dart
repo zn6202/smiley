@@ -1,7 +1,10 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smiley/core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
+import 'FallingEmojiComment.dart';
 // http
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
@@ -14,34 +17,384 @@ class BrowsePage extends StatefulWidget {
 }
 
 class _BrowsePageState extends State<BrowsePage> {
+  late PageController _mainPageController;
   late Future<List<Post>> _futureMyPosts;
   late Future<List<Post>> _futureFriendsPosts;
-  late PageController _mainPageController;
-  late PageController _friendsPostsController;
   int _currentIndex = 3;
   bool _isViewingFriendsPosts = false;
+  int? _selectedCommentIcon;
+  String _commentText = '';
+  int _currentPostId = -1;
+  
+  final StreamController<List<Comment>> _commentsController = StreamController<List<Comment>>.broadcast();
+  final ScrollController _scrollController = ScrollController();
+  final FocusNode _commentFocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    _mainPageController = PageController();
     _futureMyPosts = fetchMyPosts();
     _futureFriendsPosts = fetchFriendsPosts();
-    _mainPageController = PageController();
-    _friendsPostsController = PageController();
+
+    _futureMyPosts.then((posts) {
+      if (posts.isNotEmpty) {
+        _currentPostId = posts.first.id;
+        fetchComments(_currentPostId);
+      }
+    });
+
+    _commentFocusNode.addListener(() {
+      if (_commentFocusNode.hasFocus) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
   }
 
   @override
   void dispose() {
     _mainPageController.dispose();
-    _friendsPostsController.dispose();
+    _commentsController.close();
+    _scrollController.dispose();
+    _commentFocusNode.dispose();
     super.dispose();
   }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PageView(
+        controller: _mainPageController,
+        onPageChanged: (index) {
+          setState(() {
+            _isViewingFriendsPosts = index == 1;
+          });
+          if (index == 1) {
+            _futureFriendsPosts.then((posts) {
+              if (posts.isNotEmpty) {
+                _currentPostId = posts.first.id;
+                fetchComments(_currentPostId);
+              }
+            });
+          } else {
+            _futureMyPosts.then((posts) {
+              if (posts.isNotEmpty) {
+                _currentPostId = posts.first.id;
+                fetchComments(_currentPostId);
+              }
+            });
+          }
+        },
+        children: [
+          _buildPostsPage(_futureMyPosts, isMyPosts: true),
+          _buildPostsPage(_futureFriendsPosts, isMyPosts: false),
+        ],
+      ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+          if (_currentIndex == 3) {
+            if (_isViewingFriendsPosts) {
+              _futureFriendsPosts.then((posts) {
+                if (posts.isNotEmpty) {
+                  _currentPostId = posts.first.id;
+                  fetchComments(_currentPostId);
+                }
+              });
+            } else {
+              _futureMyPosts.then((posts) {
+                if (posts.isNotEmpty) {
+                  _currentPostId = posts.first.id;
+                  fetchComments(_currentPostId);
+                }
+              });
+            }
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildPostsPage(Future<List<Post>> futurePosts, {required bool isMyPosts}) {
+    return FutureBuilder<List<Post>>(
+      future: futurePosts,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text("No posts available"));
+        }
+
+        final posts = snapshot.data!;
+        return PageView.builder(
+          scrollDirection: Axis.vertical,
+          itemCount: posts.length,
+          onPageChanged: (index) {
+            final postId = posts[index].id;
+            if (postId != _currentPostId) {
+              _currentPostId = postId;
+              fetchComments(postId);
+            }
+          },
+          itemBuilder: (context, index) {
+            return _buildPostItem(posts[index], isMyPosts);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildPostItem(Post post, bool isMyPost) {
+    Color textColor = getTextColor(post.backgroundColor);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Container(
+          color: post.backgroundColor,
+          child: SafeArea(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  controller: _scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+                        child: Text(
+                          post.date,
+                          style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        child: Text(
+                          post.title,
+                          style: TextStyle(
+                            fontSize: 50,
+                            fontWeight: FontWeight.w700,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 10, left: 16),
+                        child: Container(
+                          width: 146,
+                          height: 42,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.5),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                          child: Row(
+                            children: [
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: const Color(0x80FFFFFF),
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: NetworkImage('http://163.22.32.24/smiley_backend/img/photo/${post.userPhoto}'),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  post.userName,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Center(
+                        child: Image.network(
+                          post.monster != null && post.monster!.isNotEmpty
+                              ? 'http://163.22.32.24/smiley_backend/img/monster/${post.monster!}'
+                              : 'http://163.22.32.24/smiley_backend/img/angel/${post.angel!}',
+                          height: 200,
+                          width: 200,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Center(
+                          child: Text(
+                            post.content,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: textColor,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                      if (!isMyPost) ...[
+                        SizedBox(height: 90),
+                        _buildCommentSection(textColor),
+                      ],
+                      SizedBox(height: 56),
+                    ],
+                  ),
+                ),
+                StreamBuilder<List<Comment>>(
+                  stream: _commentsController.stream,
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) return Container();
+                    final comments = snapshot.data!;
+                    final random = Random();
+
+                    return Stack(
+                      children: comments.map((comment) {
+                        final horizontalPosition = random.nextDouble() * constraints.maxWidth;
+                        return FallingEmojiComment(
+                          emojiId: comment.emojiId ?? 1,
+                          screenHeight: constraints.maxHeight,
+                          horizontalPosition: horizontalPosition,
+                        );
+                      }).toList(),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  Widget _buildCommentSection(Color textColor) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      child: Column(
+        children: [
+          Center(
+            child: Container(
+              width: 230,
+              height: 33,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(6, (index) {
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedCommentIcon = index;
+                      });
+                    },
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        if (_selectedCommentIcon == index)
+                          Container(
+                            width: 35,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(color: textColor, width: 2.0),
+                            ),
+                          ),
+                        Image.asset(
+                          'assets/images/comments_${index + 1}.png',
+                          width: 31.7705,
+                          height: 28.71112,
+                          fit: BoxFit.contain,
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          SizedBox(height: 5),
+          Center(
+            child: Container(
+              width: 254,
+              height: 44,
+              decoration: BoxDecoration(
+                color: Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      focusNode: _commentFocusNode,
+                      decoration: InputDecoration(
+                        hintText: "輸入回覆",
+                        border: InputBorder.none,
+                        hintStyle: TextStyle(
+                          fontSize: 18,
+                          height: 1.2,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFFC5C5C5),
+                        ),
+                      ),
+                      controller: TextEditingController(text: _commentText),
+                      onChanged: (value) {
+                        setState(() {
+                          _commentText = value;
+                        });
+                      },
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send, color: textColor),
+                    onPressed: () {
+                      submitComment();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void submitComment() {
+    // TODO: 將評論內容傳送到後端
+    print("提交評論: $_commentText");
+  }
+
+  final List<User> users = const [
+    User(id: 1, name: "AliceAliceAliceAliceAliceAlice", photo: "assets/images/default_avatar_1.png"),
+    User(id: 2, name: "Bob", photo: "assets/images/default_avatar_2.png"),
+  ];
 
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_id');
   }
-  
+
   Future<List<Post>> fetchMyPosts() async {
     final String? userId = await getUserId();
 
@@ -105,8 +458,32 @@ class _BrowsePageState extends State<BrowsePage> {
     }
   }
 
-  Color getTextColor(Color color) {
-    switch (color.value) {
+  Future<void> fetchComments(int postId) async {
+    List<Comment> comments = [
+      Comment(userId: 1, emojiId: 1, content: "這是評論3。"),
+      Comment(userId: 1, emojiId: 2, content: "這是評論3。"),
+    ];
+    _commentsController.add(comments);
+  }
+  
+  String getUserPhotoById(int userId) {
+    try {
+      return users.firstWhere((user) => user.id == userId).photo;
+    } catch (e) {
+      return 'assets/images/default_avatar.png';
+    }
+  }
+
+  String getUserNameById(int userId) {
+    try {
+      return users.firstWhere((user) => user.id == userId).name;
+    } catch (e) {
+      return 'Unknown';
+    }
+  }
+
+  Color getTextColor(Color colorId) {
+    switch (colorId.value) {
       case 0xFF222222:
         return Color(0xFFFFFF53);
       case 0xFFAF333A:
@@ -135,169 +512,11 @@ class _BrowsePageState extends State<BrowsePage> {
         return Colors.black;
     }
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _mainPageController,
-        onPageChanged: (index) {
-          setState(() {
-            _isViewingFriendsPosts = index == 1;
-          });
-        },
-        children: [
-          _buildMyPostsPage(),
-          _buildFriendsPostsWrapper(),
-        ],
-      ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget _buildMyPostsPage() {
-    return FutureBuilder<List<Post>>(
-      future: _futureMyPosts,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text("No data"));
-        }
-
-        final posts = snapshot.data!;
-
-        return PageView.builder(
-          scrollDirection: Axis.vertical,
-          reverse: true,
-          itemCount: posts.length,
-          itemBuilder: (context, index) {
-            return _buildPostItem(posts[index]);
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildFriendsPostsWrapper() {
-    return FutureBuilder<List<Post>>(
-      future: _futureFriendsPosts,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
-        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text("No data"));
-        }
-
-        final posts = snapshot.data!;
-
-        return PageView.builder(
-          controller: _friendsPostsController,
-          itemCount: posts.length,
-          scrollDirection: Axis.horizontal,
-          onPageChanged: (index) {
-            if (index == 0 && !_isViewingFriendsPosts) {
-              _mainPageController.jumpToPage(0);
-            }
-          },
-          itemBuilder: (context, index) {
-            return _buildPostItem(posts[index]);
-          },
-        );
-      },
-    );
-  }
-
-  Widget _buildPostItem(Post post) {
-    final textColor = getTextColor(post.backgroundColor);
-
-    return Container(
-      color: post.backgroundColor,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: 70.v, left: 16.h, right: 16.h),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  post.date,
-                  style: TextStyle(
-                    fontSize: 25.fSize,
-                    height: 1.2.v,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.only(top: 10.v, left: 16.h, right: 16.h),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  post.title,
-                  style: TextStyle(
-                    fontSize: 50.fSize,
-                    height: 1.2.v,
-                    fontFamily: 'Inter',
-                    fontWeight: FontWeight.w700,
-                    color: textColor,
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(height: 120.v),
-            Image.network(
-              post.monster != null && post.monster!.isNotEmpty
-              ? 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.monster!}'
-              : 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.angel!}',
-              height: 200.v,
-              width: 200.h,
-              fit: BoxFit.contain,
-            ),
-            // Image.network(
-            //   post.monster != null && post.monster!.isNotEmpty
-            //   ? 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.monster!}'
-            //   : 'http://192.168.56.1/smiley_backend/img/angel_monster/${post.angel!}',
-            //   height: 200.v,
-            //   width: 200.h,
-            //   fit: BoxFit.contain,
-            // ),
-            SizedBox(height: 30.v),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16.h),
-              child: Text(
-                post.content,
-                style: TextStyle(
-                  fontSize: 18.fSize,
-                  fontWeight: FontWeight.bold,
-                  color: textColor,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }
 
 class Post {
+  final int id;
+  final int userId;
   final Color textColor;
   final Color backgroundColor;
   final String? monster;
@@ -305,8 +524,13 @@ class Post {
   final String title;
   final String date;
   final String content;
+  // final String emotionImage;
+  final String userPhoto;
+  final String userName;
 
-  Post({
+  const Post({
+    required this.id,
+    required this.userId,
     required this.textColor,
     required this.backgroundColor,
     this.monster,
@@ -314,28 +538,55 @@ class Post {
     required this.title,
     required this.date,
     required this.content,
+    // required this.emotionImage,
+    required this.userPhoto,
+    required this.userName,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
+      id: json['id'] != null ? json['id'] as int : 0,  // 默認值為 0
+      userId: json['user_id'] != null ? json['user_id'] as int : 0,  // 默認值為 0
       textColor: Color(int.parse(json['text_color'])),
       backgroundColor: Color(int.parse(json['background_color'])),
-      monster: json['monster'] ?? '', // 可以是 null
-      angel: json['angel'] ?? '', // 可以是 null
-      title: json['title'],
-      date: json['date'],
-      content: json['content'],
+      monster: json['monster'] != null && json['monster'].isNotEmpty ? json['monster'] as String : null,
+      angel: json['angel'] != null && json['angel'].isNotEmpty ? json['angel'] as String : null,
+      title: json['title'] as String,
+      date: json['date'] as String,
+      content: json['content'] as String,
+      // emotionImage: json['emotion_image'] as String,
+      userPhoto: json['user_photo'] as String,
+      userName: json['user_name'] as String,
     );
   }
 }
 
-/*
-前端:
-- 好友貼文的回覆欄與表情貼
-- 到好友貼文後回不到自己的貼文~
-*/
+class User {
+  final int id;
+  final String name;
+  final String photo;
+
+  const User({
+    required this.id,
+    required this.name,
+    required this.photo,
+  });
+}
+
+class Comment {
+  final int userId;
+  final int? emojiId;
+  final String? content;
+
+  Comment({
+    required this.userId,
+    this.emojiId,
+    this.content,
+  });
+}
 
 /*
-後端:
-- 照片 network ip 要改(266)  -> 163.22.32.24
- */
+前端：
+- 原設計是自己貼文垂直滑動 好友貼文左右滑動 自己貼文左滑能進入好友貼文，但一直無法實現區塊來回切換。
+因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現
+*/
