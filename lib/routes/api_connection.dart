@@ -29,5 +29,6 @@ class API
   static const getFriendsPost = "$hostConnect/post/getFriendsPost.php";
   static const getDiary = "$hostConnect/diary/getDiary.php";
   static const getAngMon = "$hostConnect/diary/getAngMon.php";
+  static const getDiaryBool = "$hostConnect/diary/getDiaryBool.php";
 
 }

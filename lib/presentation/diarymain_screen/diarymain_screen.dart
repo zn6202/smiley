@@ -452,6 +452,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 /*
  1. 非當日之前的日記顯示畫面
     o 無日記 -> 直接反灰 無法點選
+
+    貼文可重複發?
  */
 
 /*

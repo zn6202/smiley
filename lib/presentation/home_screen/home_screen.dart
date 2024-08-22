@@ -1,7 +1,16 @@
+import 'dart:ffi';
+import 'package:intl/intl.dart';
+
 import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 import '../../widgets/bottom_navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
+// http
+import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -12,17 +21,65 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   TextStyle dialogContentStyle = TextStyle(
-      color: Color(0xFF545453),
-      fontSize: 16.fSize,
-      fontFamily: 'Inter',
-      fontWeight: FontWeight.w700,);
+    color: Color(0xFF545453),
+    fontSize: 16.fSize,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w700,
+  );
   TextStyle dialogTitleStyle = TextStyle(
-      color: Color(0xFF545453),
-      fontSize: 25.fSize,
-      fontFamily: 'Inter',
-      fontWeight: FontWeight.w100,);
+    color: Color(0xFF545453),
+    fontSize: 25.fSize,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w100,
+  );
   int _currentIndex = 2;
-  bool hasDiaryToday = true;
+  bool hasDiaryToday = false;
+
+  @override
+  void initState() {
+    super.initState();
+    checkDiary();
+  }
+
+  //  抓取當前 user_id
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
+  Future<void> checkDiary() async {
+    final String? userId = await getUserId();
+    String date = DateFormat('yyyy.MM.dd').format(DateTime.now());
+
+    print("進入主頁日記是否寫了函式");
+    print('user_id: $userId');
+    print('date: $date');
+
+    final response = await http.post(
+      Uri.parse(API.getDiaryBool),
+      body: {
+        'user_id': userId ?? '',
+        'date': date,
+      },
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        print("今日日記已完成是 : ${data}");
+        setState(() {
+          hasDiaryToday = data['diary_bool'];
+        });
+      } else {
+        print('今日日記未完成... $data');
+        setState(() {
+          hasDiaryToday = data['diary_bool'];
+        });
+      }
+    } else {
+      print('貼文瀏覽失敗...');
+    }
+  }
 
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
@@ -227,15 +284,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   SnackBar(
                     content: Text(
                       '今天已經寫過日記了！',
-                      style:dialogContentStyle,
+                      style: dialogContentStyle,
                     ),
-                    backgroundColor: Color(0xFFFFFFFF), 
-                    duration: Duration(seconds: 1), 
-                    shape: RoundedRectangleBorder( 
+                    backgroundColor: Color(0xFFFFFFFF),
+                    duration: Duration(seconds: 1),
+                    shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                     behavior: SnackBarBehavior.floating,
-                    margin: EdgeInsets.all(10), 
+                    margin: EdgeInsets.all(10),
                   ),
                 );
               }
@@ -450,6 +507,5 @@ class _HomeScreenState extends State<HomeScreen> {
 
 /**
 後端修改:
-載入頁面時，要去資料庫搜尋今日是否有資料。
-設定bool hasDiaryToday
+- 剛寫完案返回會無更新
  */

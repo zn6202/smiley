@@ -25,7 +25,9 @@ class _BrowsePageState extends State<BrowsePage> {
   int? _selectedCommentIcon;
   String _commentText = '';
   int _currentPostId = -1;
-  
+
+  TextEditingController commentsController = TextEditingController();
+
   final StreamController<List<Comment>> _commentsController = StreamController<List<Comment>>.broadcast();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _commentFocusNode = FocusNode();
@@ -357,7 +359,7 @@ class _BrowsePageState extends State<BrowsePage> {
                           color: Color(0xFFC5C5C5),
                         ),
                       ),
-                      controller: TextEditingController(text: _commentText),
+                      controller: commentsController,
                       onChanged: (value) {
                         setState(() {
                           _commentText = value;
@@ -380,9 +382,41 @@ class _BrowsePageState extends State<BrowsePage> {
     );
   }
 
-  void submitComment() {
-    // TODO: 將評論內容傳送到後端
+  void submitComment() async{
+    final String? userId = await getUserId();
+
+    print("進入提交評論函式");
+    print('user_id: $userId');
+    // print('post_id: $');
     print("提交評論: $_commentText");
+
+
+    final response = await http.post(
+      Uri.parse(API.getDiaryBool),
+      body: {
+        'user_id': userId ?? '',
+        'content': _commentText,
+      },
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        print("頻論提交已完成是 : ${data}");
+        // setState(() {
+        //   hasDiaryToday = data['diary_bool'];
+        // });
+      } else {
+        print('評論提交未完成... $data');
+        // setState(() {
+        //   hasDiaryToday = data['diary_bool'];
+        // });
+      }
+    } else {
+      print('提交評論失敗...');
+    }
+    // // TODO: 將評論內容傳送到後端
+    // print("提交評論: $_commentText");
   }
 
   final List<User> users = const [
@@ -589,4 +623,8 @@ class Comment {
 前端：
 - 原設計是自己貼文垂直滑動 好友貼文左右滑動 自己貼文左滑能進入好友貼文，但一直無法實現區塊來回切換。
 因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現
+- 調整貼圖大小(放大)
+- 369 send icon 會跑位
+- 回覆欄不會隨著鍵盤往上而往上 --> controller 已改成 commentsController
+- submitComment() 要傳當前 post id
 */
