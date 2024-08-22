@@ -36,31 +36,48 @@ class _PostPageState extends State<PostPage> {
   void submitPost(imageUrl) async {
     final String? userId = await getUserId();
     String backgroundColorString = backgroundColor.toString();
-    String PostBackgroundColor = backgroundColorString.split('(')[1].split(')')[0];
+    String PostBackgroundColor =
+        backgroundColorString.split('(')[1].split(')')[0];
     String textColorString = textColor.toString();
     String PostTextColor = textColorString.split('(')[1].split(')')[0];
     String title = titleController.text;
     String date = DateFormat('yyyy.MM.dd').format(DateTime.now());
     String content = contentController.text;
 
+     // 根據URL來判斷是monster還是angel，並提取文件名
+    String? monsterFileName;
+    String? angelFileName;
+    
+    // 提取文件名
+    String fileName = imageUrl.split('/').last;
+
+    print("imageUrl: $imageUrl");
+    if (imageUrl.contains('monster')) {
+      monsterFileName = fileName;
+      angelFileName = null;
+    } else if (imageUrl.contains('angel')) {
+      angelFileName = fileName;
+      monsterFileName = null;
+    }
+
     print("進入提交貼文函式");
     print('user_id: $userId');
     print('textColor: $PostTextColor');
     print('backgroundColor: $PostBackgroundColor');
-    print('monster_id: $imageUrl');
-    print('angel_id: $imageUrl');
+    print('monster: $monsterFileName');
+    print('angel: $angelFileName');
     print('title: $title');
     print('date: $date');
     print('content: $content');
 
     final response = await http.post(
       Uri.parse(API.submitPost),
-      body:{
-        'user_id': userId,
-        'text_color':PostTextColor,
+      body: {
+        'user_id': userId ?? '',
+        'text_color': PostTextColor,
         'background_color': PostBackgroundColor,
-        'monster': imageUrl, //
-        'angel': imageUrl,   //
+        'monster': monsterFileName ?? '',
+        'angel': angelFileName ?? '',
         'title': title,
         'date': date,
         'content': content,
@@ -107,7 +124,7 @@ class _PostPageState extends State<PostPage> {
                 currentDate,
                 style: TextStyle(
                   fontSize: 25.fSize,
-                  height: 20 / 25 ,
+                  height: 20 / 25,
                   fontFamily: 'Inter',
                   fontWeight: FontWeight.w600,
                   color: textColor,
@@ -154,7 +171,7 @@ class _PostPageState extends State<PostPage> {
                       height: 280.v,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage(imageUrl),
+                          image: NetworkImage(imageUrl),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -179,8 +196,8 @@ class _PostPageState extends State<PostPage> {
                         color: Color(0x80FFFFFF),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20.h, vertical: 10.v),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.h, vertical: 10.v),
                       child: TextField(
                         controller: contentController,
                         style: TextStyle(
@@ -207,7 +224,7 @@ class _PostPageState extends State<PostPage> {
                     SizedBox(height: 16.v),
                     TextButton(
                       onPressed: () {
-                        submitPost(imageUrl.split('/').last);
+                        submitPost(imageUrl);
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Color(0x80FFFFFF),
@@ -324,7 +341,7 @@ class _PostPageState extends State<PostPage> {
         return Color(0xFFFFFF53);
       case 0xFFAF333A:
         return Color(0xFFFFFF00);
-      case 0xFF374295:              // 背景
+      case 0xFF374295: // 背景
         return Color(0xFFECA8A4); // 字
       case 0xFFA1E0E4:
         return Color(0xFF4285F4);

@@ -17,7 +17,9 @@ const Color primaryColor = Color(0xFFA7BA89);
 
 // 日期文字的樣式常數，用於選定日期的顯示。
 TextStyle selectedDateStyle = TextStyle(
-    fontSize: 24.0.fSize, color: Color(0xFF545453), fontWeight: FontWeight.bold);
+    fontSize: 24.0.fSize,
+    color: Color(0xFF545453),
+    fontWeight: FontWeight.bold);
 
 // 標題文字樣式常數
 TextStyle dialogTitleStyle = TextStyle(
@@ -64,6 +66,10 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   DateTime? selectedDate = DateTime.now();
   bool isSubmitted = false; // 表示日記是否已提交
   String submittedContent = ""; // 保存提交的日記內容
+
+  String angelUrl = "";
+  String monsterUrl = "";
+
   // 抓取當前 user_id
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -103,11 +109,15 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
       final resultBERT = json.decode(responseBERT.body);
       print("BERT result = $resultBERT");
       print('BERT分析成功!');
+      angelUrl = resultBERT['angel'];
+      monsterUrl = resultBERT['monster'];
+      print('angelUrl:$angelUrl monsterUrl:$monsterUrl');
       if (context.mounted) {
         completeDialog(context); // 顯示成功對話框
       }
     } else {
-      print('BERT分析失敗... 狀態碼: ${responseBERT.statusCode}, 響應: ${responseBERT.body}');
+      print(
+          'BERT分析失敗... 狀態碼: ${responseBERT.statusCode}, 響應: ${responseBERT.body}');
       if (context.mounted) {
         failDialog(context); // 顯示失敗對話框
       }
@@ -137,34 +147,31 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     }
   }
 
-
-
-
   Widget build(BuildContext context) {
     return Scaffold(
       // 設置主體背景顏色為白色。
       backgroundColor: Colors.white,
       // 應用程式的頂部應用欄。
-          appBar: AppBar(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            leading: IconButton(
-              icon: SvgPicture.asset(
-                'assets/images/img_arrow_left.svg',
-              ),
-              onPressed: () async {
-                if (isSubmitted) {
-                  Navigator.of(context).pop();
-                } else {
-                  if (_textController.text.trim().isEmpty) {
-                    Navigator.of(context).pop();
-                  } else {
-                    showExitConfirmationDialog(context);
-                  }
-                }
-              },
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/images/img_arrow_left.svg',
           ),
+          onPressed: () async {
+            if (isSubmitted) {
+              Navigator.of(context).pop();
+            } else {
+              if (_textController.text.trim().isEmpty) {
+                Navigator.of(context).pop();
+              } else {
+                showExitConfirmationDialog(context);
+              }
+            }
+          },
+        ),
+      ),
       // 主體內容，添加內邊距。
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 24.h),
@@ -195,9 +202,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 buildEmotionBlock(
-                                  'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png'), //這裡到時候要改成小怪獸演算法函式
+                                    'http://163.22.32.24/smiley_backend/img/${angelUrl}'), //這裡到時候要改成小怪獸演算法函式
                                 buildEmotionBlock(
-                                  'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png'),
+                                    'http://163.22.32.24/smiley_backend/img/${monsterUrl}'),
                               ],
                             ),
                           ],
@@ -399,7 +406,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                         color: Colors.white, // 按鈕背景顏色
                         shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              width: 1.h, color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
+                              width: 1.h,
+                              color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
                           borderRadius: BorderRadius.circular(20), // 設置圓角大小
                         ),
                       ),
@@ -522,7 +530,8 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                         color: Colors.white, // 按鈕背景顏色
                         shape: RoundedRectangleBorder(
                           side: BorderSide(
-                              width: 1.h, color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
+                              width: 1.h,
+                              color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
                           borderRadius: BorderRadius.circular(20), // 設置圓角大小
                         ),
                       ),
@@ -593,8 +602,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               child: Container(
                 width: 304.h, // 設置對話框的寬度
                 height: 131.4.v, // 設置對話框的高度
-                padding:
-                    EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
+                padding: EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
                 clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
                 decoration: ShapeDecoration(
                   color: Colors.white, // 設置對話框的背景顏色
@@ -735,7 +743,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
           child: Container(
             width: 304.h,
             height: 160.0.v,
-            padding: EdgeInsets.symmetric(horizontal: 23.h,vertical: 23.v),
+            padding: EdgeInsets.symmetric(horizontal: 23.h, vertical: 23.v),
             decoration: ShapeDecoration(
               color: Colors.white,
               shape: RoundedRectangleBorder(

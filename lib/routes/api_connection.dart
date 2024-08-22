@@ -28,5 +28,6 @@ class API
   static const getPostRecord = "$hostConnect/post/getPostRecord.php";
   static const getFriendsPost = "$hostConnect/post/getFriendsPost.php";
   static const getDiary = "$hostConnect/diary/getDiary.php";
+  static const getAngMon = "$hostConnect/diary/getAngMon.php";
 
 }

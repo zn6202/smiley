@@ -167,8 +167,8 @@ class _PostrecordState extends State<Postrecord> {
                           Expanded(
                             child: Image.network(
                               post.monster != null && post.monster!.isNotEmpty
-                              ? 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.monster!}'
-                              : 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.angel!}',
+                              ? 'http://163.22.32.24/smiley_backend/img/monster/${post.monster!}'
+                              : 'http://163.22.32.24/smiley_backend/img/angel/${post.angel!}',
                               fit: BoxFit.contain,
                             ),
                             // child: Image.network(
@@ -332,8 +332,8 @@ Widget build(BuildContext context) {
             SizedBox(height: 120.v),
             Image.network(
               post.monster != null && post.monster!.isNotEmpty
-              ? 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.monster!}'
-              : 'http://163.22.32.24/smiley_backend/img/angel_monster/${post.angel!}',
+              ? 'http://163.22.32.24/smiley_backend/img/monster/${post.monster!}'
+              : 'http://163.22.32.24/smiley_backend/img/angel/${post.angel!}',
               height: 200.v,
               width: 200.h,
               fit: BoxFit.contain,

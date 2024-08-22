@@ -116,7 +116,13 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                   fontWeight: FontWeight.bold,
                 ),
                 weekdayLabels: [
-                  'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'
+                  'Sun',
+                  'Mon',
+                  'Tue',
+                  'Wed',
+                  'Thu',
+                  'Fri',
+                  'Sat'
                 ],
                 // 你可能需要調整日期的文字大小以適應較小的日曆
                 calendarType: CalendarDatePicker2Type.single,
@@ -170,7 +176,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
                       child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Color(0xFFA7BA89)),
                       ),
                     );
                   } else if (snapshot.hasData &&
@@ -180,7 +187,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                       child: Column(
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(left: 20.h, right: 20.h, bottom: 36.v),
+                            padding: EdgeInsets.only(
+                                left: 20.h, right: 20.h, bottom: 36.v),
                             child: Text(
                               snapshot.data!['diary']['content'],
                               style: TextStyle(
@@ -195,7 +203,9 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                           if (showEmotionBlock && emotionImages.isNotEmpty)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: emotionImages.map((image) => buildEmotionBlock(image)).toList(),
+                              children: emotionImages
+                                  .map((image) => buildEmotionBlock(image))
+                                  .toList(),
                             ),
                         ],
                       ),
@@ -222,7 +232,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     image: DecorationImage(
-                                      image: AssetImage('assets/images/add.png'),
+                                      image:
+                                          AssetImage('assets/images/add.png'),
                                       fit: BoxFit.cover,
                                     ),
                                   ),
@@ -234,7 +245,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                       );
                     } else {
                       return Container(
-                        padding: EdgeInsets.only(left: 20.h, right: 20.h, bottom: 36.v),
+                        padding: EdgeInsets.only(
+                            left: 20.h, right: 20.h, bottom: 36.v),
                         child: Text(
                           '這一天沒有寫日記 ~',
                           style: TextStyle(
@@ -257,6 +269,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
       ),
     );
   }
+
   Future<Map<String, dynamic>> _getTestDiaryData(DateTime date) async {
     final String? userId = await getUserId();
     final dateString = DateFormat('yyyy-MM-dd').format(date);
@@ -278,7 +291,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
       if (data['success'] == true) {
         // 確認 'diaries' 是否存在並且具有指定日期的日記
         if (data['diaries'] != null && data['diaries'][dateString] != null) {
-          print("在指定日期找到日記 date: $dateString diary: ${data['diaries'][dateString]['diary']['content']}");
+          print(
+              "在指定日期找到日記 date: $dateString diary: ${data['diaries'][dateString]['diary']['content']}");
           return {"diary": data['diaries'][dateString]['diary']}; // 返回指定日期的日記數據
         } else {
           print('在指定日期未找到日記');
@@ -295,17 +309,38 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   }
 
   Future<void> _fetchEmotionData() async {
-    if (_isToday(selectedDate)) {
-      setState(() {
-        emotionImages = [
-          'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png',
-          'http://163.22.32.24/smiley_backend/img/angel_monster/monster_2.png',
-        ];
-        // emotionImages = [
-        //   'http://192.168.56.1/smiley_backend/img/angel_monster/monster_1.png',
-        //   'http://192.168.56.1/smiley_backend/img/angel_monster/monster_2.png',
-        // ];
-      });
+    final String? userId = await getUserId();
+    String todayDate = DateFormat('yyyy-MM-dd').format(selectedDate!);
+    print("進入抓取小天使小怪獸函式");
+    print('user_id: $userId date: $todayDate');
+
+    final response = await http.post(
+      Uri.parse(API.getAngMon),
+      body: {
+        'user_id': userId,
+        'date': todayDate,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        setState(() {
+          emotionImages = List<String>.from(data['emotionImages']);
+        });
+        print('emotionImages: ${data['emotionImages']}');
+        // setState(() {
+        //   emotionImages = [
+        //     'http://163.22.32.24/smiley_backend/img/angel_monster/monster_1.png',
+        //     'http://163.22.32.24/smiley_backend/img/angel_monster/monster_2.png',
+        //   ];
+        // });
+      } else {
+        print('貼文瀏覽失敗... ${data['message']}');
+      }
+    } else {
+      print('貼文瀏覽失敗...');
     }
   }
 
@@ -324,6 +359,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
       ),
       child: GestureDetector(
         onTap: () {
+          print("imageUrl 是: $imageUrl");
           Navigator.pushNamed(context, AppRoutes.postPage, arguments: imageUrl);
         },
         child: Column(
@@ -389,9 +425,10 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   bool _isToday(DateTime? date) {
     if (date == null) return false;
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
-
 
 /*
   // 從後端獲取日記數據的函數
@@ -418,8 +455,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
  */
 
 /*
-後端:
+後端: -> 已解決
 - 297 _fetchEmotionData 從資料庫抓取正確的小天使小怪獸 -> 163.22.32.24
 
 */
-
