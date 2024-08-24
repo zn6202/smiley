@@ -43,13 +43,18 @@ class _CommentPageState extends State<CommentPage> {
           Positioned(
             top: 55,
             left: (MediaQuery.of(context).size.width - 152) / 2,
-            child: Container(
-              width: 152,
-              height: 138,
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(postImage),
-                  fit: BoxFit.cover,
+            child: GestureDetector(
+              onTap: (){
+                Navigator.pushNamed(context, AppRoutes.browsePage);
+              },
+              child: Container(
+                width: 152,
+                height: 138,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: NetworkImage(fetchPostImage()),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -63,9 +68,9 @@ class _CommentPageState extends State<CommentPage> {
               child: Container(
                 width: 300,
                 child: Text(
-                  postContent,
+                  fetchPostContent(),
                   style: TextStyle(
-                    color: textColor,
+                    color: Color(0xFF4C543E),
                     fontFamily: 'Inter',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -82,12 +87,15 @@ class _CommentPageState extends State<CommentPage> {
             top: 286,
             left: (MediaQuery.of(context).size.width - 350) / 2,
             right: (MediaQuery.of(context).size.width - 350) / 2,
-            child: Container(
-              width: 320,
-              height: 500,
+            child: SizedBox(
+              height: 500, // 設定固定的高度
               child: ListView.builder(
-                itemCount: comments.length + replies.length,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                itemCount: fetchComments().length + fetchReplies().length,
                 itemBuilder: (context, index) {
+                  final comments = fetchComments();
+                  final replies = fetchReplies();
+
                   if (index < comments.length) {
                     final comment = comments[index];
                     return Padding(
@@ -95,42 +103,44 @@ class _CommentPageState extends State<CommentPage> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 别人的留言气泡（左侧）
                           Flexible(
-                            child: Container(
-                              width:237,
-                              decoration: BoxDecoration(
-                                color:textColor, // 气泡背景色
-                                borderRadius: BorderRadius.circular(20),
+                            child: ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth: 235, // 設置最大寬度為 235
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  // 对方的头像
-                                  Container(
-                                    width: 29,
-                                    height: 29,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: NetworkImage(comment.avatarUrl), // 头像的链接
-                                        fit: BoxFit.cover,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFF4C543E),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      width: 29,
+                                      height: 29,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: NetworkImage(comment.avatarUrl),
+                                          fit: BoxFit.cover,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Flexible(
-                                    child: Text(
-                                      comment.text,
-                                      style: TextStyle(
-                                        color: backgroundColor,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
+                                    const SizedBox(width: 8),
+                                    Flexible(
+                                      child: Text(
+                                        comment.text,
+                                        style: TextStyle(
+                                          color: Color(0xFFF4F4E6),
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -145,51 +155,49 @@ class _CommentPageState extends State<CommentPage> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // 你的回复气泡（右侧）
-                          Flexible(
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: 235, // 設置最大寬度為 235
+                            ),
                             child: Container(
-                              width: 237,
                               decoration: BoxDecoration(
-                                color: textColor,
+                                color: Color(0xFF4C543E),
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18), // 調整 padding
-                              child: Row( // 使用 Row 來水平排列大頭貼和文字
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
+                              child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  // 第一張大頭貼
-                                  Container(
-                                    width: 29, // 設置大頭貼的寬度
-                                    height: 29,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image: NetworkImage(reply.avatarUrl), // 第一張大頭貼的連結
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10), // 大頭貼之間的間隔
-                                  // 第二張大頭貼
                                   Container(
                                     width: 29,
                                     height: 29,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       image: DecorationImage(
-                                        image: NetworkImage(reply.avatarUrl), // 第二張大頭貼的連結
+                                        image: NetworkImage(reply.avatarUrl),
                                         fit: BoxFit.cover,
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(width: 10), // 大頭貼和文字之間的間隔
-                                  // 文字
+                                  const SizedBox(width: 10),
+                                  Container(
+                                    width: 29,
+                                    height: 29,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image: NetworkImage(reply.avatarUrl),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
                                   Flexible(
                                     child: Text(
                                       reply.text,
                                       style: TextStyle(
-                                        color: backgroundColor,
-                                        fontSize: 15, // 調整文字大小
+                                        color: Color(0xFFF4F4E6),
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -246,7 +254,7 @@ List<Reply> fetchReplies() {
   return [
     Reply(
       avatarUrl: "https://via.placeholder.com/40",
-      text: "這是我的第一則回覆。",
+      text: "這。",
     ),
     Reply(
       avatarUrl: "https://via.placeholder.com/40",
