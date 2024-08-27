@@ -9,16 +9,17 @@ import '../presentation/AddDiary_screen/AddDiary_screen.dart'; // 引入寫日�
 import '../presentation/setNamePhoto_screen/setNamePhoto_screen.dart'; //引入設定姓名照片頁面組件
 import '../presentation/setting_screen/setting_screen.dart'; //引入設定頁面組件
 import '../presentation/analysis_screen/analysis_screen.dart';
+import '../presentation/ChatBot_screen/chatbot_screen.dart'; // 引入聊天機器人
 import '../presentation/setNamePhoto_screen/defaultAvatar.dart';
 // import '../presentation/setNamePhoto_screen/edit.dart';
 import '../presentation/friend_screen/friendScreen.dart';
 import '../presentation/postRecord_screen/postRecord.dart';
 import '../presentation/notification_screen/notification.dart';
 import '../presentation/friend_screen/addFriend.dart';
-import '../presentation/post_screen/postPage.dart'; 
+import '../presentation/post_screen/postPage.dart';
 import '../presentation/post_screen/browsePage.dart';
 import '../presentation/post_screen/commentPage.dart';
-import '../presentation/home_screen/home_screen.dart'; 
+import '../presentation/home_screen/home_screen.dart';
 
 class AppRoutes {
   static const String welcomeScreen = '/welcome_screen';
@@ -38,7 +39,8 @@ class AppRoutes {
   static const String postPage = '/post_page';
   static const String browsePage = '/browse_page';
   static const String commentPage = '/comment_page';
-  static const String homeScreen = '/home_screen'; 
+  static const String homeScreen = '/home_screen';
+  static const String chatbotScreen = '/ChatBot_screen';
   // static const String edit = '/edit';
 
   static Map<String, WidgetBuilder> routes = {
@@ -52,7 +54,7 @@ class AppRoutes {
     setting: (context) => settingScreen(),
     analysis: (context) => AnalysisScreen(),
     defaultAvatar: (context) => Defaultavatar(),
-    friendScreen: (context) => Friendscreen(), 
+    friendScreen: (context) => Friendscreen(),
     postRecord: (context) => Postrecord(),
     notificationScreen: (context) => Notificationscreen(),
     addFriend: (context) => AddFriend(),
@@ -60,8 +62,7 @@ class AppRoutes {
     browsePage: (context) => BrowsePage(),
     homeScreen: (context) => HomeScreen(),
     commentPage: (context) => CommentPage(),
+    chatbotScreen: (context) => ChatBotScreen(),
     // edit: (context) => EditScreen(),
   };
 }
-
-

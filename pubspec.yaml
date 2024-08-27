@@ -94,6 +94,7 @@ flutter:
     - assets/images/comments_4.png
     - assets/images/comments_5.png
     - assets/images/comments_6.png
+    - assets/images/img_send.png
   fonts: 
     - family: Inter
       fonts: 

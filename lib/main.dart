@@ -22,17 +22,17 @@ void main() async{
   // 清空 SharedPreferences
   SharedPreferences prefs = await SharedPreferences.getInstance();
   await prefs.clear();
-  
+
   if(kIsWeb){
     // 初始化 firebase
     await Firebase.initializeApp(
       options: FirebaseOptions(apiKey: "AIzaSyAmMSDYiayqcG5jY7zJ6wTp0_CTVImeCgM",
-      authDomain: "authentication-873b5.firebaseapp.com",
-      projectId: "authentication-873b5",
-      storageBucket: "authentication-873b5.appspot.com",
-      messagingSenderId: "335884564585",
-      appId: "1:335884564585:web:fcb5491a95029eae3c4af8",
-      measurementId: "G-1P51PCR60T"));
+            authDomain: "authentication-873b5.firebaseapp.com",
+            projectId: "authentication-873b5",
+            storageBucket: "authentication-873b5.appspot.com",
+            messagingSenderId: "335884564585",
+            appId: "1:335884564585:web:fcb5491a95029eae3c4af8",
+            measurementId: "G-1P51PCR60T"));
   }else{
     await Firebase.initializeApp();
   }
@@ -44,7 +44,14 @@ void main() async{
   ThemeHelper().changeTheme('primary');
 
   // 啟動 Flutter 應用程式
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => MessageProvider()),
+      ],
+      child: MyApp(),
+    ),
+  );
 }
 
 // 自訂應用程式的主組件 MyApp

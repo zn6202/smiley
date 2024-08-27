@@ -18,6 +18,9 @@ TextStyle selectedDateStyle = TextStyle(
 const Color calendarBackgroundColor = Color(0xFFF4F4E6);
 const Color addDiaryBackgroundColor = Color(0xFFFFFFFF);
 
+// 此route是否已初始化過一次
+bool _hasInitialized = false;
+
 class DiaryMainScreen extends StatefulWidget {
   @override
   _DiaryMainScreenState createState() => _DiaryMainScreenState();
@@ -30,10 +33,21 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   List<String> emotionImages = [];
   bool showEmotionBlock = false;
 
+  // 聊天機器人資料
+  Map<String, String>? welcomeMessage; // 歡迎訊息
   @override
-  void initState() {
-    super.initState();
-    _fetchEmotionData();
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    // 判斷是否初始化過一次了
+    if (!_hasInitialized) {
+      _hasInitialized = true;
+      final messageProvider  = Provider.of<MessageProvider>(context, listen: false);
+      _fetchEmotionData();
+      messageProvider.fetchWelcomeMessage();
+    }
+  }
+  void dispose() {
+    super.dispose();
   }
 
   Future<String?> getUserId() async {

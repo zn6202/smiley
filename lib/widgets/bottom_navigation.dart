@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-import '../../main.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
@@ -10,9 +7,9 @@ class CustomBottomNavigationBar extends StatefulWidget {
   final bool isHomeScreen;
 
   CustomBottomNavigationBar({
-    required this.currentIndex, 
+    required this.currentIndex,
     required this.onTap,
-    this.isTransparent = false, 
+    this.isTransparent = false,
     this.isHomeScreen = false,
   });
 
@@ -24,7 +21,7 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   late int _currentIndex = widget.currentIndex;
 
-  void _onTap(int index) {
+  void _onTap(int index, MessageProvider messageProvider) {
     if (index == 4) {
       Navigator.pushNamed(context, AppRoutes.setting);
     } else if (index == 2) {
@@ -39,6 +36,8 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       Navigator.pushNamed(context, AppRoutes.analysis);
     } else if (index == 0) {
       //聊天機器人頁面
+      messageProvider.clearUnread();
+      Navigator.pushNamed(context, AppRoutes.chatbotScreen);
     } else {
       widget.onTap(index);
     }
@@ -49,25 +48,42 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
+    final messageProvider = Provider.of<MessageProvider>(context); // 偵測未讀訊息
+    final routeName = ModalRoute.of(context)?.settings.name;
     return Container(
       decoration: BoxDecoration(
-        color: widget.isTransparent ? Colors.transparent : const Color(0xFFFCFCFE),
+        color:
+            widget.isTransparent ? Colors.transparent : const Color(0xFFFCFCFE),
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
-        onTap: _onTap,
+        onTap: (index) => _onTap(index, messageProvider),
         items: [
           BottomNavigationBarItem(
             icon: Padding(
               padding: EdgeInsets.symmetric(vertical: 8.v),
-              child: SizedBox(
-                height: 32.v,
-                width: 32.h,
-                child: SvgPicture.asset(
-                  'assets/images/chatRobot.svg',
-                  colorFilter: ColorFilter.mode(
-                    _currentIndex == 0 ? const Color(0xFFA7BA89) : const Color(0xFFC5C5C5),
-                    BlendMode.srcIn,
+              child: Badge(
+                // 顯示未讀訊息在按鈕上
+                label: 
+                  Text(
+                  '${messageProvider.newMessages}',
+                  style: TextStyle(color: Colors.white, fontSize: 12),
+                ),
+                isLabelVisible: 
+                  (messageProvider.newMessages > 0 && routeName != '/ChatBot_screen')
+                  ? true
+                  : false,
+                child: SizedBox(
+                  height: 32.v,
+                  width: 32.h,
+                  child: SvgPicture.asset(
+                    'assets/images/chatRobot.svg',
+                    colorFilter: ColorFilter.mode(
+                      _currentIndex == 0
+                          ? const Color(0xFFA7BA89)
+                          : const Color(0xFFC5C5C5),
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ),
@@ -83,7 +99,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 child: SvgPicture.asset(
                   'assets/images/analyze.svg',
                   colorFilter: ColorFilter.mode(
-                    _currentIndex == 1 ? const Color(0xFFA7BA89) : const Color(0xFFC5C5C5),
+                    _currentIndex == 1
+                        ? const Color(0xFFA7BA89)
+                        : const Color(0xFFC5C5C5),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -98,7 +116,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 height: 38.v,
                 width: 38.h,
                 child: SvgPicture.asset(
-                  widget.isHomeScreen ? 'assets/images/diary.svg' : 'assets/images/home.svg',
+                  widget.isHomeScreen
+                      ? 'assets/images/diary.svg'
+                      : 'assets/images/home.svg',
                   colorFilter: ColorFilter.mode(
                     const Color(0xFFC5C5C5),
                     BlendMode.srcIn,
@@ -117,7 +137,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 child: SvgPicture.asset(
                   'assets/images/social.svg',
                   colorFilter: ColorFilter.mode(
-                    _currentIndex == 3 ? const Color(0xFFA7BA89) : const Color(0xFFC5C5C5),
+                    _currentIndex == 3
+                        ? const Color(0xFFA7BA89)
+                        : const Color(0xFFC5C5C5),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -134,7 +156,9 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
                 child: SvgPicture.asset(
                   'assets/images/setting.svg',
                   colorFilter: ColorFilter.mode(
-                    _currentIndex == 4 ? const Color(0xFFA7BA89) : const Color(0xFFC5C5C5),
+                    _currentIndex == 4
+                        ? const Color(0xFFA7BA89)
+                        : const Color(0xFFC5C5C5),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -142,7 +166,6 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
             ),
             label: '',
           ),
-          
         ],
         type: BottomNavigationBarType.fixed,
         selectedLabelStyle: TextStyle(fontSize: 0),
