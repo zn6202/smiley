@@ -657,7 +657,9 @@ class Comment {
       id: json['id'] != null ? json['id'] as int : 0, // 默認值為 0
       userId: json['user_id'] != null ? json['user_id'] as int : 0, // 默認值為 0
       postId: json['post_id'] != null ? json['post_id'] as int : 0, // 默認值為 0
-      postUserId: json['post_user_id'] != null ? json['post_user_id'] as int : 0, // 默認值為 0
+      postUserId: json['post_user_id'] != null
+          ? json['post_user_id'] as int
+          : 0, // 默認值為 0
       emojiId: json['emoji_id'] as int,
       content: json['content'] as String,
     );
@@ -672,14 +674,13 @@ class Comment {
 - send icon 會跑位 369
 
 - 先修改以下鳩好了~
-  - 尚未有留言對話的畫面
+  - 回覆留言的輸入框
   - 按表情貼跟傳留言的成功與失敗畫面
   - 在按一次表情貼要消失
 */
 /*
 後端:
 留言聊天室
-傳留言
-傳表情貼
+表情貼
 通知中心
 */

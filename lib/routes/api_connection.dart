@@ -33,5 +33,6 @@ class API
   static const submitComment = "$hostConnect/comment/submitComment.php";
   static const getCommentAngMon = "$hostConnect/comment/getCommentAngMon.php";
   static const getComment = "$hostConnect/comment/getComment.php";
+  static const getReply = "$hostConnect/comment/getReply.php";
 
 }

@@ -141,24 +141,57 @@ class _CommentPageState extends State<CommentPage> {
   //     // 更多留言...
   //   ];
   // }
+  Future<List<Reply>> fetchReplies() async {
+    final String? postId = await getPostId();
+    final String? userId = await getUserId();
+    print("進入回別人給我的留言函式");
+    print('user_id: $userId post_id: $postId');
 
-  List<Reply> fetchReplies() {
-    return [
-      Reply(
-        avatarUrl: "https://via.placeholder.com/40",
-        text: "這。",
-      ),
-      Reply(
-        avatarUrl: "https://via.placeholder.com/40",
-        text: "這是我的第二則回覆，可能會比較長一些。",
-      ),
-      Reply(
-        avatarUrl: "https://via.placeholder.com/40",
-        text: "這是我的第三則回覆，可能會比較長一些。",
-      ),
-      // 更多回覆...
-    ];
+    final response = await http.post(
+      Uri.parse(API.getReply),
+      body: {
+        'user_id': userId,
+        'post_id': postId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        List<dynamic> repliesJson = data['comments'];
+        print("data['replies'] 是 : ${repliesJson.toString()}");
+        return repliesJson.map((json) => Reply.fromJson(json)).toList();
+      } else if (data['success'] == false &&
+          data['message'] == "No posts found for the given user and date.") {
+        print('無回覆留言... ${data['message']}');
+        return [];
+      } else {
+        print('回覆留言失敗... ${data['message']}');
+        return [];
+      }
+    } else {
+      print('回覆留言失敗...');
+      return [];
+    }
   }
+  // List<Reply> fetchReplies() {
+    // return [
+    //   Reply(
+    //     avatarUrl: "https://via.placeholder.com/40",
+    //     text: "這。",
+    //   ),
+    //   Reply(
+    //     avatarUrl: "https://via.placeholder.com/40",
+    //     text: "這是我的第二則回覆，可能會比較長一些。",
+    //   ),
+    //   Reply(
+    //     avatarUrl: "https://via.placeholder.com/40",
+    //     text: "這是我的第三則回覆，可能會比較長一些。",
+    //   ),
+    //   // 更多回覆...
+    // ];
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -227,132 +260,138 @@ class _CommentPageState extends State<CommentPage> {
               height: 500, // 設定固定的高度
               child: FutureBuilder<List<Comment>>(
                 future: fetchComments(), // 等待 fetchComments() 的結果
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                builder: (context, commentsSnapshot) {
+                  if (commentsSnapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator()); // 加載中
-                  } else if (snapshot.hasError) {
-                    return Center(
-                        child: Text('發生錯誤：${snapshot.error}')); // 顯示錯誤信息
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  } else if (commentsSnapshot.hasError) {
+                    return Center(child: Text('發生錯誤：${commentsSnapshot.error}')); // 顯示錯誤信息
+                  } else if (!commentsSnapshot.hasData || commentsSnapshot.data!.isEmpty) {
                     return Center(child: Text('沒有留言')); // 沒有數據
                   }
 
-                  final comments = snapshot.data!; // 獲取數據
-                  final replies =
-                      fetchReplies(); // 如果需要，也可以使用類似的 FutureBuilder 處理 replies
+                  final comments = commentsSnapshot.data!;
 
-                  return ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 10),
-                    itemCount: comments.length + replies.length, // 留言和回覆的總數
-                    itemBuilder: (context, index) {
-                      if (index < comments.length) {
-                        final comment = comments[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 16),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Flexible(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxWidth: 235, // 設置最大寬度為 235
-                                  ),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Color(0xFF4C543E),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 6.18),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 29,
-                                          height: 29,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                              image: NetworkImage(
-                                                  'http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          child: Text(
-                                            comment.text ?? '',
-                                            style: TextStyle(
-                                              color: Color(0xFFF4F4E6),
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        final reply = replies[index - comments.length];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 16),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: 235, // 設置最大寬度為 235
-                                ),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFF4C543E),
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 6.18),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Container(
-                                        width: 29,
-                                        height: 29,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: DecorationImage(
-                                            image:
-                                                NetworkImage(reply.avatarUrl),
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Flexible(
-                                        child: Text(
-                                          reply.text ?? '',
-                                          style: TextStyle(
-                                            color: Color(0xFFF4F4E6),
-                                            fontSize: 15,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
+                  return FutureBuilder<List<Reply>>(
+                    future: fetchReplies(), // 等待 fetchReplies() 的結果
+                    builder: (context, repliesSnapshot) {
+                      if (repliesSnapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator()); // 加載中
+                      } else if (repliesSnapshot.hasError) {
+                        return Center(child: Text('發生錯誤：${repliesSnapshot.error}')); // 顯示錯誤信息
+                      } else if (!repliesSnapshot.hasData || repliesSnapshot.data!.isEmpty) {
+                        return Center(child: Text('沒有回覆')); // 沒有數據
                       }
+
+                      final replies = repliesSnapshot.data!;
+
+                      return ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        itemCount: comments.length + replies.length, // 留言和回覆的總數
+                        itemBuilder: (context, index) {
+                          if (index < comments.length) {
+                            final comment = comments[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Flexible(
+                                    child: ConstrainedBox(
+                                      constraints: BoxConstraints(
+                                        maxWidth: 235, // 設置最大寬度為 235
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Color(0xFF4C543E),
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              width: 29,
+                                              height: 29,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  image: NetworkImage('http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Flexible(
+                                              child: Text(
+                                                comment.text ?? '',
+                                                style: TextStyle(
+                                                  color: Color(0xFFF4F4E6),
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          } else {
+                            final reply = replies[index - comments.length];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: 235, // 設置最大寬度為 235
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Color(0xFF4C543E),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            width: 29,
+                                            height: 29,
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: DecorationImage(
+                                                image: NetworkImage('http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 10),
+                                          Flexible(
+                                            child: Text(
+                                              reply.text ?? '',
+                                              style: TextStyle(
+                                                color: Color(0xFFF4F4E6),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      );
                     },
                   );
                 },
@@ -367,13 +406,34 @@ class _CommentPageState extends State<CommentPage> {
 
 // 我的回覆
 class Reply {
-  final String avatarUrl;
-  final String text;
+  final int id;
+  final int userId;
+  final int postId;
+  final int postUserId;
+  final int? emojiId;
+  final String? text;
+  final String? avatarUrl;
 
   Reply({
-    required this.avatarUrl,
-    required this.text,
+    required this.id,
+    required this.userId,
+    required this.postId,
+    required this.postUserId,
+    this.emojiId,
+    this.text,
+    this.avatarUrl,
   });
+  factory Reply.fromJson(Map<String, dynamic> json) {
+    return Reply(
+      id: json['id'] != null ? json['id'] as int : 0, // 默認值為 0
+      userId: json['user_id'] != null ? json['user_id'] as int : 0, // 默認值為 0
+      postId: json['post_id'] != null ? json['post_id'] as int : 0, // 默認值為 0
+      postUserId: json['post_user_id'] != null ? json['post_user_id'] as int : 0, // 默認值為 0
+      emojiId: json['emoji_id'] as int,
+      text: json['content'] as String,
+      avatarUrl: json['avatar_url'] as String,
+    );
+  }
 }
 
 // 別人的留言
@@ -408,3 +468,13 @@ class Comment {
     );
   }
 }
+/*
+前端：
+- 回覆留言的輸入框
+- 聊天室
+- 頭貼加名字?
+*/
+/*
+後端：
+- 連接輸入框
+*/
