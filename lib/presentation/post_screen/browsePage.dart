@@ -23,12 +23,13 @@ class _BrowsePageState extends State<BrowsePage> {
   int _currentIndex = 3;
   bool _isViewingFriendsPosts = false;
   int? _selectedCommentIcon;
-  String _commentText = '';
+  String? _commentText = '';
   int _currentPostId = -1;
 
   TextEditingController commentsController = TextEditingController(); // 新增的
 
-  final StreamController<List<Comment>> _commentsController = StreamController<List<Comment>>.broadcast();
+  final StreamController<List<Comment>> _commentsController =
+      StreamController<List<Comment>>.broadcast();
   final ScrollController _scrollController = ScrollController();
   final FocusNode _commentFocusNode = FocusNode();
 
@@ -42,7 +43,7 @@ class _BrowsePageState extends State<BrowsePage> {
     _futureMyPosts.then((posts) {
       if (posts.isNotEmpty) {
         _currentPostId = posts.first.id;
-        fetchComments(_currentPostId);
+        // fetchComments(_currentPostId);
       }
     });
 
@@ -79,14 +80,14 @@ class _BrowsePageState extends State<BrowsePage> {
             _futureFriendsPosts.then((posts) {
               if (posts.isNotEmpty) {
                 _currentPostId = posts.first.id;
-                fetchComments(_currentPostId);
+                // fetchComments(_currentPostId);
               }
             });
           } else {
             _futureMyPosts.then((posts) {
               if (posts.isNotEmpty) {
                 _currentPostId = posts.first.id;
-                fetchComments(_currentPostId);
+                // fetchComments(_currentPostId);
               }
             });
           }
@@ -107,14 +108,14 @@ class _BrowsePageState extends State<BrowsePage> {
               _futureFriendsPosts.then((posts) {
                 if (posts.isNotEmpty) {
                   _currentPostId = posts.first.id;
-                  fetchComments(_currentPostId);
+                  // fetchComments(_currentPostId);
                 }
               });
             } else {
               _futureMyPosts.then((posts) {
                 if (posts.isNotEmpty) {
                   _currentPostId = posts.first.id;
-                  fetchComments(_currentPostId);
+                  // fetchComments(_currentPostId);
                 }
               });
             }
@@ -124,7 +125,8 @@ class _BrowsePageState extends State<BrowsePage> {
     );
   }
 
-  Widget _buildPostsPage(Future<List<Post>> futurePosts, {required bool isMyPosts}) {
+  Widget _buildPostsPage(Future<List<Post>> futurePosts,
+      {required bool isMyPosts}) {
     return FutureBuilder<List<Post>>(
       future: futurePosts,
       builder: (context, snapshot) {
@@ -144,7 +146,7 @@ class _BrowsePageState extends State<BrowsePage> {
             final postId = posts[index].id;
             if (postId != _currentPostId) {
               _currentPostId = postId;
-              fetchComments(postId);
+              // fetchComments(postId);
             }
           },
           itemBuilder: (context, index) {
@@ -171,7 +173,8 @@ class _BrowsePageState extends State<BrowsePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 20, left: 16, right: 16),
+                        padding:
+                            const EdgeInsets.only(top: 20, left: 16, right: 16),
                         child: Text(
                           post.date,
                           style: TextStyle(
@@ -211,7 +214,8 @@ class _BrowsePageState extends State<BrowsePage> {
                                   color: const Color(0x80FFFFFF),
                                   shape: BoxShape.circle,
                                   image: DecorationImage(
-                                    image: NetworkImage('http://163.22.32.24/smiley_backend/img/photo/${post.userPhoto}'),
+                                    image: NetworkImage(
+                                        'http://163.22.32.24/smiley_backend/img/photo/${post.userPhoto}'),
                                   ),
                                 ),
                               ),
@@ -234,9 +238,13 @@ class _BrowsePageState extends State<BrowsePage> {
                       Center(
                         child: GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(context, AppRoutes.commentPage);
+                            savePostId(_currentPostId);
+                            Navigator.pushNamed(
+                              context,
+                              AppRoutes.commentPage,
+                              // arguments: _currentPostId, // 傳遞 _currentPostId 作為 arguments
+                            );
                           },
-                        
                           child: Image.network(
                             post.monster != null && post.monster!.isNotEmpty
                                 ? 'http://163.22.32.24/smiley_backend/img/monster/${post.monster!}'
@@ -279,7 +287,8 @@ class _BrowsePageState extends State<BrowsePage> {
 
                     return Stack(
                       children: comments.map((comment) {
-                        final horizontalPosition = random.nextDouble() * constraints.maxWidth;
+                        final horizontalPosition =
+                            random.nextDouble() * constraints.maxWidth;
                         return FallingEmojiComment(
                           emojiId: comment.emojiId ?? 1,
                           screenHeight: constraints.maxHeight,
@@ -296,9 +305,11 @@ class _BrowsePageState extends State<BrowsePage> {
       },
     );
   }
+
   Widget _buildCommentSection(Color textColor) {
     return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+      padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
       child: Column(
         children: [
           Center(
@@ -365,7 +376,8 @@ class _BrowsePageState extends State<BrowsePage> {
                           color: Color(0xFFC5C5C5),
                         ),
                       ),
-                      controller: commentsController,  // 原本是這個 controller: TextEditingController(text: _commentText), 如果用原本的，字彙從右到左出現，且留言框不會隨著鍵盤上升
+                      controller:
+                          commentsController, // 原本是這個 controller: TextEditingController(text: _commentText), 如果用原本的，字彙從右到左出現，且留言框不會隨著鍵盤上升
                       onChanged: (value) {
                         setState(() {
                           _commentText = value;
@@ -376,7 +388,7 @@ class _BrowsePageState extends State<BrowsePage> {
                   IconButton(
                     icon: Icon(Icons.send, color: textColor),
                     onPressed: () {
-                      submitComment();
+                      submitComment(_currentPostId, _selectedCommentIcon);
                     },
                   ),
                 ],
@@ -388,20 +400,30 @@ class _BrowsePageState extends State<BrowsePage> {
     );
   }
 
-  void submitComment() async{
+  Future<void> savePostId(int _currentPostId) async {
+    String? postId = _currentPostId.toString();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('postId', postId);
+  }
+
+  void submitComment(int postId, int? _selectedCommentIcon) async {
     final String? userId = await getUserId();
+    int? emojiId =
+        _selectedCommentIcon == null ? null : _selectedCommentIcon + 1;
 
     print("進入提交評論函式");
     print('user_id: $userId');
-    // print('post_id: $');
+    print('post_id: $postId');
+    print('emoji_id: $emojiId');
     print("提交評論: $_commentText");
 
-
     final response = await http.post(
-      Uri.parse(API.getDiaryBool),
+      Uri.parse(API.submitComment),
       body: {
-        'user_id': userId ?? '',
-        'content': _commentText,
+        'user_id': userId.toString(),
+        'post_id': postId.toString(),
+        'emoji_id': emojiId.toString() ?? '',
+        'content': _commentText ?? '',
       },
     );
     if (response.statusCode == 200) {
@@ -409,24 +431,19 @@ class _BrowsePageState extends State<BrowsePage> {
 
       if (data['success'] == true) {
         print("頻論提交已完成是 : ${data}");
-        // setState(() {
-        //   hasDiaryToday = data['diary_bool'];
-        // });
       } else {
         print('評論提交未完成... $data');
-        // setState(() {
-        //   hasDiaryToday = data['diary_bool'];
-        // });
       }
     } else {
       print('提交評論失敗...');
     }
-    // // TODO: 將評論內容傳送到後端
-    // print("提交評論: $_commentText");
   }
 
   final List<User> users = const [
-    User(id: 1, name: "AliceAliceAliceAliceAliceAlice", photo: "assets/images/default_avatar_1.png"),
+    User(
+        id: 1,
+        name: "AliceAliceAliceAliceAliceAlice",
+        photo: "assets/images/default_avatar_1.png"),
     User(id: 2, name: "Bob", photo: "assets/images/default_avatar_2.png"),
   ];
 
@@ -485,7 +502,8 @@ class _BrowsePageState extends State<BrowsePage> {
         List<dynamic> postsJson = data['posts'];
         print("data['posts'] 是 : ${postsJson.toString()}");
         return postsJson.map((json) => Post.fromJson(json)).toList();
-      }else if (data['success'] == false && data['message']=="No posts found for the given user and date."){
+      } else if (data['success'] == false &&
+          data['message'] == "No posts found for the given user and date.") {
         print('無好友發布貼文... ${data['message']}');
         return [];
       } else {
@@ -498,29 +516,29 @@ class _BrowsePageState extends State<BrowsePage> {
     }
   }
 
-  Future<void> fetchComments(int postId) async {
-    List<Comment> comments = [
-      Comment(userId: 1, emojiId: 1, content: "這是評論3。"),
-      Comment(userId: 1, emojiId: 2, content: "這是評論3。"),
-    ];
-    _commentsController.add(comments);
-  }
-  
-  String getUserPhotoById(int userId) {
-    try {
-      return users.firstWhere((user) => user.id == userId).photo;
-    } catch (e) {
-      return 'assets/images/default_avatar.png';
-    }
-  }
+  // Future<void> fetchComments(int postId) async {
+  //   List<Comment> comments = [
+  //     Comment(userId: 1, emojiId: 1, content: "這是評論3。"),
+  //     Comment(userId: 1, emojiId: 2, content: "這是評論3。"),
+  //   ];
+  //   _commentsController.add(comments);
+  // }
 
-  String getUserNameById(int userId) {
-    try {
-      return users.firstWhere((user) => user.id == userId).name;
-    } catch (e) {
-      return 'Unknown';
-    }
-  }
+  // String getUserPhotoById(int userId) {
+  //   try {
+  //     return users.firstWhere((user) => user.id == userId).photo;
+  //   } catch (e) {
+  //     return 'assets/images/default_avatar.png';
+  //   }
+  // }
+
+  // String getUserNameById(int userId) {
+  //   try {
+  //     return users.firstWhere((user) => user.id == userId).name;
+  //   } catch (e) {
+  //     return 'Unknown';
+  //   }
+  // }
 
   Color getTextColor(Color colorId) {
     switch (colorId.value) {
@@ -585,12 +603,16 @@ class Post {
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-      id: json['id'] != null ? json['id'] as int : 0,  // 默認值為 0
-      userId: json['user_id'] != null ? json['user_id'] as int : 0,  // 默認值為 0
+      id: json['id'] != null ? json['id'] as int : 0, // 默認值為 0
+      userId: json['user_id'] != null ? json['user_id'] as int : 0, // 默認值為 0
       textColor: Color(int.parse(json['text_color'])),
       backgroundColor: Color(int.parse(json['background_color'])),
-      monster: json['monster'] != null && json['monster'].isNotEmpty ? json['monster'] as String : null,
-      angel: json['angel'] != null && json['angel'].isNotEmpty ? json['angel'] as String : null,
+      monster: json['monster'] != null && json['monster'].isNotEmpty
+          ? json['monster'] as String
+          : null,
+      angel: json['angel'] != null && json['angel'].isNotEmpty
+          ? json['angel'] as String
+          : null,
       title: json['title'] as String,
       date: json['date'] as String,
       content: json['content'] as String,
@@ -614,15 +636,32 @@ class User {
 }
 
 class Comment {
+  final int id;
   final int userId;
+  final int postId;
+  final int postUserId;
   final int? emojiId;
   final String? content;
 
   Comment({
+    required this.id,
     required this.userId,
+    required this.postId,
+    required this.postUserId,
     this.emojiId,
     this.content,
   });
+
+  factory Comment.fromJson(Map<String, dynamic> json) {
+    return Comment(
+      id: json['id'] != null ? json['id'] as int : 0, // 默認值為 0
+      userId: json['user_id'] != null ? json['user_id'] as int : 0, // 默認值為 0
+      postId: json['post_id'] != null ? json['post_id'] as int : 0, // 默認值為 0
+      postUserId: json['post_user_id'] != null ? json['post_user_id'] as int : 0, // 默認值為 0
+      emojiId: json['emoji_id'] as int,
+      content: json['content'] as String,
+    );
+  }
 }
 
 /*
@@ -633,10 +672,9 @@ class Comment {
 - send icon 會跑位 369
 
 - 先修改以下鳩好了~
-  - 我更改了留言輸入欄的 _commentsController -> 不確定可不可以這樣改，但改了之後字方向正常，輸入欄也會隨鍵盤上升 29 362
-  - submitComment() 要傳當前的 post id 進 submitComment 裡面
   - 尚未有留言對話的畫面
   - 按表情貼跟傳留言的成功與失敗畫面
+  - 在按一次表情貼要消失
 */
 /*
 後端:

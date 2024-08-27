@@ -30,5 +30,8 @@ class API
   static const getDiary = "$hostConnect/diary/getDiary.php";
   static const getAngMon = "$hostConnect/diary/getAngMon.php";
   static const getDiaryBool = "$hostConnect/diary/getDiaryBool.php";
+  static const submitComment = "$hostConnect/comment/submitComment.php";
+  static const getCommentAngMon = "$hostConnect/comment/getCommentAngMon.php";
+  static const getComment = "$hostConnect/comment/getComment.php";
 
 }
