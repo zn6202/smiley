@@ -67,14 +67,15 @@ def getChatHistory():
 userChatHistory = getChatHistory()
 # 取得當前台灣時間 & 配合時間的問候語
 class AboutTime:
-    now = datetime.now()
-    def getCurrentTime(now=now):
+    def getCurrentTime():
+        now = datetime.now()
         year, month, day, weekday_number, hour, minute, second = \
         now.year, now.month, now.day, now.weekday(), now.hour, now.minute, now.second
         weekdays = ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六', '星期日']
         weekday = weekdays[weekday_number]
         return f"{year}年{month}月{day}日，{weekday}，{hour}點{minute}分{second}秒"
-    def firstMessage(now=now):
+    def firstMessage():
+        now = datetime.now()
         hour = now.hour
         if  (6 <= hour < 11):
             return "早安"
@@ -178,7 +179,7 @@ def updateSystem():
     system = f"""
                 你將扮演「{assistantName}」，正在和「{userName}」進行對話。
                 「{assistantName}」是一個外星人，名字叫「{assistantName}」是因為外形像一隻溫暖可愛的小蜜蜂，性別不明，原本住在從幾十萬光年外的未知星球，但因為某次飛船事故，錯使她來到了地球，並定居了下來，她遇見了「{userName}」並成為了彼此的摯友。
-                「{assistantName}」主要講繁體中文，不是一個AI語言模型，充滿情感與智慧，總是充滿活力與熱情。
+                「{assistantName}」主要講繁體中文，既不是一個AI語言模型，也不是人工智慧助手，充滿情感與智慧，總是充滿活力與熱情。
                 「{assistantName}」有一位好朋友「{userName}」，並隨時願意聆聽並給予「{userName}」支持與鼓勵。
                 「{assistantName}」的目標是透過陪伴與建議，讓「{userName}」在生活中感受到溫暖與力量。
 
@@ -199,10 +200,9 @@ def updateSystem():
                 「{assistantName}」會記住以下各項資訊，將以下資訊濃縮轉化進簡短且口語化的句子與「{userName}」聊天：
                     
                     資訊二、「{userName}」的「目前所在地」為「{getUserLocation()}」。
-                    資訊三、「現在時間」是「台灣時間{AboutTime.getCurrentTime()}」，當「{userName}」詢問時間相關的問題時，可以用該資訊回答。
-                    資訊四、最近的「各地區天氣預報」為「{weatherInfo}」，
-                           「{assistantName}」會根據「{userName}」的「目前所在地」結合「現在時間」和「各地區天氣預報」等資訊，
-                            判斷當地的天氣狀況，並給予關心。
+                    資訊三、「現在時間」是「台灣時間{AboutTime.getCurrentTime()}」，但是當被問到「現在時間」相關問題時，只會請對方查看自己手機上的時間。
+                    資訊四、最近的「各地區天氣預報」為「{weatherInfo}」，當被問到「天氣」相關問題時
+                           「{assistantName}」會根據「{userName}」的「目前所在地」和「各地區天氣預報」等資訊判斷當地的天氣狀況，並給予關心。
             """
                     # 資訊一、「{assistantName}」與「{userName}」的「歷史聊天紀錄」為「{userChatHistory}」。
                     #        當「{userName}」詢問或遇上某些問題，「{assistantName}」會先判斷該問題是否有出現在「歷史聊天紀錄」，若有，則會根據當中的資訊回答。
@@ -240,6 +240,10 @@ history_messages = [{'role': 'system', 'content': updateSystem()},
                     #{'role': 'user', 'content': f"yo！"},]，我在2024年8月14日寫了一篇日記
                     # {'role': 'user', 'content': f"嗨～{assistantName}{AboutTime.firstMessage()}"},]
 
+fixedMessage = ["現在幾點了","現在幾點了？",]
+timeResponse = "我不太確定現在實際的時間，或許你可以看看你手機的時間會比較準確呦!"
+fixedResponse = [timeResponse,timeResponse,]
+
 # 回傳歡迎訊息
 @app.route('/welcome', methods=['POST'])
 def welcome():
@@ -254,14 +258,19 @@ def send_message_to_python():
     # 動態更新 system 訊息
     del history_messages[0]
     history_messages.insert(0, {"role": "system", "content": updateSystem()})
-    message_user_get = request.get_json()                                   # 取得使用者訊息 {'messages': '嗨'}
+    message_user_get = request.get_json()                                                  # 取得使用者訊息 {'messages': '嗨'}
     message_user = message_user_get['messages']
-    # response_user = {'role': 'user', 'content': message_user}  #    將使用者訊息轉為模型可讀取型態
-    response_user = {'role': 'user', 'content': f'「{userName}」：「{message_user}」'}  #    將使用者訊息轉為模型可讀取型態
-    history_messages.append(response_user)                                      #    加使用者訊息到歷史紀錄
-    messsage_assistant = client.chat(model=model, messages=history_messages)    # 模型生成回應
-    response_assistant = messsage_assistant['message']                          #     取得模型回應
-    history_messages.append(response_assistant)                                 #     加模型回應訊息至歷史紀錄
+    response_user = {'role': 'user', 'content': f'「{userName}」：「{message_user}」'}     # 將使用者訊息轉為模型可讀取型態
+    # 判斷是否為固定問答句
+    if (message_user in fixedMessage):
+        index = fixedMessage.index(message_user)
+        fixedAnswer = fixedResponse[index]                                                  #    取得固定回應句
+        response_assistant = {'role': 'assistant', 'content': f'「{assistantName}」：「{fixedAnswer}」'}
+    else: 
+        history_messages.append(response_user)                                              #    加使用者訊息到歷史紀錄
+        messsage_assistant = client.chat(model=model, messages=history_messages)            #    模型生成回應
+        response_assistant = messsage_assistant['message']                                  #    取得模型回應
+    history_messages.append(response_assistant)                                     # 加回應訊息至歷史紀錄
     print(history_messages)
     return jsonify({'response': response_assistant["content"]})                 # 回傳json化的模型回應訊息
 

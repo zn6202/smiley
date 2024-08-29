@@ -69,9 +69,13 @@ class _CommentPageState extends State<CommentPage> {
 
       if (data['success'] == true) {
         print("天使怪獸是 : ${data['image']} 貼文內容是 : ${data['content']}");
+        print(
+            "文字顏色是 : ${data['text_color']} 貼文顏色是 : ${data['background_color']}");
         setState(() {
           postImage = data['image'];
           postContent = data['content'];
+          textColor = Color(int.parse(data['text_color']));
+          backgroundColor = Color(int.parse(data['background_color']));
         });
         return data['image'];
       } else {
@@ -85,9 +89,9 @@ class _CommentPageState extends State<CommentPage> {
   }
 
   // 假設的函數用於從資料庫讀取貼文顏色
-  Color fetchTextColor() {
-    return Color(0xFFFF53FF);
-  }
+  // Color fetchTextColor() {
+  //   return Color(0xFFFF53FF);
+  // }
 
   // // 假設的函數用於從資料庫讀取貼文內容
   // String fetchPostContent() {
@@ -129,6 +133,7 @@ class _CommentPageState extends State<CommentPage> {
       return [];
     }
   }
+
   //   return [
   //     Comment(
   //       avatarUrl: "https://via.placeholder.com/29",
@@ -176,21 +181,21 @@ class _CommentPageState extends State<CommentPage> {
     }
   }
   // List<Reply> fetchReplies() {
-    // return [
-    //   Reply(
-    //     avatarUrl: "https://via.placeholder.com/40",
-    //     text: "這。",
-    //   ),
-    //   Reply(
-    //     avatarUrl: "https://via.placeholder.com/40",
-    //     text: "這是我的第二則回覆，可能會比較長一些。",
-    //   ),
-    //   Reply(
-    //     avatarUrl: "https://via.placeholder.com/40",
-    //     text: "這是我的第三則回覆，可能會比較長一些。",
-    //   ),
-    //   // 更多回覆...
-    // ];
+  // return [
+  //   Reply(
+  //     avatarUrl: "https://via.placeholder.com/40",
+  //     text: "這。",
+  //   ),
+  //   Reply(
+  //     avatarUrl: "https://via.placeholder.com/40",
+  //     text: "這是我的第二則回覆，可能會比較長一些。",
+  //   ),
+  //   Reply(
+  //     avatarUrl: "https://via.placeholder.com/40",
+  //     text: "這是我的第三則回覆，可能會比較長一些。",
+  //   ),
+  //   // 更多回覆...
+  // ];
   // }
 
   @override
@@ -198,6 +203,7 @@ class _CommentPageState extends State<CommentPage> {
     // final int? postId = ModalRoute.of(context)?.settings.arguments as int?;
 
     return Scaffold(
+      backgroundColor: backgroundColor, // 設置整體背景色
       body: Stack(
         children: [
           // 貼文照片
@@ -239,7 +245,7 @@ class _CommentPageState extends State<CommentPage> {
                 child: Text(
                   postContent ?? '',
                   style: TextStyle(
-                    color: Color(0xFF4C543E),
+                    color: textColor, //標題顏色
                     fontFamily: 'Inter',
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -261,12 +267,21 @@ class _CommentPageState extends State<CommentPage> {
               child: FutureBuilder<List<Comment>>(
                 future: fetchComments(), // 等待 fetchComments() 的結果
                 builder: (context, commentsSnapshot) {
-                  if (commentsSnapshot.connectionState == ConnectionState.waiting) {
+                  if (commentsSnapshot.connectionState ==
+                      ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator()); // 加載中
                   } else if (commentsSnapshot.hasError) {
-                    return Center(child: Text('發生錯誤：${commentsSnapshot.error}')); // 顯示錯誤信息
-                  } else if (!commentsSnapshot.hasData || commentsSnapshot.data!.isEmpty) {
-                    return Center(child: Text('沒有留言')); // 沒有數據
+                    return Center(
+                        child:
+                            Text('發生錯誤：${commentsSnapshot.error}')); // 顯示錯誤信息
+                  } else if (!commentsSnapshot.hasData ||
+                      commentsSnapshot.data!.isEmpty) {
+                    return Center(
+                          child: Text(
+                            '沒有留言',
+                            style: TextStyle(color: textColor),
+                          ), // 沒有評論和回覆，顯示「沒有留言」
+                        );
                   }
 
                   final comments = commentsSnapshot.data!;
@@ -274,12 +289,22 @@ class _CommentPageState extends State<CommentPage> {
                   return FutureBuilder<List<Reply>>(
                     future: fetchReplies(), // 等待 fetchReplies() 的結果
                     builder: (context, repliesSnapshot) {
-                      if (repliesSnapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator()); // 加載中
+                      if (repliesSnapshot.connectionState ==
+                          ConnectionState.waiting) {
+                        return Center(
+                            child: CircularProgressIndicator()); // 加載中
                       } else if (repliesSnapshot.hasError) {
-                        return Center(child: Text('發生錯誤：${repliesSnapshot.error}')); // 顯示錯誤信息
-                      } else if (!repliesSnapshot.hasData || repliesSnapshot.data!.isEmpty) {
-                        return Center(child: Text('沒有回覆')); // 沒有數據
+                        return Center(
+                            child: Text(
+                                '發生錯誤：${repliesSnapshot.error}')); // 顯示錯誤信息
+                      } else if (!repliesSnapshot.hasData ||
+                          (repliesSnapshot.data!.isEmpty && comments.isEmpty)) {
+                        return Center(
+                          child: Text(
+                            '沒有留言',
+                            style: TextStyle(color: textColor),
+                          ), // 沒有評論和回覆，顯示「沒有留言」
+                        );
                       }
 
                       final replies = repliesSnapshot.data!;
@@ -291,7 +316,8 @@ class _CommentPageState extends State<CommentPage> {
                           if (index < comments.length) {
                             final comment = comments[index];
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 16),
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -302,10 +328,12 @@ class _CommentPageState extends State<CommentPage> {
                                       ),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: Color(0xFF4C543E),
-                                          borderRadius: BorderRadius.circular(20),
+                                          color: textColor, // 評論框背景
+                                          borderRadius:
+                                              BorderRadius.circular(20),
                                         ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 10, vertical: 6.18),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
@@ -315,7 +343,8 @@ class _CommentPageState extends State<CommentPage> {
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
                                                 image: DecorationImage(
-                                                  image: NetworkImage('http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
+                                                  image: NetworkImage(
+                                                      'http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
@@ -325,7 +354,7 @@ class _CommentPageState extends State<CommentPage> {
                                               child: Text(
                                                 comment.text ?? '',
                                                 style: TextStyle(
-                                                  color: Color(0xFFF4F4E6),
+                                                  color: backgroundColor, // 評論字
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -342,7 +371,8 @@ class _CommentPageState extends State<CommentPage> {
                           } else {
                             final reply = replies[index - comments.length];
                             return Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 16),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -353,10 +383,11 @@ class _CommentPageState extends State<CommentPage> {
                                     ),
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Color(0xFF4C543E),
+                                        color: textColor, // 回復框背景
                                         borderRadius: BorderRadius.circular(20),
                                       ),
-                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6.18),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 6.18),
                                       child: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
@@ -366,7 +397,8 @@ class _CommentPageState extends State<CommentPage> {
                                             decoration: BoxDecoration(
                                               shape: BoxShape.circle,
                                               image: DecorationImage(
-                                                image: NetworkImage('http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
+                                                image: NetworkImage(
+                                                    'http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
                                                 fit: BoxFit.cover,
                                               ),
                                             ),
@@ -376,7 +408,7 @@ class _CommentPageState extends State<CommentPage> {
                                             child: Text(
                                               reply.text ?? '',
                                               style: TextStyle(
-                                                color: Color(0xFFF4F4E6),
+                                                color: backgroundColor, // 回覆字顏色
                                                 fontSize: 15,
                                                 fontWeight: FontWeight.bold,
                                               ),
@@ -428,7 +460,9 @@ class Reply {
       id: json['id'] != null ? json['id'] as int : 0, // 默認值為 0
       userId: json['user_id'] != null ? json['user_id'] as int : 0, // 默認值為 0
       postId: json['post_id'] != null ? json['post_id'] as int : 0, // 默認值為 0
-      postUserId: json['post_user_id'] != null ? json['post_user_id'] as int : 0, // 默認值為 0
+      postUserId: json['post_user_id'] != null
+          ? json['post_user_id'] as int
+          : 0, // 默認值為 0
       emojiId: json['emoji_id'] as int,
       text: json['content'] as String,
       avatarUrl: json['avatar_url'] as String,
@@ -461,7 +495,9 @@ class Comment {
       id: json['id'] != null ? json['id'] as int : 0, // 默認值為 0
       userId: json['user_id'] != null ? json['user_id'] as int : 0, // 默認值為 0
       postId: json['post_id'] != null ? json['post_id'] as int : 0, // 默認值為 0
-      postUserId: json['post_user_id'] != null ? json['post_user_id'] as int : 0, // 默認值為 0
+      postUserId: json['post_user_id'] != null
+          ? json['post_user_id'] as int
+          : 0, // 默認值為 0
       emojiId: json['emoji_id'] as int,
       text: json['content'] as String,
       avatarUrl: json['avatar_url'] as String,
@@ -471,8 +507,6 @@ class Comment {
 /*
 前端：
 - 回覆留言的輸入框
-- 聊天室
-- 頭貼加名字?
 */
 /*
 後端：

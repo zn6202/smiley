@@ -1,15 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../core/app_export.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:intl/intl.dart';
-import '../../widgets/bottom_navigation.dart';
+
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 // http
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
 
 const Color primaryColor = Color(0xFFA7BA89);
 TextStyle selectedDateStyle = TextStyle(
@@ -18,8 +16,6 @@ TextStyle selectedDateStyle = TextStyle(
 const Color calendarBackgroundColor = Color(0xFFF4F4E6);
 const Color addDiaryBackgroundColor = Color(0xFFFFFFFF);
 
-// 此route是否已初始化過一次
-bool _hasInitialized = false;
 
 class DiaryMainScreen extends StatefulWidget {
   @override
@@ -33,21 +29,10 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   List<String> emotionImages = [];
   bool showEmotionBlock = false;
 
-  // 聊天機器人資料
-  Map<String, String>? welcomeMessage; // 歡迎訊息
   @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    // 判斷是否初始化過一次了
-    if (!_hasInitialized) {
-      _hasInitialized = true;
-      final messageProvider  = Provider.of<MessageProvider>(context, listen: false);
-      _fetchEmotionData();
-      messageProvider.fetchWelcomeMessage();
-    }
-  }
-  void dispose() {
-    super.dispose();
+  void initState() {
+    super.initState();
+    _fetchEmotionData();
   }
 
   Future<String?> getUserId() async {

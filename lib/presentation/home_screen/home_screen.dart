@@ -1,16 +1,14 @@
 import 'dart:ffi';
 import 'package:intl/intl.dart';
-
-import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
-import '../../widgets/bottom_navigation.dart';
 import 'package:url_launcher/url_launcher.dart';
 // http
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:convert';
+
+// 此route是否已初始化過一次
+bool _hasInitialized = false;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -35,10 +33,21 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 2;
   bool hasDiaryToday = false;
 
+  // 聊天機器人資料
+  Map<String, String>? welcomeMessage; // 歡迎訊息
   @override
-  void initState() {
-    super.initState();
-    checkDiary();
+  Future<void> didChangeDependencies() async {
+    super.didChangeDependencies();
+    // 判斷是否初始化過一次了
+    if (!_hasInitialized) {
+      _hasInitialized = true;
+      final messageProvider  = Provider.of<MessageProvider>(context, listen: false);
+      checkDiary();
+      messageProvider.fetchWelcomeMessage();
+    }
+  }
+  void dispose() {
+    super.dispose();
   }
 
   //  抓取當前 user_id

@@ -368,8 +368,6 @@ Widget build(BuildContext context) {
 
 /*
 前端
-- 未處理留言
-
-後端
-- 圖片路徑 ip 要改 (http://192.168.56.1/smiley_backend/...) -> 163.22.32.24
+- 也要接留言
+- 祝祝畫的新的圖，大小要調整
  */
