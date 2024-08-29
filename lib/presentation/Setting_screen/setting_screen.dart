@@ -352,3 +352,8 @@ class _SettingScreenState extends State<settingScreen> {
     }
   }
 }
+
+/*
+前端:
+- 通知中心按鈕刪掉
+ */

@@ -43,7 +43,7 @@ class _BrowsePageState extends State<BrowsePage> {
     _futureMyPosts.then((posts) {
       if (posts.isNotEmpty) {
         _currentPostId = posts.first.id;
-        // fetchComments(_currentPostId);
+        fetchComments(_currentPostId);
       }
     });
 
@@ -80,14 +80,14 @@ class _BrowsePageState extends State<BrowsePage> {
             _futureFriendsPosts.then((posts) {
               if (posts.isNotEmpty) {
                 _currentPostId = posts.first.id;
-                // fetchComments(_currentPostId);
+                fetchComments(_currentPostId);
               }
             });
           } else {
             _futureMyPosts.then((posts) {
               if (posts.isNotEmpty) {
                 _currentPostId = posts.first.id;
-                // fetchComments(_currentPostId);
+                fetchComments(_currentPostId);
               }
             });
           }
@@ -108,14 +108,14 @@ class _BrowsePageState extends State<BrowsePage> {
               _futureFriendsPosts.then((posts) {
                 if (posts.isNotEmpty) {
                   _currentPostId = posts.first.id;
-                  // fetchComments(_currentPostId);
+                  fetchComments(_currentPostId);
                 }
               });
             } else {
               _futureMyPosts.then((posts) {
                 if (posts.isNotEmpty) {
                   _currentPostId = posts.first.id;
-                  // fetchComments(_currentPostId);
+                  fetchComments(_currentPostId);
                 }
               });
             }
@@ -146,7 +146,7 @@ class _BrowsePageState extends State<BrowsePage> {
             final postId = posts[index].id;
             if (postId != _currentPostId) {
               _currentPostId = postId;
-              // fetchComments(postId);
+              fetchComments(postId);
             }
           },
           itemBuilder: (context, index) {
@@ -389,6 +389,7 @@ class _BrowsePageState extends State<BrowsePage> {
                     icon: Icon(Icons.send, color: textColor),
                     onPressed: () {
                       submitComment(_currentPostId, _selectedCommentIcon);
+                      fetchComments(_currentPostId);
                     },
                   ),
                 ],
@@ -516,29 +517,34 @@ class _BrowsePageState extends State<BrowsePage> {
     }
   }
 
-  // Future<void> fetchComments(int postId) async {
-  //   List<Comment> comments = [
-  //     Comment(userId: 1, emojiId: 1, content: "這是評論3。"),
-  //     Comment(userId: 1, emojiId: 2, content: "這是評論3。"),
-  //   ];
-  //   _commentsController.add(comments);
-  // }
+  void fetchComments(int postId) async {
+    final String? userId = await getUserId();
 
-  // String getUserPhotoById(int userId) {
-  //   try {
-  //     return users.firstWhere((user) => user.id == userId).photo;
-  //   } catch (e) {
-  //     return 'assets/images/default_avatar.png';
-  //   }
-  // }
+    print("抓取 emoji_id 函式");
+    print('posId 是: $postId userId 是: $userId');
 
-  // String getUserNameById(int userId) {
-  //   try {
-  //     return users.firstWhere((user) => user.id == userId).name;
-  //   } catch (e) {
-  //     return 'Unknown';
-  //   }
-  // }
+    final response = await http.post(
+      Uri.parse(API.getFallingEmoji), // 请确保你有定义这个 API 地址
+      body: {'user_id': userId, 'post_id': postId.toString()},
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+      if (data['success'] == true) {
+        List<dynamic> commentsJson = data['comments'];
+        List<Comment> comments =
+            commentsJson.map((json) => Comment.fromJson(json)).toList();
+        _commentsController.add(comments);
+        print("抓取 emoji_id 成功 comments: $comments");
+      } else {
+        _commentsController.add([]);
+        print("無符合的 emoji_id ");
+      }
+    } else {
+      _commentsController.add([]);
+      print("抓取 emoji_id 失敗...");
+    }
+  }
 
   Color getTextColor(Color colorId) {
     switch (colorId.value) {
@@ -669,16 +675,22 @@ class Comment {
 /*
 前端：
 - 原設計是自己貼文垂直滑動 好友貼文左右滑動 自己貼文左滑能進入好友貼文，但一直無法實現區塊來回切換。
-  因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現 -> 要改
+  因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現
+  - 如果滑動真的不行的話，看要不要新增懸浮紐: 可切換自己好友貼文(一律左右滑動)、呼叫下方的功能鍵
+- 本來是按怪獸會到留言區，改成點留言區 icon 會到留言區，且 icon 右上有小數字會顯示總共有幾個留言
 - 調整怪獸大小(放大)
 - send icon 會跑位 369
-- 留言: 回覆留言的輸入框
-- 好友輸入評論: 在按一次表情貼要消失
-- 自己的貼文是看不到發文者的 ex 頭貼 bbb
+
+
+以下可晚一點再調整:
+- browsePage 再按一次表情貼要消失
+- 掉落的表情貼沒有留在地板
+- 自己的貼文是看不到發文者的 ex: 頭貼 bbb
+- 功能鍵要可隱藏 (看是要點一下畫面，會出現消失 or 上下滑出現消失 or ...)
+
 */
+
 /*
 後端:
-留言聊天室
-表情貼
-通知中心
-*/
+- 留言區 icon 的留言數量
+ */

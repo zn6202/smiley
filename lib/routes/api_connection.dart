@@ -33,6 +33,8 @@ class API
   static const submitComment = "$hostConnect/comment/submitComment.php";
   static const getCommentAngMon = "$hostConnect/comment/getCommentAngMon.php";
   static const getComment = "$hostConnect/comment/getComment.php";
+  static const getFallingEmoji = "$hostConnect/comment/getFallingEmoji.php";
+  static const submitReply = "$hostConnect/comment/submitReply.php";
   static const getReply = "$hostConnect/comment/getReply.php";
 
 }

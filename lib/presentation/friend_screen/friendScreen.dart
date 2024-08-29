@@ -314,3 +314,8 @@ class _FriendscreenState extends State<Friendscreen> {
     );
   }
 }
+
+/*
+前端:
+- 加好友 icon 要顯示有幾個未被處理的好友邀請
+ */

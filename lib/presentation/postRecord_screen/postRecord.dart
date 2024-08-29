@@ -368,6 +368,6 @@ Widget build(BuildContext context) {
 
 /*
 前端
-- 也要接留言
+- 也要可以進到留言區留言
 - 祝祝畫的新的圖，大小要調整
  */

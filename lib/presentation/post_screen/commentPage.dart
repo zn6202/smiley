@@ -51,6 +51,35 @@ class _CommentPageState extends State<CommentPage> {
     return prefs.getString('postId');
   }
 
+  void submitReply(int postId, String content) async {
+    final String? userId = await getUserId();
+
+    print("進入提交評論函式");
+    print('user_id: $userId');
+    print('post_id: $postId');
+    print("提交回覆: $content");
+
+    final response = await http.post(
+      Uri.parse(API.submitReply),
+      body: {
+        'user_id': userId.toString(),
+        'post_id': postId.toString(),
+        'content': content,
+      },
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> data = jsonDecode(response.body);
+
+      if (data['success'] == true) {
+        print("回覆提交已完成是 : ${data}");
+      } else {
+        print('回覆提交未完成... $data');
+      }
+    } else {
+      print('提交評論失敗...');
+    }
+  }
+
   // 假設的函數用於從資料庫讀取貼文照片
   Future<String?> fetchPostImage() async {
     final String? postId = await getPostId();
@@ -277,11 +306,11 @@ class _CommentPageState extends State<CommentPage> {
                   } else if (!commentsSnapshot.hasData ||
                       commentsSnapshot.data!.isEmpty) {
                     return Center(
-                          child: Text(
-                            '沒有留言',
-                            style: TextStyle(color: textColor),
-                          ), // 沒有評論和回覆，顯示「沒有留言」
-                        );
+                      child: Text(
+                        '沒有留言',
+                        style: TextStyle(color: textColor),
+                      ), // 沒有評論和回覆，顯示「沒有留言」
+                    );
                   }
 
                   final comments = commentsSnapshot.data!;
@@ -506,9 +535,13 @@ class Comment {
 }
 /*
 前端：
+- 改留言區樣式
 - 回覆留言的輸入框
+  - 輸入欄按傳送鍵之後，傳送當前的 'postId' 和 '輸入內容' 至 submitReply() (第54行)
 */
 /*
-後端：
-- 連接輸入框
+後端:
+- commentPage 
+  - 輸入要跟後端結合
+  - 確認新版留言區的後端是正確
 */
