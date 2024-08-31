@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 // http
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 // 此route是否已初始化過一次
@@ -41,11 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
     // 判斷是否初始化過一次了
     if (!_hasInitialized) {
       _hasInitialized = true;
-      final messageProvider  = Provider.of<MessageProvider>(context, listen: false);
+      final messageProvider =
+          Provider.of<MessageProvider>(context, listen: false);
       checkDiary();
       messageProvider.fetchWelcomeMessage();
     }
   }
+
   void dispose() {
     super.dispose();
   }
@@ -366,7 +369,50 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  showFlowerDialog(BuildContext context) {
+  void showFlowerDialog(BuildContext context) async {
+    // 先從本地存儲中獲取今天的花名和花語
+    final prefs = await SharedPreferences.getInstance();
+    final String? flowerName = prefs.getString('flowerName');
+    final String? flowerMeaning = prefs.getString('flowerMeaning');
+    final String? flowerImage = prefs.getString('flowerImage');
+    final String? lastFetchDate = prefs.getString('lastFetchDate');
+    print('進入每日隨機花語函式');
+    print('花名:$flowerName 花語:$flowerMeaning 圖像:$flowerImage');
+
+    // 如果今天的花名和花語已經存在，直接使用
+    if (flowerName != null &&
+        flowerMeaning != null &&
+        flowerImage != null &&
+        lastFetchDate == DateTime.now().toIso8601String().substring(0, 10)) {
+      _showDialog(context, flowerName, flowerMeaning, flowerImage);
+    } else {
+      // 否則從後端請求新的花名和花語
+      final response = await http.post(
+        Uri.parse(API.getFlower),
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final name = data['name'];
+        final meaning = data['meaning'];
+        final image = data['image'];
+
+        // 更新本地存儲
+        await prefs.setString('flowerName', name);
+        await prefs.setString('flowerMeaning', meaning);
+        await prefs.setString('flowerImage', image);
+        await prefs.setString(
+            'lastFetchDate', DateTime.now().toIso8601String().substring(0, 10));
+
+        // 顯示對話框
+        _showDialog(context, name, meaning, image);
+      } else {
+        // 處理錯誤
+        print('Failed to load flower data');
+      }
+    }
+  }
+
+  void _showDialog(BuildContext context, String name, String meaning, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -375,9 +421,9 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(24.0),
           ),
           child: Container(
-            width: 304.h,
-            height: 160.0.v,
-            padding: EdgeInsets.symmetric(horizontal: 23.h, vertical: 23.v),
+            // width: 304.h,
+            // height: 190.0.v,
+            padding: EdgeInsets.symmetric(horizontal: 23.h, vertical: 16.v),
             decoration: ShapeDecoration(
               color: Colors.white,
               shape: RoundedRectangleBorder(
@@ -385,12 +431,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min, // 確保 Column 的大小僅根據其內容來確定
+              // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    '臺灣金蓮花',
+                    name,
                     textAlign: TextAlign.center,
                     style: dialogTitleStyle,
                   ),
@@ -407,14 +454,20 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: 10.v),
+                SizedBox(height: 20.v),
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    '深谷裡堅毅的微笑。\n在低潮時不忘抬頭。',
+                    meaning,
                     textAlign: TextAlign.center,
                     style: dialogContentStyle,
                   ),
+                ),
+                // SizedBox(height: 10.v),
+                Image.network(
+                  'http://163.22.32.24/smiley_backend/img/angel/$image',
+                  height: 170.v,  // 調整圖片高度
+                  fit: BoxFit.cover,
                 ),
               ],
             ),
