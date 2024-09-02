@@ -7,6 +7,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:smiley/core/app_export.dart';
+import 'package:smiley/presentation/post_screen/browsePage.dart';
 import '../../widgets/bottom_navigation.dart';
 import 'FallingEmojiComment.dart';
 // http
@@ -14,11 +15,6 @@ import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
-
-// class CommentPage extends StatefulWidget {
-//   @override
-//   _CommentPageState createState() => _CommentPageState();
-// }
 
 class CommentPage extends StatefulWidget {
   @override
@@ -40,6 +36,9 @@ class _CommentPageState extends State<CommentPage> {
     fetchComments();
     fetchReplies();
   }
+
+  TextEditingController _replyController = TextEditingController();
+  FocusNode _focusNode = FocusNode();
 
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -227,6 +226,95 @@ class _CommentPageState extends State<CommentPage> {
   // ];
   // }
 
+  void _showReplyDialog(String text, String Url, int postId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent, // 确保底部弹窗背景是透明的
+      builder: (BuildContext context) {
+        return Padding(
+          padding: MediaQuery.of(context).viewInsets, // To handle the keyboard
+          child: Container(
+            color: Colors.transparent, // 确保背景是透明的
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    padding: const EdgeInsets.all(16.0),
+                    decoration: BoxDecoration(
+                      color: textColor,
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          // 回副的那則留言
+                          children: [
+                            CircleAvatar(
+                              backgroundImage: NetworkImage(
+                                  'http://163.22.32.24/smiley_backend/img/photo/${Url}'),
+                              radius: 24.0,
+                            ),
+                            SizedBox(width: 10.0),
+                            Text(
+                              text,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 10.v), // 上方間距
+                        Divider(
+                          color: const Color.fromARGB(255, 0, 0, 0), // 線條顏色
+                          thickness: 1, // 線條厚度
+                        ),
+                        SizedBox(height: 10.0),
+                        TextField(
+                          // 输入框
+                          controller: _replyController,
+                          focusNode: _focusNode,
+                          decoration: InputDecoration(
+                            hintText: '輸入回覆',
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                              borderSide: BorderSide.none,
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(Icons.send),
+                              onPressed: () {
+                                String content = _replyController.text;
+                                submitReply(postId, content);
+                                Navigator.pop(context);
+                                //  fetchComments(_currentPostId);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    ).whenComplete(() {
+      // 重置输入框内容
+      _replyController.clear();
+    });
+
+    Future.delayed(Duration(milliseconds: 100), () {
+      _focusNode.requestFocus();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // final int? postId = ModalRoute.of(context)?.settings.arguments as int?;
@@ -347,17 +435,84 @@ class _CommentPageState extends State<CommentPage> {
                             return Padding(
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 16),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Flexible(
-                                    child: ConstrainedBox(
+                              child: InkWell(
+                                onTap: () => _showReplyDialog(
+                                    comment.text ?? '',
+                                    comment.avatarUrl ?? '',
+                                    comment.postId),
+                                // child: Row(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Flexible(
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: 235, // 設置最大寬度為 235
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                            color: textColor, // 評論框背景
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 6.18),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                width: 29,
+                                                height: 29,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(
+                                                        'http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: Text(
+                                                  comment.text ?? '',
+                                                  style: TextStyle(
+                                                    color:
+                                                        backgroundColor, // 評論字
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          } else {
+                            final reply = replies[index - comments.length];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5, horizontal: 35),
+                              child: InkWell(
+                                onTap: () => _showReplyDialog(reply.text ?? '',
+                                    reply.avatarUrl ?? '', reply.postId),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(Icons.reply, size: 36, color:textColor.withOpacity(0.8)), 
+                                    ConstrainedBox(
                                       constraints: BoxConstraints(
                                         maxWidth: 235, // 設置最大寬度為 235
                                       ),
                                       child: Container(
                                         decoration: BoxDecoration(
-                                          color: textColor, // 評論框背景
+                                          color: textColor, // 回復框背景
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
@@ -373,17 +528,18 @@ class _CommentPageState extends State<CommentPage> {
                                                 shape: BoxShape.circle,
                                                 image: DecorationImage(
                                                   image: NetworkImage(
-                                                      'http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
+                                                      'http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
                                                   fit: BoxFit.cover,
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(width: 8),
+                                            const SizedBox(width: 10),
                                             Flexible(
                                               child: Text(
-                                                comment.text ?? '',
+                                                reply.text ?? '',
                                                 style: TextStyle(
-                                                  color: backgroundColor, // 評論字
+                                                  color:
+                                                      backgroundColor, // 回覆字顏色
                                                   fontSize: 15,
                                                   fontWeight: FontWeight.bold,
                                                 ),
@@ -393,61 +549,8 @@ class _CommentPageState extends State<CommentPage> {
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            final reply = replies[index - comments.length];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 16),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth: 235, // 設置最大寬度為 235
-                                    ),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: textColor, // 回復框背景
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10, vertical: 6.18),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            width: 29,
-                                            height: 29,
-                                            decoration: BoxDecoration(
-                                              shape: BoxShape.circle,
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                    'http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
-                                                fit: BoxFit.cover,
-                                              ),
-                                            ),
-                                          ),
-                                          const SizedBox(width: 10),
-                                          Flexible(
-                                            child: Text(
-                                              reply.text ?? '',
-                                              style: TextStyle(
-                                                color: backgroundColor, // 回覆字顏色
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             );
                           }
@@ -535,8 +638,8 @@ class Comment {
 }
 /*
 前端：
-- 改留言區樣式
-- 回覆留言的輸入框
+- 改留言區樣式 
+- 回覆留言的輸入框 - 完成
   - 輸入欄按傳送鍵之後，傳送當前的 'postId' 和 '輸入內容' 至 submitReply() (第54行)
 */
 /*
