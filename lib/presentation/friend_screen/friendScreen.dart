@@ -142,30 +142,60 @@ class _FriendscreenState extends State<Friendscreen> {
         elevation: 0, // 設置應用欄的陰影為0
         backgroundColor: Colors.transparent, // 設置背景透明
         leading: IconButton(
-            icon: SvgPicture.asset(
-              'assets/images/img_arrow_left.svg',
-              color: Color(0xFFA7BA89),
-            ),
-            onPressed: () async {
-              FocusScope.of(context).requestFocus(FocusNode());
+          icon: SvgPicture.asset(
+            'assets/images/img_arrow_left.svg',
+            color: Color(0xFFA7BA89),
+          ),
+          onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
             await Future.delayed(Duration(milliseconds: 300));
             Navigator.pop(context); // 點擊返回按鈕返回上一頁
-            },
-          ),
+          },
+        ),
         title: Image.asset(
           'assets/images/friend_y.png',
           height: 30.v, // 您可以根據需要調整圖片的高度
         ),
         centerTitle: true, // 將圖片設置為居中
         actions: [
-          IconButton(
-            icon: Image.asset(
-              'assets/images/addFriend.png', // addFriend圖標圖片
-              height: 30.v, // 您可以根據需要調整圖片的高度
+          Padding(
+            padding: const EdgeInsets.only(right: 20.0), // 向左移動
+            child: Stack(
+              children: [
+                IconButton(
+                  icon: Image.asset(
+                    'assets/images/addFriend.png', // addFriend圖標圖片
+                    height: 30.v, 
+                  ),
+                  onPressed: () {
+                    Navigator.pushNamed(context, AppRoutes.addFriend);
+                  },
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: Container( 
+                    width: 14,
+                    height: 14, 
+                    decoration: BoxDecoration(
+                      color: Color(0xFFA7BA89),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '3', // 後端回傳未處理的好友邀請數量
+                        style: TextStyle(
+                          color: Color(0xFFF4F4E6), 
+                          fontSize: 10, 
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            onPressed: () {
-              Navigator.pushNamed(context, AppRoutes.addFriend);
-            },
           ),
         ],
       ),
@@ -316,6 +346,6 @@ class _FriendscreenState extends State<Friendscreen> {
 }
 
 /*
-前端:
-- 加好友 icon 要顯示有幾個未被處理的好友邀請
+後端:
+- 加好友 icon 要顯示有幾個未被處理的好友邀請 186
  */
