@@ -37,5 +37,6 @@ class API
   static const submitReply = "$hostConnect/comment/submitReply.php";
   static const getReply = "$hostConnect/comment/getReply.php";
   static const getFlower = "$hostConnect/flower/getFlower.php";
+  static const getInvitedSum = "$hostConnect/user/getInvitedSum.php";
 
 }

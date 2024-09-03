@@ -288,8 +288,8 @@ class _AddFriendState extends State<AddFriend> {
             ),
             onPressed: () async {
               FocusScope.of(context).requestFocus(FocusNode());
-            await Future.delayed(Duration(milliseconds: 300));
-            Navigator.pop(context); // 點擊返回按鈕返回上一頁
+              await Future.delayed(Duration(milliseconds: 300));
+              Navigator.pop(context); // 點擊返回按鈕返回上一頁
             },
           ),
         title: Image.asset(

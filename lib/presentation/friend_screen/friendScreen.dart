@@ -18,11 +18,13 @@ class _FriendscreenState extends State<Friendscreen> {
   List<Map<String, String>> filteredFriends = [];
   List invitedListMember = [];
   String searchText = '';
+  int invitedSum = 0;
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    fetchInvitedSum();
   }
 
   Future<String?> getUserId() async {
@@ -87,6 +89,35 @@ class _FriendscreenState extends State<Friendscreen> {
         setState(() {
           friends = [];
         });
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
+
+  void fetchInvitedSum() async {
+    final String? userId = await getUserId();
+    print("進入好友邀請數量函式: $userId");
+
+    final response = await http.post(
+      Uri.parse(API.getInvitedSum), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        setState(() {
+          invitedSum = result['count'];
+        });
+        print("計算成功 $invitedSum");
+      } else {
+        setState(() {
+          invitedSum = 0;
+        });
+        print('User not found.');
       }
     } else {
       throw Exception('Failed to load user');
@@ -172,7 +203,7 @@ class _FriendscreenState extends State<Friendscreen> {
                     Navigator.pushNamed(context, AppRoutes.addFriend);
                   },
                 ),
-                if (invitedListMember.isNotEmpty)
+                if (invitedSum != 0)
                   Positioned(
                     right: 0,
                     top: 0,
@@ -185,7 +216,7 @@ class _FriendscreenState extends State<Friendscreen> {
                       ),
                       child: Center(
                         child: Text(
-                          '${invitedListMember.length}',
+                          '${invitedSum}',//
                           style: TextStyle(
                             color: Color(0xFFF4F4E6),
                             fontSize: 10,
@@ -349,6 +380,6 @@ class _FriendscreenState extends State<Friendscreen> {
 }
 
 /*
-後端:
-- 待處理好友邀請數量錯誤
+前端:
+- 當我從 addFriend.dart 同意好友然後按返回鍵回到 friendScreen.dart，icon 數字沒有及時修改
  */
