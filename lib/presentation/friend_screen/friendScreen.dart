@@ -25,7 +25,8 @@ class _FriendscreenState extends State<Friendscreen> {
     fetchData();
   }
 
-  Future<String?> getUserId() async { // 使用者的 id
+  Future<String?> getUserId() async {
+    // 使用者的 id
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_id');
   }
@@ -37,13 +38,13 @@ class _FriendscreenState extends State<Friendscreen> {
     final response = await http.post(
       Uri.parse(API.getFriends),
       body: {
-        'user_id':userId,
+        'user_id': userId,
       },
     );
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      final exp=result['users'];
+      final exp = result['users'];
       print('result是: $exp');
 
       // 確保 `result` 是 Map 類型，並檢查 `success` 是否為 true
@@ -63,10 +64,11 @@ class _FriendscreenState extends State<Friendscreen> {
               });
 
               // 将 user_id 添加到 invitedListMember 中
-              tempInvitedListMember.add(item['id'] as String); // assuming 'id' is returned
+              tempInvitedListMember
+                  .add(item['id'] as String); // assuming 'id' is returned
             }
           }
-          
+
           setState(() {
             friends = tempFriendRequests;
             invitedListMember = tempInvitedListMember;
@@ -91,7 +93,7 @@ class _FriendscreenState extends State<Friendscreen> {
     }
   }
 
-  void delFriend(int friendId ,int index) async{ 
+  void delFriend(int friendId, int index) async {
     final String? userId = await getUserId();
     print("進入刪除好友函式: $userId 要刪除 $friendId");
 
@@ -110,7 +112,6 @@ class _FriendscreenState extends State<Friendscreen> {
           friends.removeAt(index);
         });
         print("拒絕邀請成功");
-
       } else {
         print('User not found.');
       }
@@ -165,35 +166,36 @@ class _FriendscreenState extends State<Friendscreen> {
                 IconButton(
                   icon: Image.asset(
                     'assets/images/addFriend.png', // addFriend圖標圖片
-                    height: 30.v, 
+                    height: 30.v,
                   ),
                   onPressed: () {
                     Navigator.pushNamed(context, AppRoutes.addFriend);
                   },
                 ),
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: Container( 
-                    width: 14,
-                    height: 14, 
-                    decoration: BoxDecoration(
-                      color: Color(0xFFA7BA89),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '3', // 後端回傳未處理的好友邀請數量
-                        style: TextStyle(
-                          color: Color(0xFFF4F4E6), 
-                          fontSize: 10, 
-                          fontWeight: FontWeight.w600,
+                if (invitedListMember.isNotEmpty)
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: Color(0xFFA7BA89),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${invitedListMember.length}',
+                          style: TextStyle(
+                            color: Color(0xFFF4F4E6),
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -320,12 +322,13 @@ class _FriendscreenState extends State<Friendscreen> {
                               SizedBox(width: 5.h),
                               IconButton(
                                 padding: EdgeInsets.only(left: 12.h),
-                                icon: Image.asset(
-                                    'assets/images/delFriend.png'),
+                                icon:
+                                    Image.asset('assets/images/delFriend.png'),
                                 onPressed: () {
                                   setState(() {
                                     filterFriends(searchText);
-                                    int whoInviteMe = int.parse(friends[index]['id']!);
+                                    int whoInviteMe =
+                                        int.parse(friends[index]['id']!);
                                     print('whoInviteMe: $whoInviteMe');
                                     delFriend(whoInviteMe, index);
                                     // 現在的刪除只是頁面上的 要再加上後端的刪除
@@ -347,5 +350,5 @@ class _FriendscreenState extends State<Friendscreen> {
 
 /*
 後端:
-- 加好友 icon 要顯示有幾個未被處理的好友邀請 186
+- 待處理好友邀請數量錯誤
  */
