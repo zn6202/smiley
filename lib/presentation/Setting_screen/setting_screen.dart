@@ -1,4 +1,3 @@
-// 構建選項網格小部件。
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sqflite/sqflite.dart';
@@ -13,23 +12,20 @@ import 'dart:convert';
 //  
 import '../setNamePhoto_screen/setNamePhoto_screen.dart';
 
-// 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);
 const Color backgroundColor = Color(0xFFF4F4E6);
 
-// 日記主畫面的 StatefulWidget。
 class settingScreen extends StatefulWidget {
   @override
   _SettingScreenState createState() => _SettingScreenState();
 }
 
-// SettingScreen 的狀態管理類別，管理小部件的狀態。
 class _SettingScreenState extends State<settingScreen> {
   int _currentIndex = 4;
   String userName = '';
   String userProfilePic = '';
   String userId = '';
-  String albumPhoto= '';
+  String albumPhoto = '';
 
   @override
   void initState() {
@@ -56,37 +52,16 @@ class _SettingScreenState extends State<settingScreen> {
     return Name.getString('user_name');
   }
 
-  // Future<void> loadUserAlbumPhoto() async {
-  //   albumPhoto = await getUserAlbumPhoto() ?? '';
-  //   print('預設姓名為: $albumPhoto');
-  //   if (mounted) {
-  //     setState(() {});
-  //   }
-  // }
-
-  // Future<String?> getUserAlbumPhoto() async {
-  //   final photo = await SharedPreferences.getInstance();
-  //   return photo.getString('user_album_photo');
-  // }
-
-  /* 後端這裡要修改!!!!!!!!!!
-  這裡是模擬從後端獲取用戶數據的函數 要改成可以從後台抓name 跟照片回來
-  */
   Future<void> _fetchUserData() async {
-    // 模擬從資料庫獲取數據
     final String? id = await getUserId();
     if (id == null) {
-      // 處理 user_id 為空的情況
       print('Error: user_id is null');
       return;
     }
 
-    // await loadUserAlbumPhoto();
-    // print('albumPhoto為: $albumPhoto');
-
     print("進入設定出現個資函式");
     final response = await http.post(
-      Uri.parse(API.getProfile), // 解析字串變成 URI 對象
+      Uri.parse(API.getProfile),
       body: {
         'id': id,
       },
@@ -102,7 +77,6 @@ class _SettingScreenState extends State<settingScreen> {
         print('用戶id: $userId 用戶名稱: $userName, 用戶照片路徑: $userProfilePic');
         sendAvatarPath();
         sendName();
-        // 在這裡處理獲取到的用戶名稱和照片資訊
       } else {
         print('設定功能的個資取得失敗: ${responseData['message']}');
       }
@@ -123,20 +97,17 @@ class _SettingScreenState extends State<settingScreen> {
   }
 
   @override
-  // 構建主要小部件結構。
   Widget build(BuildContext context) {
     return Scaffold(
-      // Scaffold 提供一個架構以布局主要組件。
       body: Container(
-        color: backgroundColor, // 修改背景顏色。
+        color: backgroundColor,
         child: SafeArea(
-          // SafeArea 確保內容顯示在顯示器安全區域邊界內。
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               _buildProfileSection(),
               Expanded(
-                child: _buildOptionsGrid(), // 構建並顯示選項網格的小部件。
+                child: _buildOptionsGrid(),
               ),
               CustomBottomNavigationBar(
                 currentIndex: _currentIndex,
@@ -153,10 +124,9 @@ class _SettingScreenState extends State<settingScreen> {
     );
   }
 
-  // 構建個人資料部分小部件。
   Widget _buildProfileSection() {
     return Container(
-      color: backgroundColor, // 修改背景顏色。
+      color: backgroundColor,
       padding: EdgeInsets.only(
         top: 132.v,
         bottom: 40.v,
@@ -167,92 +137,92 @@ class _SettingScreenState extends State<settingScreen> {
             width: 80.h,
             height: 80.v,
             decoration: BoxDecoration(
-              color: Colors.white, // 背景顏色
-              shape: BoxShape.circle, // 圓形
+              color: Colors.white,
+              shape: BoxShape.circle,
             ),
             child: CircleAvatar(
               radius: 35,
-              backgroundColor: Color(0xFFF4F4E6), // 設置背景為白色
+              backgroundColor: Color(0xFFF4F4E6),
               backgroundImage: userProfilePic.isNotEmpty
-                  ? NetworkImage(userProfilePic) // 這裡事先預設從伺服器(網路)抓
+                  ? NetworkImage(userProfilePic)
                   : AssetImage('assets/images/default_avatar.png')
                       as ImageProvider<Object>?,
             ),
           ),
-          SizedBox(height: 16.v), // 減小這裡的高度
+          SizedBox(height: 16.v),
           Container(
             width: 104.h,
             height: 28.v,
             decoration: BoxDecoration(
-              color: Colors.white, // 背景顏色
-              borderRadius: BorderRadius.circular(20.0), // 圓角
-              border: Border.all(color: Color(0xFFFFFFFF), width: 1.h), // 邊框
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20.0),
+              border: Border.all(color: Color(0xFFFFFFFF), width: 1.h),
             ),
-            padding: EdgeInsets.all(2.adaptSize), // 內邊距
+            padding: EdgeInsets.all(2.adaptSize),
             child: Container(
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
-                color: primaryColor, // 背景顏色
-                borderRadius: BorderRadius.circular(20.0), // 圓角
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(20.0),
               ),
               child: Center(
                 child: Text(
                   'name',
                   style: TextStyle(
-                    fontSize: 14.fSize, // 字體大小
-                    color: Colors.white, // 字體顏色
+                    fontSize: 14.fSize,
+                    color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ),
           ),
-          SizedBox(height: 8.v), // 增加一個固定高度的空間
+          SizedBox(height: 8.v),
           Text(
-            userName, // 用戶名
+            userName,
             style: TextStyle(
-              fontSize: 18.fSize, // 字體大小
+              fontSize: 18.fSize,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF545453), // 字體顏色
+              color: Color(0xFF545453),
             ),
           ),
-          SizedBox(height: 16.v), // 減小這裡的高度
+          SizedBox(height: 16.v),
           Container(
             width: 104.h,
             height: 28.v,
             decoration: BoxDecoration(
-              color: Colors.white, // 背景顏色
-              borderRadius: BorderRadius.circular(20.0), // 圓角
-              border: Border.all(color: Color(0xFFFFFFFF), width: 1.h), // 邊框
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20.0),
+              border: Border.all(color: Color(0xFFFFFFFF), width: 1.h),
             ),
-            padding: EdgeInsets.all(2.adaptSize), // 內邊距
+            padding: EdgeInsets.all(2.adaptSize),
             child: Container(
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
-                color: primaryColor, // 背景顏色
-                borderRadius: BorderRadius.circular(20.0), // 圓角
+                color: primaryColor,
+                borderRadius: BorderRadius.circular(20.0),
               ),
               child: Center(
                 child: Text(
                   'id',
                   style: TextStyle(
-                    fontSize: 14.fSize, // 字體大小
-                    color: Colors.white, // 字體顏色
+                    fontSize: 14.fSize,
+                    color: Colors.white,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
             ),
           ),
-          SizedBox(height: 8.v), // 增加一個固定高度的空間
+          SizedBox(height: 8.v),
           Text(
-            userId, // 用戶 ID
+            userId,
             style: TextStyle(
-              fontSize: 18.fSize, // 字體大小
+              fontSize: 18.fSize,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF545453), // 字體顏色
+              color: Color(0xFF545453),
             ),
           ),
         ],
@@ -260,62 +230,59 @@ class _SettingScreenState extends State<settingScreen> {
     );
   }
 
-  // 構建選項網格小部件。
   Widget _buildOptionsGrid() {
     return Padding(
       padding: EdgeInsets.only(
         left: 60.v,
         right: 60.v,
-      ), // 外邊距
+      ),
       child: GridView.builder(
-        itemCount: 4, // 總共4個網格項目
+        itemCount: 3, // 修改為3個網格項目
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2, // 每行顯示兩個網格
-          crossAxisSpacing: 20.h, // 水平間距
-          mainAxisSpacing: 20.v, // 垂直間距
-          childAspectRatio: 117 / 92, // 寬高比
+          crossAxisCount: 2,
+          crossAxisSpacing: 20.h,
+          mainAxisSpacing: 20.v,
+          childAspectRatio: 117 / 92,
         ),
         itemBuilder: (context, index) {
           List<String> images = [
             'assets/images/Record.png',
             'assets/images/friend.png',
             'assets/images/edit.png',
-            'assets/images/notify.png'
           ];
-          List<String> labels = ['貼文記錄', '好友', '編輯', '通知中心'];
+          List<String> labels = ['貼文記錄', '好友', '編輯'];
           return _buildGridOption(images[index], labels[index], () {
-            _handleGridOptionTap(index); // 傳遞索引到處理函數
+            _handleGridOptionTap(index);
           });
         },
       ),
     );
   }
 
-  // 構建網格選項小部件。
   Widget _buildGridOption(String imagePath, String label, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 117.h, // 設置寬度為 117
-        height: 92.v, // 設置高度為 92
+        width: 117.h,
+        height: 92.v,
         decoration: BoxDecoration(
-          color: Colors.white, // 背景顏色
-          borderRadius: BorderRadius.circular(15.0), // 圓角
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15.0),
         ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center, // 內容垂直居中
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
-              imagePath, // 圖標圖片路徑
-              width: 40.h, // 圖片寬度
-              height: 40.v, // 圖片高度
+              imagePath,
+              width: 40.h,
+              height: 40.v,
             ),
-            SizedBox(height: 8.v), // 增加一個固定高度的空間
+            SizedBox(height: 8.v),
             Text(
-              label, // 標籤文字
+              label,
               style: TextStyle(
-                fontSize: 16.fSize, // 字體大小
-                color: Color(0xFFA7BA89), // 字體顏色
+                fontSize: 16.fSize,
+                color: Color(0xFFA7BA89),
                 fontWeight: FontWeight.w700,
               ),
             ),
@@ -325,9 +292,7 @@ class _SettingScreenState extends State<settingScreen> {
     );
   }
 
-  // 處理網格選項點擊事件
-  void _handleGridOptionTap(int index) async{
-    // 根據索引執行不同的操作
+  void _handleGridOptionTap(int index) async {
     switch (index) {
       case 0:
         Navigator.pushNamed(context, AppRoutes.postRecord);
@@ -336,7 +301,6 @@ class _SettingScreenState extends State<settingScreen> {
         Navigator.pushNamed(context, AppRoutes.friendScreen);
         break;
       case 2:
-        // 編輯的操作
         await sendAvatarPath();
         Navigator.push(
           context,
@@ -344,16 +308,7 @@ class _SettingScreenState extends State<settingScreen> {
             builder: (context) => SetNamePhoto(sourcePage: 'setting'),
           ),
         );
-        
-        break;
-      case 3:
-        Navigator.pushNamed(context, AppRoutes.notificationScreen);
         break;
     }
   }
 }
-
-/*
-前端:
-- 通知中心按鈕刪掉
- */
