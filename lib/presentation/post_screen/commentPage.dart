@@ -50,13 +50,14 @@ class _CommentPageState extends State<CommentPage> {
     return prefs.getString('postId');
   }
 
-  void submitReply(int postId, String content) async {
+  void submitReply(int postId, String content, int pos) async {
     final String? userId = await getUserId();
 
     print("進入提交評論函式");
     print('user_id: $userId');
     print('post_id: $postId');
     print("提交回覆: $content");
+    print("回覆的對象評論 id 為: $pos");
 
     final response = await http.post(
       Uri.parse(API.submitReply),
@@ -64,6 +65,7 @@ class _CommentPageState extends State<CommentPage> {
         'user_id': userId.toString(),
         'post_id': postId.toString(),
         'content': content,
+        'pos': pos.toString(),
       },
     );
     if (response.statusCode == 200) {
@@ -226,7 +228,7 @@ class _CommentPageState extends State<CommentPage> {
   // ];
   // }
 
-  void _showReplyDialog(String text, String Url, int postId) {
+  void _showReplyDialog(String text, String Url, int postId, int pos) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -289,7 +291,7 @@ class _CommentPageState extends State<CommentPage> {
                               icon: Icon(Icons.send),
                               onPressed: () {
                                 String content = _replyController.text;
-                                submitReply(postId, content);
+                                submitReply(postId, content, pos);
                                 Navigator.pop(context);
                                 //  fetchComments(_currentPostId);
                               },
@@ -439,7 +441,8 @@ class _CommentPageState extends State<CommentPage> {
                                 onTap: () => _showReplyDialog(
                                     comment.text ?? '',
                                     comment.avatarUrl ?? '',
-                                    comment.postId),
+                                    comment.postId,
+                                    comment.pos),
                                 // child: Row(
                                 child: Row(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -500,7 +503,7 @@ class _CommentPageState extends State<CommentPage> {
                                   vertical: 5, horizontal: 35),
                               child: InkWell(
                                 onTap: () => _showReplyDialog(reply.text ?? '',
-                                    reply.avatarUrl ?? '', reply.postId),
+                                    reply.avatarUrl ?? '', reply.postId, reply.pos),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -576,6 +579,7 @@ class Reply {
   final int postUserId;
   final int? emojiId;
   final String? text;
+  final int pos;
   final String? avatarUrl;
 
   Reply({
@@ -585,6 +589,7 @@ class Reply {
     required this.postUserId,
     this.emojiId,
     this.text,
+    required this.pos,
     this.avatarUrl,
   });
   factory Reply.fromJson(Map<String, dynamic> json) {
@@ -597,6 +602,7 @@ class Reply {
           : 0, // 默認值為 0
       emojiId: json['emoji_id'] as int,
       text: json['content'] as String,
+      pos: json['pos'] != null ? json['pos'] as int : 0, // 默認值為 0
       avatarUrl: json['avatar_url'] as String,
     );
   }
@@ -610,6 +616,7 @@ class Comment {
   final int postUserId;
   final int? emojiId;
   final String? text;
+  final int pos;
   final String? avatarUrl;
 
   Comment({
@@ -619,6 +626,7 @@ class Comment {
     required this.postUserId,
     this.emojiId,
     this.text,
+    required this.pos,
     this.avatarUrl,
   });
 
@@ -632,6 +640,7 @@ class Comment {
           : 0, // 默認值為 0
       emojiId: json['emoji_id'] as int,
       text: json['content'] as String,
+      pos: json['pos'] != null ? json['pos'] as int : 0, // 默認值為 0
       avatarUrl: json['avatar_url'] as String,
     );
   }
@@ -648,3 +657,5 @@ class Comment {
   - 輸入要跟後端結合
   - 確認新版留言區的後端是正確
 */
+
+// 確認 _showReplyDialog 231 445 506 的 pos 有無正確傳遞，有的話就沒問題~
