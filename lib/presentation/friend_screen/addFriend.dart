@@ -289,7 +289,7 @@ class _AddFriendState extends State<AddFriend> {
             onPressed: () async {
               FocusScope.of(context).requestFocus(FocusNode());
               await Future.delayed(Duration(milliseconds: 300));
-              Navigator.pop(context); // 點擊返回按鈕返回上一頁
+              Navigator.pop(context); // pop 回上一頁的時候，ui 的 icon 數字要變
             },
           ),
         title: Image.asset(
@@ -653,12 +653,6 @@ class _AddFriendState extends State<AddFriend> {
 /*
 前端修改:
 - 114，如果對方已加我好友，當我搜尋對方時，icon 要是 "勾勾" 或 "叉叉"
-*/
+- new! 292 pop 回上一頁的時候，ui 的 icon 數字要變
 
-/*
-後端修改:
-- acceptFriend 74行 需傳到後端資料庫 同意好友
-- sendFriendRequest 86行 需傳到後端資料庫 發送好友請求
-- 140 305 407行都分別要顯示後端傳來的用戶頭貼 不確定這樣的格式是否可以 需確認
-- 148需顯示自己的頭貼
 */

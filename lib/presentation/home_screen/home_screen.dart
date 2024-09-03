@@ -5,11 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 // http
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
-import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// 此route是否已初始化過一次
-bool _hasInitialized = false;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -34,23 +31,10 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 2;
   bool hasDiaryToday = false;
 
-  // 聊天機器人資料
-  Map<String, String>? welcomeMessage; // 歡迎訊息
   @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    // 判斷是否初始化過一次了
-    if (!_hasInitialized) {
-      _hasInitialized = true;
-      final messageProvider =
-          Provider.of<MessageProvider>(context, listen: false);
-      checkDiary();
-      messageProvider.fetchWelcomeMessage();
-    }
-  }
-
-  void dispose() {
-    super.dispose();
+  void initState() {
+    super.initState();
+    checkDiary();
   }
 
   //  抓取當前 user_id
@@ -412,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _showDialog(BuildContext context, String name, String meaning, String image) {
+  void _showDialog(
+      BuildContext context, String name, String meaning, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -466,7 +451,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 // SizedBox(height: 10.v),
                 Image.network(
                   'http://163.22.32.24/smiley_backend/img/angel/$image',
-                  height: 170.v,  // 調整圖片高度
+                  height: 170.v, // 調整圖片高度
                   fit: BoxFit.cover,
                 ),
               ],

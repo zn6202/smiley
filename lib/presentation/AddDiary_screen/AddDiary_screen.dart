@@ -9,8 +9,6 @@ import '../../widgets/app_bar/appbar_leading_image.dart';
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'dart:convert';
 
 // 主題色彩常數，用於應用程式中的主色調。
 const Color primaryColor = Color(0xFFA7BA89);

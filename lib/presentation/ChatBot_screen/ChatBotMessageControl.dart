@@ -1,5 +1,7 @@
 import '../../core/app_export.dart';
 import 'package:http/http.dart' as http;
+import '../../routes/api_connection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // 管理聊天機器人
 
@@ -11,6 +13,10 @@ class MessageProvider with ChangeNotifier {
   List<Map<String, String>> get messages => this._messages;
   int get newMessages => this._newMessages;
   bool isSending = true;
+
+  // 使用者資料
+  String userID = "";
+  String userName = 'User';
 
   set newMessages(int newMessages){
     this._newMessages = newMessages;
@@ -24,10 +30,51 @@ class MessageProvider with ChangeNotifier {
     _newMessages = value;
     notifyListeners();
   }
+
+  Future<String?> getUserId() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_id');
+  }
+
+  // 取得userName、接收歡迎訊息
+  Future<void> fetchUserData() async {
+    // 模擬從資料庫獲取數據
+    final String? id = await getUserId();
+    if (id == null) {
+      // 處理 user_id 為空的情況
+      print('Error: user_id is null');
+      return;
+    }
+    final response = await http.post(
+      Uri.parse(API.getProfile), // 解析字串變成 URI 對象
+      body: {
+        'id': id,
+      },
+    );
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = json.decode(response.body);
+      if (responseData['success']) {
+          userID = id;
+          userName = responseData['name'];
+          return;
+      } else {
+        print('使用者名稱取得失敗: ${responseData['message']}');
+        return;
+      }
+    } else {
+      print('使用者名稱取得失敗...');
+      return;
+    }
+  }
+
+  // 助手機器人歡迎訊息$
   Future<Map<String, String>> fetchWelcomeMessage() async {
+    await fetchUserData(); // 取得使用者名稱
+    print("userName:$userName");
     final response = await http.post(
       Uri.parse('http://10.0.2.2:5001/welcome'),
       headers: <String, String>{'Content-Type': 'application/json; charset=utf-8',},
+      body: jsonEncode({'user_id': userID, 'user_name': userName})
       );
     if (response.statusCode == 200) {
       // response.body = "response": "\u6211\u6703\u4e00\u76f4\u966a\u4f34\u5728\u4f60\u8eab\u908a\uff0c\u7121\u8ad6\u4f60\u9047\u5230\u4ec0\u9ebc\u56f0\u96e3\u6216\u7169\u60f1\u3002"
@@ -48,13 +95,15 @@ class MessageProvider with ChangeNotifier {
       return responseMessage;
     }
   }
-  // 一個非同步函數，接受一個字串參數messageContent，用於傳送訊息到Python伺服器並等待回應
+  
+  // 接受一個字串參數messageContent，用於傳送訊息到Python伺服器並等待回應
   Future<Map<String, String>> sendDataToPython(String messageContent) async {           // 傳送訊息至Python，等待接收回覆
+    await fetchUserData(); // 取得使用者名稱
     final message = messageContent;                                                     //     欲傳送之訊息：{'role': 'user', 'content': 使用者輸入之訊息}
     final response = await http.post(                                                   //     發送HTTP POST請求至後端並等待回應，傳送訊息，並等待回覆
       Uri.parse('http://10.0.2.2:5001/send_message_to_python'),                         //       設定請求的URL，指向本地開發環境的Python伺服器
       headers: <String, String>{'Content-Type': 'application/json; charset=utf-8',},    //        設定HTTP請求的標頭，指定內容類型為JSON，編碼為UTF-8
-      body: jsonEncode({'messages': message})                                           //       傳送之訊息（將訊息內容包裝為JSON格式並作為請求的body）
+      body: jsonEncode({'user_id': userID,'user_name': userName,'messages': message})   //        傳送之訊息（將訊息內容包裝為JSON格式並作為請求的body）
     );
     if (response.statusCode == 200) {                                                   //     成功收到回覆（如果HTTP回應狀態碼為200，表示請求成功）
       final jsonresponseDecoded = jsonDecode(response.body);                            //     將回應的body從JSON格式解碼為Dart物件

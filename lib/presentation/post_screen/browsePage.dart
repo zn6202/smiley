@@ -25,6 +25,7 @@ class _BrowsePageState extends State<BrowsePage> {
   int? _selectedCommentIcon;
   String? _commentText = '';
   int _currentPostId = -1;
+  int commentSum = 0;
 
   TextEditingController commentsController = TextEditingController(); // 新增的
 
@@ -44,6 +45,7 @@ class _BrowsePageState extends State<BrowsePage> {
       if (posts.isNotEmpty) {
         _currentPostId = posts.first.id;
         fetchComments(_currentPostId);
+        fetchCommentSum(_currentPostId); //
       }
     });
 
@@ -56,6 +58,34 @@ class _BrowsePageState extends State<BrowsePage> {
         );
       }
     });
+  }
+
+  void fetchCommentSum(int postId) async {
+    print("進入評論數量函式 postId: $postId");
+
+    final response = await http.post(
+      Uri.parse(API.getCommentSum), // 解析字串變成 URI 對象
+      body: {
+        'post_id': postId.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        setState(() {
+          commentSum = result['count'];
+        });
+        print("計算成功 $commentSum");
+      } else {
+        setState(() {
+          commentSum = 0;
+        });
+        print('User not found.');
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
 
   @override
@@ -81,6 +111,7 @@ class _BrowsePageState extends State<BrowsePage> {
               if (posts.isNotEmpty) {
                 _currentPostId = posts.first.id;
                 fetchComments(_currentPostId);
+                fetchCommentSum(_currentPostId);
               }
             });
           } else {
@@ -88,6 +119,7 @@ class _BrowsePageState extends State<BrowsePage> {
               if (posts.isNotEmpty) {
                 _currentPostId = posts.first.id;
                 fetchComments(_currentPostId);
+                fetchCommentSum(_currentPostId);
               }
             });
           }
@@ -109,6 +141,7 @@ class _BrowsePageState extends State<BrowsePage> {
                 if (posts.isNotEmpty) {
                   _currentPostId = posts.first.id;
                   fetchComments(_currentPostId);
+                  fetchCommentSum(_currentPostId);
                 }
               });
             } else {
@@ -116,6 +149,7 @@ class _BrowsePageState extends State<BrowsePage> {
                 if (posts.isNotEmpty) {
                   _currentPostId = posts.first.id;
                   fetchComments(_currentPostId);
+                  fetchCommentSum(_currentPostId);
                 }
               });
             }
@@ -147,6 +181,7 @@ class _BrowsePageState extends State<BrowsePage> {
             if (postId != _currentPostId) {
               _currentPostId = postId;
               fetchComments(postId);
+              fetchCommentSum(postId);
             }
           },
           itemBuilder: (context, index) {
@@ -173,7 +208,8 @@ class _BrowsePageState extends State<BrowsePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+                        padding:
+                            const EdgeInsets.only(top: 50, left: 16, right: 16),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -185,15 +221,17 @@ class _BrowsePageState extends State<BrowsePage> {
                                 color: textColor,
                               ),
                             ),
-                            Stack( // 右上icon
+                            Stack(
+                              // 右上icon
                               children: [
-                                IconButton( // icon本人
+                                IconButton(
+                                  // icon本人
                                   icon: Image.asset(
                                     'assets/images/comments.png',
                                     width: 30, // 調整圖標的大小
                                     height: 30,
                                     color: textColor,
-                                  ), 
+                                  ),
                                   onPressed: () {
                                     savePostId(_currentPostId);
                                     Navigator.pushNamed(
@@ -202,35 +240,38 @@ class _BrowsePageState extends State<BrowsePage> {
                                     );
                                   },
                                 ),
-                                Positioned(
-                                  right: 0,
-                                  top: 0,
-                                  child: Container( // 留言數輛
-                                    width: 14, // 調整圓形容器的大小
-                                    height: 14, 
-                                    decoration: BoxDecoration(
-                                      color: textColor,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        '3', // 後端回傳的留言數量
-                                        style: TextStyle(
-                                          color: Colors.black, 
-                                          fontSize: 10, // 調整字體大小
-                                          fontWeight: FontWeight.w600,
+                                if (commentSum != 0)
+                                  Positioned(
+                                    right: 0,
+                                    top: 0,
+                                    child: Container(
+                                      // 留言數輛
+                                      width: 14, // 調整圓形容器的大小
+                                      height: 14,
+                                      decoration: BoxDecoration(
+                                        color: textColor,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          '${commentSum}', // 後端回傳的留言數量
+                                          style: TextStyle(
+                                            color: Colors.black,
+                                            fontSize: 10, // 調整字體大小
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          textAlign: TextAlign.center,
                                         ),
-                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
                           ],
                         ),
                       ),
-                      Padding(// 日記標題
+                      Padding(
+                        // 日記標題
                         padding: const EdgeInsets.only(left: 16, right: 16),
                         child: Text(
                           post.title,
@@ -244,7 +285,7 @@ class _BrowsePageState extends State<BrowsePage> {
                       if (!isMyPost)
                         Padding(
                           padding: const EdgeInsets.only(top: 10, left: 16),
-                          child: Container(                          
+                          child: Container(
                             width: 146,
                             height: 42,
                             decoration: BoxDecoration(
@@ -433,11 +474,12 @@ class _BrowsePageState extends State<BrowsePage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.send, color: textColor),
-                    padding: EdgeInsets.zero, 
+                    padding: EdgeInsets.zero,
                     constraints: BoxConstraints(), // 去除默认的大小限制
                     onPressed: () {
                       submitComment(_currentPostId, _selectedCommentIcon);
                       fetchComments(_currentPostId);
+                      fetchCommentSum(_currentPostId);
                     },
                   ),
                 ],

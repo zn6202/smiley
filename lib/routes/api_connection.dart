@@ -36,6 +36,7 @@ class API
   static const getFallingEmoji = "$hostConnect/comment/getFallingEmoji.php";
   static const submitReply = "$hostConnect/comment/submitReply.php";
   static const getReply = "$hostConnect/comment/getReply.php";
+  static const getCommentSum = "$hostConnect/comment/getCommentSum.php";
   static const getFlower = "$hostConnect/flower/getFlower.php";
   static const getInvitedSum = "$hostConnect/user/getInvitedSum.php";
 

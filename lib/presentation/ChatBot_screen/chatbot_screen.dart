@@ -79,40 +79,40 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
             children: [
               // 標題框
               SizedBox(height: 32),
-              // 暫時日記按鈕
-              Consumer<MessageProvider>(                                  // 當接收到機器人回覆時刷新介面，拉到最底部
-                builder: (context, messageProvider, child) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 100,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: Color.fromARGB(255, 255, 255, 255),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "小助手",
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Color(0xFF545453),
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      OutlinedButton(
-                        child: Text("取得日記"),
-                        onPressed: () {
-                          _sendDiary(messageProvider);
-                        },
-                      ),
-                    ],
-                  );
-                },
-              ),
+              // // 暫時日記按鈕
+              // Consumer<MessageProvider>(                                  // 當接收到機器人回覆時刷新介面，拉到最底部
+              //   builder: (context, messageProvider, child) {
+              //     return Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Container(
+              //           width: 100,
+              //           height: 40,
+              //           decoration: BoxDecoration(
+              //             color: Color.fromARGB(255, 255, 255, 255),
+              //             borderRadius: BorderRadius.circular(20),
+              //           ),
+              //           alignment: Alignment.center,
+              //           child: Text(
+              //             "小助手",
+              //             style: TextStyle(
+              //               fontSize: 18,
+              //               fontWeight: FontWeight.w700,
+              //               color: Color(0xFF545453),
+              //             ),
+              //             textAlign: TextAlign.center,
+              //           ),
+              //         ),
+              //         OutlinedButton(
+              //           child: Text("取得日記"),
+              //           onPressed: () {
+              //             _sendDiary(messageProvider);
+              //           },
+              //         ),
+              //       ],
+              //     );
+              //   },
+              // ),
               // Center(
               //   child: Container(
               //     width: 100,

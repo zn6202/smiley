@@ -331,7 +331,8 @@ class _CommentPageState extends State<CommentPage> {
             left: (MediaQuery.of(context).size.width - 152) / 2,
             child: GestureDetector(
               onTap: () {
-                Navigator.pushNamed(context, AppRoutes.browsePage);
+                // Navigator.pushNamed(context, AppRoutes.browsePage); // 原本的
+                Navigator.pop(context); // 點頭貼會跳錯貼文，所以改成這個試試看~ pop 回上一頁的時候，ui 的 icon 數字要變
               },
               child: Container(
                 width: 152,
@@ -502,13 +503,18 @@ class _CommentPageState extends State<CommentPage> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 5, horizontal: 35),
                               child: InkWell(
-                                onTap: () => _showReplyDialog(reply.text ?? '',
-                                    reply.avatarUrl ?? '', reply.postId, reply.pos),
+                                onTap: () => _showReplyDialog(
+                                    reply.text ?? '',
+                                    reply.avatarUrl ?? '',
+                                    reply.postId,
+                                    reply.pos),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(Icons.reply, size: 36, color:textColor.withOpacity(0.8)), 
+                                    Icon(Icons.reply,
+                                        size: 36,
+                                        color: textColor.withOpacity(0.8)),
                                     ConstrainedBox(
                                       constraints: BoxConstraints(
                                         maxWidth: 235, // 設置最大寬度為 235
@@ -650,10 +656,6 @@ class Comment {
 - 改留言區樣式 
 - 回覆留言的輸入框 - 完成
   - 輸入欄按傳送鍵之後，傳送當前的 'postId' 和 '輸入內容' 至 submitReply() (第54行)
-*/
-/*
-後端:
-- commentPage 
-  - 輸入要跟後端結合
-  - 確認新版留言區的後端是正確
+
+- new! 335 pop 回上一頁的時候，ui 的 icon 數字要變
 */
