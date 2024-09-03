@@ -55,9 +55,9 @@ class _CommentPageState extends State<CommentPage> {
 
     print("進入提交評論函式");
     print('user_id: $userId');
-    print('post_id: $postId');
+    print('post_id: $postId'); //
     print("提交回覆: $content");
-    print("回覆的對象評論 id 為: $pos");
+    print("回覆的對象評論 id 為: $pos"); //
 
     final response = await http.post(
       Uri.parse(API.submitReply),
