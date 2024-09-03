@@ -471,8 +471,8 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(24.0),
           ),
           child: Container(
-            width: 304.h,
-            height: 265.0.v,
+            // width: 304.h,
+            // height: 265.0.v,
             padding: EdgeInsets.only(
                 left: 23.h, right: 23.h, top: 23.v, bottom: 13.v),
             decoration: ShapeDecoration(
@@ -482,7 +482,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min, //容器的大小會隨著內部子元素的總大小而調整
+              // mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 SizedBox(
                   width: double.infinity,
