@@ -173,18 +173,64 @@ class _BrowsePageState extends State<BrowsePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding:
-                            const EdgeInsets.only(top: 20, left: 16, right: 16),
-                        child: Text(
-                          post.date,
-                          style: TextStyle(
-                            fontSize: 25,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
+                        padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              post.date,
+                              style: TextStyle(
+                                fontSize: 28, // 調整文本的字體大小
+                                fontWeight: FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                            Stack( // 右上icon
+                              children: [
+                                IconButton( // icon本人
+                                  icon: Image.asset(
+                                    'assets/images/comments.png',
+                                    width: 30, // 調整圖標的大小
+                                    height: 30,
+                                    color: textColor,
+                                  ), 
+                                  onPressed: () {
+                                    savePostId(_currentPostId);
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.commentPage,
+                                    );
+                                  },
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  child: Container( // 留言數輛
+                                    width: 14, // 調整圓形容器的大小
+                                    height: 14, 
+                                    decoration: BoxDecoration(
+                                      color: textColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '3', // 後端回傳的留言數量
+                                        style: TextStyle(
+                                          color: Colors.black, 
+                                          fontSize: 10, // 調整字體大小
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
-                      Padding(
+                      Padding(// 日記標題
                         padding: const EdgeInsets.only(left: 16, right: 16),
                         child: Text(
                           post.title,
@@ -195,45 +241,46 @@ class _BrowsePageState extends State<BrowsePage> {
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10, left: 16),
-                        child: Container(
-                          width: 146,
-                          height: 42,
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: const Color(0x80FFFFFF),
-                                  shape: BoxShape.circle,
-                                  image: DecorationImage(
-                                    image: NetworkImage(
-                                        'http://163.22.32.24/smiley_backend/img/photo/${post.userPhoto}'),
+                      if (!isMyPost)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10, left: 16),
+                          child: Container(                          
+                            width: 146,
+                            height: 42,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 40,
+                                  height: 40,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0x80FFFFFF),
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: NetworkImage(
+                                          'http://163.22.32.24/smiley_backend/img/photo/${post.userPhoto}'),
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  post.userName,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    post.userName,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                  overflow: TextOverflow.ellipsis,
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
-                      ),
                       const SizedBox(height: 40),
                       Center(
                         child: GestureDetector(
@@ -359,7 +406,7 @@ class _BrowsePageState extends State<BrowsePage> {
                 color: Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(20),
               ),
-              padding: EdgeInsets.fromLTRB(20, 10, 10, 10),
+              padding: EdgeInsets.symmetric(horizontal: 10), // 修改为对称的左右内边距
               child: Row(
                 children: [
                   Expanded(
@@ -376,8 +423,7 @@ class _BrowsePageState extends State<BrowsePage> {
                           color: Color(0xFFC5C5C5),
                         ),
                       ),
-                      controller:
-                          commentsController, // 原本是這個 controller: TextEditingController(text: _commentText), 如果用原本的，字彙從右到左出現，且留言框不會隨著鍵盤上升
+                      controller: commentsController,
                       onChanged: (value) {
                         setState(() {
                           _commentText = value;
@@ -387,6 +433,8 @@ class _BrowsePageState extends State<BrowsePage> {
                   ),
                   IconButton(
                     icon: Icon(Icons.send, color: textColor),
+                    padding: EdgeInsets.zero, 
+                    constraints: BoxConstraints(), // 去除默认的大小限制
                     onPressed: () {
                       submitComment(_currentPostId, _selectedCommentIcon);
                       fetchComments(_currentPostId);
@@ -677,20 +725,18 @@ class Comment {
 - 原設計是自己貼文垂直滑動 好友貼文左右滑動 自己貼文左滑能進入好友貼文，但一直無法實現區塊來回切換。
   因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現
   - 如果滑動真的不行的話，看要不要新增懸浮紐: 可切換自己好友貼文(一律左右滑動)、呼叫下方的功能鍵
-- 本來是按怪獸會到留言區，改成點留言區 icon 會到留言區，且 icon 右上有小數字會顯示總共有幾個留言
 - 調整怪獸大小(放大)
-- send icon 會跑位 369
+
 
 
 以下可晚一點再調整:
 - browsePage 再按一次表情貼要消失
 - 掉落的表情貼沒有留在地板
-- 自己的貼文是看不到發文者的 ex: 頭貼 bbb
 - 功能鍵要可隱藏 (看是要點一下畫面，會出現消失 or 上下滑出現消失 or ...)
 
 */
 
 /*
 後端:
-- 留言區 icon 的留言數量
+- 留言區 icon 的留言數量 218
  */
