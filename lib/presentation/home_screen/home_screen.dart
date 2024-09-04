@@ -6,7 +6,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:flutter/material.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -35,6 +36,32 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     checkDiary();
+  }
+
+  Future<void> getMusic() async {
+    final String? userId = await getUserId();
+    print("進入撥音樂函式 userid: $userId");
+
+    final response = await http.post(
+      Uri.parse(API.getMusic), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userId!,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      if (result['success']) {
+        String musicPath = result['music_path'];
+        print("音樂撥放成功: $musicPath");
+        AudioPlayer audioPlayer = AudioPlayer();
+        await audioPlayer.play(UrlSource(musicPath));
+      } else {
+        print('User not found.');
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
   }
 
   //  抓取當前 user_id
@@ -519,10 +546,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                        _launchURL(
-                            'https://youtu.be/Ntr0ZnRr7Qo?si=Es3Akat9qymQlvrs');
-                      },
+                      onTap: getMusic,
+                      // () {
+                      //   _launchURL(
+                      //       'https://youtu.be/Ntr0ZnRr7Qo?si=Es3Akat9qymQlvrs');
+                      // },
                       child: Image.asset(
                         'assets/images/home/music.png',
                         width: 122.h,
