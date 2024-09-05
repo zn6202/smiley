@@ -1,16 +1,19 @@
 import '../../core/app_export.dart';
+import 'package:just_audio/just_audio.dart';
 
 class CustomBottomNavigationBar extends StatefulWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final bool isTransparent;
   final bool isHomeScreen;
+  final AudioPlayer? audioPlayer; // 新增音樂播放器參數
 
   CustomBottomNavigationBar({
     required this.currentIndex,
     required this.onTap,
     this.isTransparent = false,
     this.isHomeScreen = false,
+    this.audioPlayer, // 初始化音樂播放器參數
   });
 
   @override
@@ -21,7 +24,23 @@ class CustomBottomNavigationBar extends StatefulWidget {
 class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   late int _currentIndex = widget.currentIndex;
 
-  void _onTap(int index, MessageProvider messageProvider) {
+  Future<void> disposeMusic() async {
+    if (widget.audioPlayer != null) {
+      if (widget.audioPlayer!.playing) {
+        await widget.audioPlayer!.pause();  // 暫停音樂
+        await widget.audioPlayer!.dispose(); // 釋放資源
+        print('音樂已暫停並釋放資源');
+      } else {
+        print('音樂播放器未播放音樂');
+      }
+    } else {
+      print('音樂播放器未初始化');
+    }
+  }
+
+  void _onTap(int index, MessageProvider messageProvider) async {
+    await disposeMusic(); // 等待 disposeMusic 完成
+
     if (index == 4) {
       Navigator.pushNamed(context, AppRoutes.setting);
     } else if (index == 2) {
@@ -47,13 +66,18 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   }
 
   @override
+  void dispose() {
+    // 不需要在這裡釋放音樂播放器資源，因為它應該由父元件負責
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final messageProvider = Provider.of<MessageProvider>(context); // 偵測未讀訊息
     final routeName = ModalRoute.of(context)?.settings.name;
     return Container(
       decoration: BoxDecoration(
-        color:
-            widget.isTransparent ? Colors.transparent : const Color(0xFFFCFCFE),
+        color: widget.isTransparent ? Colors.transparent : const Color(0xFFFCFCFE),
       ),
       child: BottomNavigationBar(
         currentIndex: _currentIndex,
@@ -64,15 +88,14 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
               padding: EdgeInsets.symmetric(vertical: 8.v),
               child: Badge(
                 // 顯示未讀訊息在按鈕上
-                label: 
-                  Text(
+                label: Text(
                   '${messageProvider.newMessages}',
                   style: TextStyle(color: Colors.white, fontSize: 12),
                 ),
-                isLabelVisible: 
-                  (messageProvider.newMessages > 0 && routeName != '/ChatBot_screen')
-                  ? true
-                  : false,
+                isLabelVisible:
+                    (messageProvider.newMessages > 0 && routeName != '/ChatBot_screen')
+                        ? true
+                        : false,
                 child: SizedBox(
                   height: 32.v,
                   width: 32.h,

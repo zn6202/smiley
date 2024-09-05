@@ -7,7 +7,10 @@ import 'package:http/http.dart' as http;
 import '../../routes/api_connection.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
+import 'package:just_audio/just_audio.dart';
+import 'dart:async'; // for TimeoutException
+import 'dart:io'; // for SocketExecption
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -16,7 +19,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   TextStyle dialogContentStyle = TextStyle(
     color: Color(0xFF545453),
     fontSize: 16.fSize,
@@ -31,36 +34,186 @@ class _HomeScreenState extends State<HomeScreen> {
   );
   int _currentIndex = 2;
   bool hasDiaryToday = false;
+  bool? isPlaying; //false
+  AudioPlayer? player; // 保留音樂播放器實例
+  String? musicButton = 'music.png'; // 保留音樂播放器實例
+  String musicTalk = ' \\ 點我去聽音樂 ! /';
+  String musicDialog =
+      "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。";
 
   @override
   void initState() {
     super.initState();
     checkDiary();
+    saveMusicStatus(false);
+    saveMusicTalk(' \\ 點我去聽音樂 ! /');
+    saveMusicDialog(
+        "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+    _initializeMusicStatus();
+    // _setupPlayerListeners(); // 設置播放器監聽器
   }
 
-  Future<void> getMusic() async {
-    final String? userId = await getUserId();
-    print("進入撥音樂函式 userid: $userId");
+  @override
+  void dispose() {
+    print('音樂暫停且資源釋放中 isPlaying: $isPlaying'); // 拉到左右返回見的時候會跑到這裡
+    WidgetsBinding.instance.removeObserver(this);
+    if (isPlaying == true) {
+      player?.pause(); //音樂暫停
+      saveMusicStatus(false);
+      saveMusicTalk(' \\ 點我去聽音樂 ! /');
+      saveMusicDialog(
+          "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+    }
+    player?.dispose(); // 釋放音樂資源
+    super.dispose();
+  }
 
-    final response = await http.post(
-      Uri.parse(API.getMusic), // 解析字串變成 URI 對象
-      body: {
-        'user_id': userId!,
-      },
-    );
+  Future<void> disposeMusic() async {
+    print('音樂暫停且資源釋放中 isPlaying: $isPlaying');
+    WidgetsBinding.instance.removeObserver(this);
+    if (isPlaying == true) {
+      await player?.pause(); // 確保音樂暫停完成
+      saveMusicStatus(false);
+      saveMusicTalk(' \\ 點我去聽音樂 ! /');
+      saveMusicDialog(
+          "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+    }
+    player?.dispose(); // 釋放資源
+  }
 
-    if (response.statusCode == 200) {
-      final result = json.decode(response.body);
-      if (result['success']) {
-        String musicPath = result['music_path'];
-        print("音樂撥放成功: $musicPath");
-        AudioPlayer audioPlayer = AudioPlayer();
-        await audioPlayer.play(UrlSource(musicPath));
+// 設置播放器監聽器
+  // void _setupPlayerListeners() {
+  //   player?.playerStateStream.listen((playerState) {
+  //     if (playerState.playing) {
+  //       setState(() {
+  //         isPlaying = true;
+  //         musicButton = 'musicPause.png';
+  //       });
+  //     } else {
+  //       setState(() {
+  //         isPlaying = false;
+  //         musicButton = 'music.png';
+  //       });
+  //     }
+  //   });
+  // }
+
+  // 初始化音樂狀態
+  Future<void> _initializeMusicStatus() async {
+    isPlaying = await getMusicStatus();
+    musicTalk = await getMusicTalk();
+    musicDialog = await getMusicDialog();
+    print('初始化的 isPlaying 為: $isPlaying');
+    // 根據音樂狀態設置初始值
+    // setState(() {
+    //   musicButton = isPlaying == true ? musicEmoAngMon : 'music.png';
+    // });
+  }
+
+  //  抓取當前 user_id
+  Future<bool?> getMusicStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('musicStatus') ?? false;
+  }
+
+  Future<void> saveMusicStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('musicStatus', status);
+  }
+
+  Future<String> getMusicTalk() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('musicTalk') ?? ' \\ 點我去聽音樂 ! /';
+  }
+
+  Future<void> saveMusicTalk(String talk) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('musicTalk', talk);
+  }
+
+  Future<String> getMusicDialog() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('musicDialog') ??
+        '音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。';
+  }
+
+  Future<void> saveMusicDialog(String dialog) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('musicDialog', dialog);
+  }
+
+  Future<void> toggleMusic() async {
+    print('musicButton 是 : $musicButton');
+    try {
+      if (isPlaying == null || isPlaying == true) {
+        //
+        // 如果音樂正在播放，則暫停音樂
+        print('音樂正在播放 $isPlaying ');
+        await player?.pause();
+        setState(() {
+          isPlaying = false;
+          musicButton = 'music.png';
+          musicTalk = ' \\ 點我去聽音樂 ! /';
+          musicDialog =
+              "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。";
+        });
+        await saveMusicStatus(isPlaying ?? false);
+        print(' isPlaying 是 : $isPlaying');
       } else {
-        print('User not found.');
+        // 如果音樂未播放，則開始播放
+        final String? userId = await getUserId();
+        if (userId == null) {
+          print("無法獲取 userId");
+          return;
+        }
+
+        print("進入撥音樂函式 userid: $userId");
+
+        final response = await http.post(
+          Uri.parse(API.getMusic),
+          body: {
+            'user_id': userId,
+          },
+        ).timeout(Duration(seconds: 60)); // 設置超時
+
+        if (response.statusCode == 200) {
+          final result = json.decode(response.body);
+          if (result['success']) {
+            String musicPath = result['music_path'];
+            String musicEmoDialog = result['music_dialog'];
+            String musicEmoAngMon = result['music_photo'];
+
+            
+            print("音樂撥放成功 musicPath: $musicPath musicEmoDialog: $musicEmoDialog musicEmoAngMon: $musicEmoAngMon");
+
+            player ??= AudioPlayer();
+            await player?.setUrl(musicPath);
+            player?.play();
+
+            setState(() {
+              isPlaying = true;
+              musicButton = musicEmoAngMon;
+              musicTalk = ' \\ 點我暫停音樂 ! /';
+              musicDialog = musicEmoDialog;
+            });
+            await saveMusicStatus(isPlaying ?? false);
+            await saveMusicTalk(musicTalk);
+            await saveMusicDialog(musicDialog);
+            print(' isPlaying 是 : $isPlaying');
+          } else {
+            print('音樂文件未找到。');
+          }
+        } else {
+          print('獲取音樂失敗，狀態碼: ${response.statusCode}');
+          throw Exception('Failed to load music');
+        }
       }
-    } else {
-      throw Exception('Failed to load user');
+    } on TimeoutException catch (e) {
+      print("請求超時: $e");
+    } on SocketException catch (e) {
+      print("網絡連接錯誤: $e");
+    } catch (e) {
+      print("未知錯誤: $e");
     }
   }
 
@@ -196,14 +349,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       bottomNavigationBar: CustomBottomNavigationBar(
+        // 這裡是下方功能鍵嗎?
         currentIndex: _currentIndex,
-        onTap: (index) {
+        onTap: (index) async {
+          await disposeMusic(); // 等待 disposeMusic 完成
           setState(() {
             _currentIndex = index;
           });
         },
         isTransparent: true,
         isHomeScreen: true,
+        audioPlayer: player,
       ),
     );
   }
@@ -489,8 +645,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  showMusicDialog(BuildContext context) {
-    showDialog(
+  Future<void> showMusicDialog(BuildContext context) async {
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
@@ -536,31 +692,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。",
+                    musicDialog, // "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。",
                     textAlign: TextAlign.center,
                     style: dialogContentStyle,
                   ),
                 ),
                 SizedBox(height: 7.v),
-                Row(
+                Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    GestureDetector(
-                      onTap: getMusic,
-                      // () {
-                      //   _launchURL(
-                      //       'https://youtu.be/Ntr0ZnRr7Qo?si=Es3Akat9qymQlvrs');
-                      // },
-                      child: Image.asset(
-                        'assets/images/home/music.png',
-                        width: 122.h,
-                        height: 88.v,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    SizedBox(width: 10.h),
                     Text(
-                      "(點我去聽音樂 ! )",
+                      musicTalk, //" \\ 點我去聽音樂 ! /", // '\'使用兩個反斜杠來顯示一個反斜杠
                       style: TextStyle(
                         fontSize: 12.fSize,
                         height: 1.75,
@@ -569,6 +711,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         color: Color(0xFF9C9C94),
                       ),
                       textAlign: TextAlign.center,
+                    ),
+                    SizedBox(width: 10.h),
+                    GestureDetector(
+                      onTap: () async {
+                        // 執行 toggleMusic 並獲取音樂檔案名稱
+                        await toggleMusic();
+                        // 關閉當前對話框
+                        Navigator.pop(context);
+                        // 顯示新的對話框
+                        await showMusicDialog(context);
+                      },
+                      child: Image.network(
+                        "http://163.22.32.24/smiley_backend/img/music/${musicButton}",
+                        width: 122.h,
+                        height: 88.v,
+                        fit: BoxFit.contain,
+                        key: UniqueKey(), // 使用 UniqueKey 強制重新加載圖片
+                      ),
                     ),
                   ],
                 ),
@@ -581,7 +741,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+/*
+當我按撥放後，沒有按暫停，就按下方功能鍵去其他頁面，音樂要自動暫停加釋放資源。想辦法進到 disposeMusic()
+*/
+
 /**
 後端修改:
 - 剛寫完案返回會無更新
+- 音樂
  */

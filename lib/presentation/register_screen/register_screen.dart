@@ -87,6 +87,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // google 註冊(如果已經註冊過就會直接登入)
   Future<void> signInWithGoogle() async {
     try {
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        scopes: ['email'],
+      );
+      
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
       final GoogleSignInAuthentication? googleAuth =

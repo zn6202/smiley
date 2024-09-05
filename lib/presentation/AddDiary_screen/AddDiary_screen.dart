@@ -64,7 +64,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   DateTime? selectedDate = DateTime.now();
   bool isSubmitted = false; // 表示日記是否已提交
   String submittedContent = ""; // 保存提交的日記內容
-
+  String dialogMessage = '分析情緒中，請稍後...';
   String angelUrl = "";
   String monsterUrl = "";
 
@@ -109,18 +109,20 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
       print('BERT分析成功!');
       angelUrl = resultBERT['angel'];
       monsterUrl = resultBERT['monster'];
-      print('angelUrl:$angelUrl monsterUrl:$monsterUrl');
-      if (context.mounted) {
-        completeDialog(context); // 顯示成功對話框
-      }
+
+      // 更新對話框內容，顯示分析結果
+      setState(() {
+        dialogMessage = '分析成功！結果已出爐。';
+      });
     } else {
       print(
           'BERT分析失敗... 狀態碼: ${responseBERT.statusCode}, 響應: ${responseBERT.body}');
-      if (context.mounted) {
-        failDialog(context); // 顯示失敗對話框
-      }
-    }
 
+      // 更新對話框內容，顯示失敗信息
+      setState(() {
+        dialogMessage = '分析失敗，請重試。';
+      });
+    }
     // 日記提交請求
     final response = await http.post(
       Uri.parse(API.diary), // 解析字串變成 URI 對象
@@ -199,7 +201,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                buildEmotionBlock(
+                                buildAngelBlock(
                                     'http://163.22.32.24/smiley_backend/img/${angelUrl}'), //這裡到時候要改成小怪獸演算法函式
                                 buildEmotionBlock(
                                     'http://163.22.32.24/smiley_backend/img/${monsterUrl}'),
@@ -286,6 +288,79 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
               height: 27.v,
               child: Text(
                 '情緒小怪獸',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFC4C4C4),
+                  fontSize: 16.fSize,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.32,
+                ),
+              ),
+            ),
+            Container(
+              width: 126.h,
+              height: 122.v,
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+            SizedBox(height: 30.v),
+            Container(
+              width: 114.h,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: Text(
+                '輕觸發文',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Color(0xFFCDCED0),
+                  fontSize: 15.fSize,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w600,
+                  height: 1.5.v / 15.fSize,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildAngelBlock(String imageUrl) {
+    return Container(
+      width: 140.h,
+      height: 246.v,
+      padding: EdgeInsets.symmetric(horizontal: 18.h, vertical: 20.v),
+      margin: EdgeInsets.symmetric(horizontal: 14.5.h),
+      decoration: ShapeDecoration(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(width: 1, color: Color(0xFFC4C4C4)),
+          borderRadius: BorderRadius.circular(20),
+        ),
+      ),
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, AppRoutes.postPage, arguments: imageUrl);
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            SizedBox(
+              width: 106.h,
+              height: 27.v,
+              child: Text(
+                '情緒小天使',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Color(0xFFC4C4C4),
@@ -794,7 +869,6 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
 - 捲動畫面最上方會有紫色陰影
 - 輸入框與提交後日記顯示的起始點有些微不同
 
-- new! 左邊標題是情緒小天使
 */
 
 /*

@@ -126,9 +126,13 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   void addComplete() async {
     // 獲取導航傳遞過來的Firebase UID
     firebaseId = await getFirebaseId();
-    print('firebaseId = $firebaseId');
+    print('firebaseId 是 = $firebaseId');
     if (firebaseId == null) {
-      print('Error: firebaseId is null');
+      print('Error是: firebaseId is null');
+      return;
+    }
+    if (selectedAvatarPath == null) {
+      print('Error是: selectedAvatarPath is null');
       return;
     }
 
