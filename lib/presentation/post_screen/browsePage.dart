@@ -27,6 +27,7 @@ class _BrowsePageState extends State<BrowsePage> {
   int _currentPostId = -1;
   int commentSum = 0;
 
+  // FocusNode _commentFocusNode = FocusNode();
   TextEditingController commentsController = TextEditingController(); // 新增的
 
   final StreamController<List<Comment>> _commentsController =
@@ -40,6 +41,10 @@ class _BrowsePageState extends State<BrowsePage> {
     _mainPageController = PageController();
     _futureMyPosts = fetchMyPosts();
     _futureFriendsPosts = fetchFriendsPosts();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _commentFocusNode.unfocus(); // 确保页面加载时输入框不会自动聚焦
+    });
 
     _futureMyPosts.then((posts) {
       if (posts.isNotEmpty) {
@@ -159,6 +164,38 @@ class _BrowsePageState extends State<BrowsePage> {
     );
   }
 
+// 留言發送成功提示
+  void showSnackBar(String message) {
+    OverlayState? overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Center(
+        child: Container(
+          width: 100,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            message,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              decoration: TextDecoration.none,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+    overlayState?.insert(overlayEntry);
+    // 顯示時長
+    Future.delayed(Duration(seconds: 3), () {
+      overlayEntry.remove();
+    });
+  }
+
   Widget _buildPostsPage(Future<List<Post>> futurePosts,
       {required bool isMyPosts}) {
     return FutureBuilder<List<Post>>(
@@ -240,7 +277,9 @@ class _BrowsePageState extends State<BrowsePage> {
                                     ).then((_) {
                                       fetchComments(_currentPostId);
                                       fetchCommentSum(_currentPostId);
-                                    });;
+                                      FocusScope.of(context).unfocus();
+                                    });
+                                    ;
                                   },
                                 ),
                                 if (commentSum != 0)
@@ -450,7 +489,7 @@ class _BrowsePageState extends State<BrowsePage> {
                 color: Color(0xFFFFFFFF),
                 borderRadius: BorderRadius.circular(20),
               ),
-              padding: EdgeInsets.symmetric(horizontal: 10), // 修改为对称的左右内边距
+              padding: EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 children: [
                   Expanded(
@@ -466,6 +505,7 @@ class _BrowsePageState extends State<BrowsePage> {
                           fontWeight: FontWeight.w700,
                           color: Color(0xFFC5C5C5),
                         ),
+                        contentPadding: EdgeInsets.symmetric(vertical: 12),
                       ),
                       controller: commentsController,
                       onChanged: (value) {
@@ -478,11 +518,12 @@ class _BrowsePageState extends State<BrowsePage> {
                   IconButton(
                     icon: Icon(Icons.send, color: textColor),
                     padding: EdgeInsets.zero,
-                    constraints: BoxConstraints(), // 去除默认的大小限制
+                    constraints: BoxConstraints(),
                     onPressed: () {
                       submitComment(_currentPostId, _selectedCommentIcon);
                       fetchComments(_currentPostId);
                       fetchCommentSum(_currentPostId);
+                      FocusScope.of(context).unfocus();
                     },
                   ),
                 ],
@@ -525,6 +566,11 @@ class _BrowsePageState extends State<BrowsePage> {
 
       if (data['success'] == true) {
         print("頻論提交已完成是 : ${data}");
+        showSnackBar('留言已發送');
+        commentsController.clear();
+        // FocusScope.of(context).unfocus();
+        // _replyControlle.clear();
+        fetchCommentSum(postId);
       } else {
         print('評論提交未完成... $data');
       }
@@ -771,17 +817,10 @@ class Comment {
   因此先用左右滑動切塊區塊 好友與自己貼文都是上下滑動的方式實現
   - 如果滑動真的不行的話，看要不要新增懸浮紐: 可切換自己好友貼文(一律左右滑動)、呼叫下方的功能鍵
 - 調整怪獸大小(放大)
-
-
-
-以下可晚一點再調整:
 - browsePage 再按一次表情貼要消失
 - 掉落的表情貼沒有留在地板
 - 功能鍵要可隱藏 (看是要點一下畫面，會出現消失 or 上下滑出現消失 or ...)
 
+- new 從browsepage回來會自動對焦到輸入框...
 */
 
-/*
-後端:
-- 留言區 icon 的留言數量 218
- */

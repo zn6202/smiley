@@ -26,8 +26,8 @@ class _CommentPageState extends State<CommentPage> {
   Color textColor = Color(0xFF4C543E);
   String? postImage = "";
   String? postContent = "";
-  final comments = "";
-  final replies = "";
+  // final comments = "";
+  // final replies = "";
 
   @override
   void initState() {
@@ -118,16 +118,6 @@ class _CommentPageState extends State<CommentPage> {
     // return "https://via.placeholder.com/152x138";
   }
 
-  // 假設的函數用於從資料庫讀取貼文顏色
-  // Color fetchTextColor() {
-  //   return Color(0xFFFF53FF);
-  // }
-
-  // // 假設的函數用於從資料庫讀取貼文內容
-  // String fetchPostContent() {
-  //   return "陽光特別明亮，讓人忍不住想要好好開始這一天。可是，隨著時間的推移，內心卻慢慢被一些說不上來的不安和焦慮感包圍...";
-  // }
-
   // 假設的函數用於從資料庫讀取留言數據
   Future<List<Comment>> fetchComments() async {
     final String? postId = await getPostId();
@@ -164,18 +154,6 @@ class _CommentPageState extends State<CommentPage> {
     }
   }
 
-  //   return [
-  //     Comment(
-  //       avatarUrl: "https://via.placeholder.com/29",
-  //       text: "這是第一則留言",
-  //     ),
-  //     Comment(
-  //       avatarUrl: "https://via.placeholder.com/29",
-  //       text: "這是第二則留言，可能會比較長一些1111111111。",
-  //     ),
-  //     // 更多留言...
-  //   ];
-  // }
   Future<List<Reply>> fetchReplies() async {
     final String? postId = await getPostId();
     final String? userId = await getUserId();
@@ -210,23 +188,38 @@ class _CommentPageState extends State<CommentPage> {
       return [];
     }
   }
-  // List<Reply> fetchReplies() {
-  // return [
-  //   Reply(
-  //     avatarUrl: "https://via.placeholder.com/40",
-  //     text: "這。",
-  //   ),
-  //   Reply(
-  //     avatarUrl: "https://via.placeholder.com/40",
-  //     text: "這是我的第二則回覆，可能會比較長一些。",
-  //   ),
-  //   Reply(
-  //     avatarUrl: "https://via.placeholder.com/40",
-  //     text: "這是我的第三則回覆，可能會比較長一些。",
-  //   ),
-  //   // 更多回覆...
-  // ];
-  // }
+
+// 留言發送成功提示
+  void showSnackBar(String message) {
+    OverlayState? overlayState = Overlay.of(context);
+    OverlayEntry overlayEntry = OverlayEntry(
+      builder: (context) => Center(
+        child: Container(
+          width: 100,
+          height: 50,
+          decoration: BoxDecoration(
+            color: Colors.black.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            message,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 12,
+              decoration: TextDecoration.none,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+    overlayState?.insert(overlayEntry);
+    // 顯示時長
+    Future.delayed(Duration(seconds: 3), () {
+      overlayEntry.remove();
+    });
+  }
 
   void _showReplyDialog(String text, String Url, int postId, int pos) {
     showModalBottomSheet(
@@ -292,6 +285,7 @@ class _CommentPageState extends State<CommentPage> {
                               onPressed: () {
                                 String content = _replyController.text;
                                 submitReply(postId, content, pos);
+                                showSnackBar("留言已發送");
                                 Navigator.pop(context);
                                 //  fetchComments(_currentPostId);
                               },
@@ -332,7 +326,8 @@ class _CommentPageState extends State<CommentPage> {
             child: GestureDetector(
               onTap: () {
                 // Navigator.pushNamed(context, AppRoutes.browsePage); // 原本的
-                Navigator.pop(context); // 點頭貼會跳錯貼文，所以改成這個試試看~ pop 回上一頁的時候，ui 的 icon 數字要變
+                Navigator.pop(
+                    context); // 點頭貼會跳錯貼文，所以改成這個試試看~ pop 回上一頁的時候，ui 的 icon 數字要變
               },
               child: Container(
                 width: 152,
@@ -406,6 +401,7 @@ class _CommentPageState extends State<CommentPage> {
 
                   final comments = commentsSnapshot.data!;
 
+                  // 獲取回覆
                   return FutureBuilder<List<Reply>>(
                     future: fetchReplies(), // 等待 fetchReplies() 的結果
                     builder: (context, repliesSnapshot) {
@@ -429,128 +425,167 @@ class _CommentPageState extends State<CommentPage> {
 
                       final replies = repliesSnapshot.data!;
 
+                      // 確認回覆資料是否正確獲取
+                      print('獲取到的回覆資料:');
+                      for (var reply in replies) {
+                        print('回覆: pos = ${reply.pos}, 內容 = ${reply.text}');
+                      }
+
+                      // 創建一個 Map，將評論 ID 與其對應的回覆列表關聯
+                      Map<int, List<Reply>> repliesMap = {};
+                      for (var reply in replies) {
+                        if (repliesMap.containsKey(reply.pos)) {
+                          repliesMap[reply.pos]!.add(reply);
+                        } else {
+                          repliesMap[reply.pos] = [reply];
+                        }
+                      }
+
+                      // 印出回覆 map 的 key 值（即 pos），以確保 map 正確建立
+                      print('建立的回覆 map keys (評論 pos): ${repliesMap.keys}');
                       return ListView.builder(
                         padding: const EdgeInsets.symmetric(vertical: 10),
-                        itemCount: comments.length + replies.length, // 留言和回覆的總數
+                        itemCount: comments.length, // 只計算評論數量
                         itemBuilder: (context, index) {
-                          if (index < comments.length) {
-                            final comment = comments[index];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 16),
-                              child: InkWell(
-                                onTap: () => _showReplyDialog(
-                                    comment.text ?? '',
-                                    comment.avatarUrl ?? '',
-                                    comment.postId,
-                                    comment.pos),
-                                // child: Row(
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Flexible(
-                                      child: ConstrainedBox(
-                                        constraints: BoxConstraints(
-                                          maxWidth: 235, // 設置最大寬度為 235
-                                        ),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                            color: textColor, // 評論框背景
-                                            borderRadius:
-                                                BorderRadius.circular(20),
+                          final comment = comments[index];
+
+                          // 印出每個評論的 pos
+                          print(
+                              '顯示評論: pos = ${comment.pos}, 內容 = ${comment.text}');
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 5, horizontal: 16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // 顯示評論
+                                InkWell(
+                                  onTap: () => _showReplyDialog(
+                                      comment.text ?? '',
+                                      comment.avatarUrl ?? '',
+                                      comment.postId,
+                                      comment.pos),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Flexible(
+                                        child: ConstrainedBox(
+                                          constraints: BoxConstraints(
+                                            maxWidth: 235, // 設置最大寬度為 235
                                           ),
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10, vertical: 6.18),
-                                          child: Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              Container(
-                                                width: 29,
-                                                height: 29,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: NetworkImage(
-                                                        'http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                              const SizedBox(width: 8),
-                                              Flexible(
-                                                child: Text(
-                                                  comment.text ?? '',
-                                                  style: TextStyle(
-                                                    color:
-                                                        backgroundColor, // 評論字
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          } else {
-                            final reply = replies[index - comments.length];
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5, horizontal: 35),
-                              child: InkWell(
-                                onTap: () => _showReplyDialog(
-                                    reply.text ?? '',
-                                    reply.avatarUrl ?? '',
-                                    reply.postId,
-                                    reply.pos),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Icon(Icons.reply,
-                                        size: 36,
-                                        color: textColor.withOpacity(0.8)),
-                                    ConstrainedBox(
-                                      constraints: BoxConstraints(
-                                        maxWidth: 235, // 設置最大寬度為 235
-                                      ),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          color: textColor, // 回復框背景
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 10, vertical: 6.18),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              width: 29,
-                                              height: 29,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                  image: NetworkImage(
-                                                      'http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: textColor, // 評論框背景
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
-                                            const SizedBox(width: 10),
-                                            Flexible(
-                                              child: Text(
-                                                reply.text ?? '',
-                                                style: TextStyle(
-                                                  color:
-                                                      backgroundColor, // 回覆字顏色
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.bold,
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 6.18),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Container(
+                                                  width: 29,
+                                                  height: 29,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(
+                                                          'http://163.22.32.24/smiley_backend/img/photo/${comment.avatarUrl!}'),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 8),
+                                                Flexible(
+                                                  child: Text(
+                                                    comment.text ?? '',
+                                                    style: TextStyle(
+                                                      color:
+                                                          backgroundColor, // 評論字
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // 顯示與此評論相關的回覆
+                                if (repliesMap.containsKey(comment.pos)) ...[
+                                  const SizedBox(height: 8), // 留些間距
+                                  for (var reply in repliesMap[comment.pos]!)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5, horizontal: 35),
+                                      child: InkWell(
+                                        onTap: () => _showReplyDialog(
+                                            reply.text ?? '',
+                                            reply.avatarUrl ?? '',
+                                            reply.postId,
+                                            reply.pos),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.reply,
+                                                size: 36,
+                                                color:
+                                                    textColor.withOpacity(0.8)),
+                                            ConstrainedBox(
+                                              constraints: BoxConstraints(
+                                                maxWidth: 235, // 設置最大寬度為 235
+                                              ),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: textColor, // 回復框背景
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 10,
+                                                        vertical: 6.18),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    Container(
+                                                      width: 29,
+                                                      height: 29,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        image: DecorationImage(
+                                                          image: NetworkImage(
+                                                              'http://163.22.32.24/smiley_backend/img/photo/${reply.avatarUrl!}'),
+                                                          fit: BoxFit.cover,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    const SizedBox(width: 10),
+                                                    Flexible(
+                                                      child: Text(
+                                                        reply.text ?? '',
+                                                        style: TextStyle(
+                                                          color:
+                                                              backgroundColor, // 回覆字顏色
+                                                          fontSize: 15,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ),
@@ -558,11 +593,10 @@ class _CommentPageState extends State<CommentPage> {
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          }
+                                ]
+                              ],
+                            ),
+                          );
                         },
                       );
                     },
@@ -651,11 +685,4 @@ class Comment {
     );
   }
 }
-/*
-前端：
-- 改留言區樣式 
-- 回覆留言的輸入框 - 完成
-  - 輸入欄按傳送鍵之後，傳送當前的 'postId' 和 '輸入內容' 至 submitReply() (第54行)
 
-- new! 335 pop 回上一頁的時候，ui 的 icon 數字要變
-*/
