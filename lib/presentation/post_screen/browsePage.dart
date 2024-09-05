@@ -237,7 +237,10 @@ class _BrowsePageState extends State<BrowsePage> {
                                     Navigator.pushNamed(
                                       context,
                                       AppRoutes.commentPage,
-                                    );
+                                    ).then((_) {
+                                      fetchComments(_currentPostId);
+                                      fetchCommentSum(_currentPostId);
+                                    });;
                                   },
                                 ),
                                 if (commentSum != 0)
