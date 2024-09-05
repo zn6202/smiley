@@ -200,7 +200,10 @@ class _FriendscreenState extends State<Friendscreen> {
                     height: 30.v,
                   ),
                   onPressed: () {
-                    Navigator.pushNamed(context, AppRoutes.addFriend);
+                    Navigator.pushNamed(context, AppRoutes.addFriend).then((_) {
+                      fetchInvitedSum();
+                    });
+                    ;
                   },
                 ),
                 if (invitedSum != 0)
@@ -216,7 +219,7 @@ class _FriendscreenState extends State<Friendscreen> {
                       ),
                       child: Center(
                         child: Text(
-                          '${invitedSum}',//
+                          '${invitedSum}', //代處理好友邀請數量
                           style: TextStyle(
                             color: Color(0xFFF4F4E6),
                             fontSize: 10,
@@ -356,14 +359,8 @@ class _FriendscreenState extends State<Friendscreen> {
                                 icon:
                                     Image.asset('assets/images/delFriend.png'),
                                 onPressed: () {
-                                  setState(() {
-                                    filterFriends(searchText);
-                                    int whoInviteMe =
-                                        int.parse(friends[index]['id']!);
-                                    print('whoInviteMe: $whoInviteMe');
-                                    delFriend(whoInviteMe, index);
-                                    // 現在的刪除只是頁面上的 要再加上後端的刪除
-                                  });
+                                  // 弹出确认对话框
+                                  showDelConfirmationDialog(context);
                                 },
                               ),
                             ],
@@ -377,8 +374,160 @@ class _FriendscreenState extends State<Friendscreen> {
       ),
     );
   }
+
+  showDelConfirmationDialog(BuildContext context) {
+    // 顯示對話框
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // 返回一個自定義的 Dialog 小部件
+        return Dialog(
+          // 設置對話框的形狀和圓角
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
+          ),
+          child: Container(
+            width: 304.h, // 設置對話框的寬度
+            height: 222.4.v, // 設置對話框的高度
+            padding: EdgeInsets.symmetric(horizontal: 23.h), // 設置對話框的內邊距
+            clipBehavior: Clip.antiAlias, // 防止對話框內容超出邊界
+            decoration: ShapeDecoration(
+              color: Colors.white, // 設置對話框的背景顏色
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0), // 設置圓角大小
+              ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, // 垂直方向上居中對齊
+              crossAxisAlignment: CrossAxisAlignment.center, // 水平方向上居中對齊
+              children: [
+                // 設置標題文本
+                SizedBox(
+                  width: double.infinity, // 寬度設置為充滿父容器
+                  child: Text(
+                    '刪除好友確認', // 標題文本
+                    textAlign: TextAlign.center, // 文本居中對齊
+                    style: dialogTitleStyle,
+                  ),
+                ),
+                SizedBox(height: 10.v), // 添加垂直間距
+                // 添加橫線
+                Container(
+                  width: 244.5.h,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1.h,
+                        strokeAlign: BorderSide.strokeAlignCenter,
+                        color: Color(0xFFDADADA),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.v), // 添加垂直間距
+                // 設置提示文本
+                SizedBox(
+                  width: double.infinity, // 寬度設置為充滿父容器
+                  child: Text(
+                    '按下確認鍵後，立即刪除好友。您確認要刪除嗎？', // 提示文本
+                    textAlign: TextAlign.center, // 文本居中對齊
+                    style: dialogContentStyle,
+                  ),
+                ),
+                SizedBox(height: 20.v), // 添加垂直間距
+                // 添加水平排列的按鈕
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 按鈕之間均勻分布
+                  children: [
+                    // 返回按鈕
+                    Container(
+                      height: 42.v, // 按鈕容器高度
+                      width: 114.h, // 設置按鈕寬度
+                      decoration: ShapeDecoration(
+                        color: Colors.white, // 按鈕背景顏色
+                        shape: RoundedRectangleBorder(
+                          side: BorderSide(
+                              width: 1.h,
+                              color: Color(0xFFA7BA89)), // 設置邊框顏色和寬度
+                          borderRadius: BorderRadius.circular(20), // 設置圓角大小
+                        ),
+                      ),
+                      child: Center(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text(
+                            '取消', // 按鈕文本
+                            textAlign: TextAlign.center, // 文本居中對齊
+                            style: buttonTextStylePrimary,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // 確認按鈕
+                    Container(
+                      height: 42.v, // 按鈕容器高度
+                      width: 114.h, // 設置按鈕寬度
+                      decoration: ShapeDecoration(
+                        color: Color(0xFFA7BA89), // 按鈕背景顏色
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20), // 設置圓角大小
+                        ),
+                      ),
+                      child: Center(
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop(); // 點擊按鈕時關閉對話框
+                          },
+                          child: Text(
+                            '確認', // 按鈕文本
+                            textAlign: TextAlign.center, // 文本居中對齊
+                            style: buttonTextStyleWhite,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
+// 標題文字樣式常數
+TextStyle dialogTitleStyle = TextStyle(
+    color: Color(0xFF545453),
+    fontSize: 25.fSize,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w100,
+    letterSpacing: -0.32);
+
+// 提示文字樣式常數
+TextStyle dialogContentStyle = TextStyle(
+    color: Color(0xFF545453),
+    fontSize: 16.fSize,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w100,
+    letterSpacing: -0.32);
+
+TextStyle buttonTextStyleWhite = TextStyle(
+    color: Colors.white,
+    fontSize: 18.fSize,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w600,
+    height: 1.0);
+
+TextStyle buttonTextStylePrimary = TextStyle(
+    color: Color(0xFFA7BA89),
+    fontSize: 18.fSize,
+    fontFamily: 'Inter',
+    fontWeight: FontWeight.w600,
+    height: 1.0);
 /*
 前端:
 - 當我從 addFriend.dart 同意好友然後按返回鍵回到 friendScreen.dart，icon 數字沒有及時修改
