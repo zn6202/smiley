@@ -357,11 +357,10 @@ class _FriendscreenState extends State<Friendscreen> {
                               IconButton(
                                 padding: EdgeInsets.only(left: 12.h),
                                 icon:
-                                    Image.asset('assets/images/delFriend.png'),
-                                onPressed: () {
-                                  // 弹出确认对话框
-                                  showDelConfirmationDialog(context);
-                                },
+                                  Image.asset('assets/images/delFriend.png'),
+                                  onPressed: () {
+                                    showDelConfirmationDialog(context, int.parse(filteredFriends[index]['id']!), index); // 傳遞好友 ID 和 index
+                                  },
                               ),
                             ],
                           ),
@@ -375,7 +374,7 @@ class _FriendscreenState extends State<Friendscreen> {
     );
   }
 
-  showDelConfirmationDialog(BuildContext context) {
+  showDelConfirmationDialog(BuildContext context, int friendId, int index) {
     // 顯示對話框
     showDialog(
       context: context,
@@ -478,6 +477,7 @@ class _FriendscreenState extends State<Friendscreen> {
                       child: Center(
                         child: TextButton(
                           onPressed: () {
+                            delFriend(friendId, index); // 刪除好友
                             Navigator.of(context).pop(); // 點擊按鈕時關閉對話框
                           },
                           child: Text(

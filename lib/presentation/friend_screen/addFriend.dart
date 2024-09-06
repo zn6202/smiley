@@ -16,7 +16,11 @@ class AddFriend extends StatefulWidget {
 class _AddFriendState extends State<AddFriend> {
   List<Map<String, String>> friendRequests = [];
   List<Map<String, String>> searchResults = [];
+  List<Map<String, String>> friends = [];
+  List<Map<String, String>> filteredFriends = [];
   List invitedListMember = [];
+  List sentFriendRequests = []; // 我發出的好友請求
+  List receivedFriendRequests = [];
   String searchText = '';
   bool showSuccessMessage = false;
   Map<String, String>? acceptedFriend;
@@ -29,6 +33,7 @@ class _AddFriendState extends State<AddFriend> {
   void initState() {
     super.initState();
     fetchFriendRequests();
+    fetchFriends();
 
     // 監聽焦點變化
     searchFocusNode.addListener(() {
@@ -44,14 +49,68 @@ class _AddFriendState extends State<AddFriend> {
     });
   }
 
-  Future<String?> getUserId() async { // 使用者的 id
+  Future<String?> getUserId() async {
+    // 使用者的 id
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_id');
   }
 
+  Future<void> fetchFriends() async {
+    final String? userId = await getUserId();
+    // print("進入呈現好友列表函式 $userId");
+
+    final response = await http.post(
+      Uri.parse(API.getFriends),
+      body: {
+        'user_id': userId,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body);
+      final exp = result['users'];
+      print('result是: $exp');
+
+      // 確保 `result` 是 Map 類型，並檢查 `success` 是否為 true
+      if (result['success']) {
+        // 檢查 `users` 是否存在且是 List 類型
+        if (result['users'] is List) {
+          List<Map<String, String>> tempFriendRequests = [];
+          for (var item in result['users']) {
+            // 確保 item 是 Map<String, dynamic>
+            if (item is Map<String, dynamic>) {
+              tempFriendRequests.add({
+                'id': item['id'].toString(),
+                'name': item['name'] as String,
+                'photo': item['photo'] as String,
+              });
+            }
+          }
+
+          setState(() {
+            friends = tempFriendRequests;
+          });
+          print("好友列表: $friends");
+        } else {
+          print('Invalid format for users');
+          setState(() {
+            friends = [];
+          });
+        }
+      } else {
+        print('User not found or invalid success flag');
+        setState(() {
+          friends = [];
+        });
+      }
+    } else {
+      throw Exception('Failed to load user');
+    }
+  }
+
   Future<void> fetchFriendRequests() async {
     final String? userId = await getUserId();
-    print("進入被邀請好友列表函式 $userId");
+    print("進入加好友的邀請好友列表函式 $userId");
 
     final response = await http.post(
       Uri.parse(API.invitedList),
@@ -62,46 +121,69 @@ class _AddFriendState extends State<AddFriend> {
 
     if (response.statusCode == 200) {
       final result = json.decode(response.body);
-      final exp=result['users'];
-      print('result是: $exp');
+      print('result是: $result');
 
       // 確保 `result` 是 Map 類型，並檢查 `success` 是否為 true
       if (result['success']) {
-        // 檢查 `users` 是否存在且是 List 類型
-        if (result['users'] is List) {
-          List<Map<String, String>> tempFriendRequests = [];
-          List<String> tempInvitedListMember = [];
+        List<Map<String, String>> tempSentRequests = [];
+        List<Map<String, String>> tempReceivedRequests = [];
+        List<String> tempInvitedListMember = [];
+        List<Map<String, String>> tempFriendRequests = [];
+        //         List<String> tempInvitedListMember = [];
 
-          for (var item in result['users']) {
-            // 確保 item 是 Map<String, dynamic>
+        //         for (var item in result['users']) {
+        //           // 確保 item 是 Map<String, dynamic>
+        //           if (item is Map<String, dynamic>) {
+        //             tempFriendRequests.add({
+        // 處理發出的好友請求
+        if (result['sent_by_me'] is List) {
+          for (var item in result['sent_by_me']) {
             if (item is Map<String, dynamic>) {
+              tempSentRequests.add({
+                'id': item['id'].toString(),
+                'name': item['name'] as String,
+                'photo': item['photo'] as String,
+              });
+            }
+          }
+        }
+
+        // 處理收到的好友請求
+        if (result['sent_by_other'] is List) {
+          for (var item in result['sent_by_other']) {
+            if (item is Map<String, dynamic>) {
+              tempReceivedRequests.add({
+                'id': item['id'].toString(),
+                'name': item['name'] as String,
+                'photo': item['photo'] as String,
+              });
               tempFriendRequests.add({
                 'id': item['id'].toString(),
                 'name': item['name'] as String,
                 'photo': item['photo'] as String,
               });
-
-              // 将 user_id 添加到 invitedListMember 中
-              tempInvitedListMember.add(item['id'] as String); // assuming 'id' is returned
+              // 將 user_id 添加到 invitedListMember 中
+              tempInvitedListMember.add(item['id'].toString()); // 假設 'id' 是回傳的值
             }
           }
-          
-          setState(() {
-            friendRequests = tempFriendRequests;
-            invitedListMember = tempInvitedListMember;
-          });
-          print("想加的好友列表 有: $friendRequests");
-          print("想加我好友的 id 有: $invitedListMember");
-        } else {
-          print('Invalid format for users');
-          setState(() {
-            friendRequests = [];
-          });
         }
+
+        setState(() {
+          sentFriendRequests = tempSentRequests; // 我發出的好友請求
+          friendRequests = tempFriendRequests; // 對我發邀請
+          receivedFriendRequests = tempReceivedRequests; // 我收到的好友請求
+          invitedListMember = tempInvitedListMember; // 想加我的好友的 id
+        });
+
+        print("我發出的好友邀請列表 有: $sentFriendRequests");
+        print("想加我的好友列表 有: $friendRequests");
+        print("想加我的好友列表 有: $receivedFriendRequests");
+        print("想加我好友的 id 有: $invitedListMember");
       } else {
         print('User not found or invalid success flag');
         setState(() {
-          friendRequests = [];
+          sentFriendRequests = [];
+          receivedFriendRequests = [];
         });
       }
     } else {
@@ -109,17 +191,18 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  Future<void> searchUsers(String query) async { //搜尋用戶後端資料
+  Future<void> searchUsers(String query) async {
+    //搜尋用戶後端資料
     final String? userId = await getUserId();
     print("進入搜尋好友函式");
-    // 以 aaa 為例: 
+    // 以 aaa 為例:
     // 想加 aaa 好友的 id 有: [39, 23]，如果 aaa 在加好友搜尋 39 或 23，右邊顯示的 icon 要換
     // invitedListMember = [39, 23]
-    if (invitedListMember.contains(query)){
+    if (invitedListMember.contains(query.toString())) {
       setState(() {
         // 顯示的人
       });
-    }else if (userId != query){
+    } else if (userId != query) {
       final response = await http.post(
         Uri.parse(API.searchUser), // 解析字串變成 URI 對象
         body: {
@@ -140,11 +223,16 @@ class _AddFriendState extends State<AddFriend> {
               }
             ];
           });
+          print('存入的搜尋結果: $searchResults');
+          print('搜尋的 query: $query');
+
         } else {
           setState(() {
             searchResults = [];
           });
-          print('User not found.');
+          print('找不到該用戶.');
+          print('搜尋的 query: $query');
+          print('invitedListMember: $invitedListMember');
         }
       } else {
         throw Exception('Failed to load user');
@@ -152,7 +240,7 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  void acceptFriend(int userInvite ,int index) async{
+  void acceptFriend(int userInvite, int index) async {
     final String? userId = await getUserId();
     print("進入接受好友函式: $userInvite 邀請 $userId");
 
@@ -179,7 +267,6 @@ class _AddFriendState extends State<AddFriend> {
           });
         });
         print("接受邀請成功");
-
       } else {
         setState(() {
           searchResults = [];
@@ -191,7 +278,7 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  void rejectFriend(int userInvite ,int index) async{ 
+  void rejectFriend(int userInvite, int index) async {
     final String? userId = await getUserId();
     print("進入拒絕好友函式: $userId 要拒絕 $userInvite 的邀請");
 
@@ -210,7 +297,6 @@ class _AddFriendState extends State<AddFriend> {
           friendRequests.removeAt(index);
         });
         print("拒絕邀請成功");
-
       } else {
         setState(() {
           searchResults = [];
@@ -222,16 +308,17 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  void sendFriendRequest(int index) async{ 
+  void sendFriendRequest(int index) async {
     final String? userId = await getUserId();
     final friendId = searchResults[index]['id'];
     print("進入搜尋好友函式 userId: $userId , friendId: $friendId");
 
-    if (searchResults[index]['hasRequested'] == 'false'){  // 發送好友請求，並匯進資料庫
+    if (searchResults[index]['hasRequested'] == 'false') {
+      // 發送好友請求，並匯進資料庫
       final response = await http.post(
         Uri.parse(API.inviteFriend), // 解析字串變成 URI 對象
         body: {
-          'user_id':userId,
+          'user_id': userId,
           'friend_id': friendId,
         },
       );
@@ -249,11 +336,12 @@ class _AddFriendState extends State<AddFriend> {
       } else {
         throw Exception('Failed to load user');
       }
-    }else{ // 撤銷好友邀請，從資料庫移除
+    } else {
+      // 撤銷好友邀請，從資料庫移除
       final response = await http.post(
         Uri.parse(API.cancelInviteFriend), // 解析字串變成 URI 對象
         body: {
-          'user_id':userId,
+          'user_id': userId,
           'friend_id': friendId,
         },
       );
@@ -262,7 +350,8 @@ class _AddFriendState extends State<AddFriend> {
         final result = json.decode(response.body);
         if (result['success']) {
           setState(() {
-            searchResults[index]['hasRequested'] = 'false'; //false 為還不是好友(撤銷邀請，對方拒絕)
+            searchResults[index]['hasRequested'] =
+                'false'; //false 為還不是好友(撤銷邀請，對方拒絕)
           });
           print('撤銷好友邀請成功!');
         } else {
@@ -282,16 +371,16 @@ class _AddFriendState extends State<AddFriend> {
         elevation: 0, // 設置應用欄的陰影為0
         backgroundColor: Colors.transparent, // 設置背景透明
         leading: IconButton(
-            icon: SvgPicture.asset(
-              'assets/images/img_arrow_left.svg',
-              color: Color(0xFFA7BA89),
-            ),
-            onPressed: () async {
-              FocusScope.of(context).requestFocus(FocusNode());
-              await Future.delayed(Duration(milliseconds: 300));
-              Navigator.pop(context); // pop 回上一頁的時候，ui 的 icon 數字要變
-            },
+          icon: SvgPicture.asset(
+            'assets/images/img_arrow_left.svg',
+            color: Color(0xFFA7BA89),
           ),
+          onPressed: () async {
+            FocusScope.of(context).requestFocus(FocusNode());
+            await Future.delayed(Duration(milliseconds: 300));
+            Navigator.pop(context); // pop 回上一頁的時候，ui 的 icon 數字要變
+          },
+        ),
         title: Image.asset(
           'assets/images/addFriend_y.png',
           height: 30.v, // 您可以根據需要調整圖片的高度
@@ -305,6 +394,7 @@ class _AddFriendState extends State<AddFriend> {
         },
         child: showSuccessMessage
             ? Center(
+                // 成功接受邀請提示窗
                 key: ValueKey<bool>(showSuccessMessage),
                 child: Container(
                   width: 304.h,
@@ -321,15 +411,18 @@ class _AddFriendState extends State<AddFriend> {
                         children: [
                           CircleAvatar(
                             backgroundColor: Color(0xFFFFFFF), // 設置背景顏色
-                            backgroundImage: AssetImage(acceptedFriend!['photo']!), //我不確定這樣寫能不能顯示接受者的頭像 需確認
+                            backgroundImage: AssetImage(acceptedFriend![
+                                'photo']!), //我不確定這樣寫能不能顯示接受者的頭像 需確認
                             radius: 30,
                           ),
                           SizedBox(width: 10.h),
-                          Image.asset('assets/images/Lightning.png', height: 30),
+                          Image.asset('assets/images/Lightning.png',
+                              height: 30),
                           SizedBox(width: 10.h),
                           CircleAvatar(
                             backgroundColor: Color(0xFFF4F4E6), // 設置背景顏色
-                            backgroundImage: AssetImage('assets/images/default_avatar_9.png'), //顯示自己的頭像
+                            backgroundImage: AssetImage(
+                                'assets/images/default_avatar_9.png'), //顯示自己的頭像
                             radius: 30,
                           ),
                         ],
@@ -350,18 +443,21 @@ class _AddFriendState extends State<AddFriend> {
                 ),
               )
             : Padding(
+                // 搜尋好友的各種情形對應的UI
                 key: ValueKey<bool>(showSuccessMessage),
                 padding: EdgeInsets.all(16.adaptSize),
                 child: Column(
                   children: [
                     Container(
+                      // 搜尋框
                       width: 376.h,
                       height: 44.v,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 10.v),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 20.h, vertical: 10.v),
                       child: Row(
                         children: [
                           Image.asset(
@@ -371,7 +467,7 @@ class _AddFriendState extends State<AddFriend> {
                           SizedBox(width: 10.h),
                           Expanded(
                             child: TextField(
-                              controller: searchController, 
+                              controller: searchController,
                               focusNode: searchFocusNode,
                               onChanged: (value) {
                                 setState(() {
@@ -452,78 +548,131 @@ class _AddFriendState extends State<AddFriend> {
                                           ),
                                         )
                                       : ListView.builder(
-                                        padding: EdgeInsets.symmetric(horizontal: 20.h),
-                                        itemCount: searchResults.length,
-                                        itemBuilder: (context, index) {
-                                          return Padding(
-                                            padding: EdgeInsets.symmetric(vertical: 10.v),
-                                            child: Row(
-                                              children: [
-                                                Stack(
-                                                  alignment: Alignment.centerLeft,
-                                                  children: [
-                                                    Container(
-                                                      width: 67.h,
-                                                      height: 67.v,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
+                                          padding: EdgeInsets.symmetric(horizontal: 20.h),
+                                          itemCount: searchResults.length,
+                                          itemBuilder: (context, index) {String searchedUserId = searchResults[index]['id']!;
+
+                                            // 判斷關係
+                                            bool isFriend = friends.any((friend) => friend['id'].toString() == searchResults[index]['id'].toString());
+                                            bool isSentByMe = sentFriendRequests.any((request) => request['id'] == searchedUserId);
+                                            bool isReceivedByMe = friendRequests.any((request) => request['id'] == searchedUserId);
+
+                                            // 檢查
+                                            print('目前的好友列表: $friends');
+                                            print('目前收到的好友邀請: $receivedFriendRequests'); //friendRequests
+                                            print('搜尋到的用戶ID: $searchedUserId');
+                                            print('isFriend: $isFriend, isSentByMe: $isSentByMe, isReceivedByMe: $isReceivedByMe');
+
+                                            return Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 10.v),
+                                              child: Row(
+                                                children: [
+                                                  Stack(
+                                                    alignment: Alignment.centerLeft,
+                                                    children: [
+                                                      Container(
+                                                        width: 67.h,
+                                                        height: 67.v,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          shape: BoxShape.circle,
+                                                        ),
                                                       ),
-                                                    ),
-                                                    Container(
-                                                      width: 250.h,
-                                                      height: 50.v,
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius: BorderRadius.circular(25),
-                                                      ),
-                                                      child: Row(
-                                                        children: [
-                                                          Container(
-                                                            width: 45.h,
-                                                            height: 45.v,
-                                                            margin: EdgeInsets.only(left: 10.h),
-                                                            decoration: BoxDecoration(
-                                                              shape: BoxShape.circle,
-                                                              image: DecorationImage(
-                                                                image: NetworkImage(searchResults[index]['photo']!),
-                                                                // image: AssetImage(searchResults[index]['photo']!),
-                                                                fit: BoxFit.cover,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                          Expanded(
-                                                            child: Center(
-                                                              child: Text(
-                                                                searchResults[index]['name']!,
-                                                                style: TextStyle(
-                                                                  fontSize: 20.fSize,
-                                                                  fontWeight: FontWeight.w700,
-                                                                  color: Color(0xFF545453),
+                                                      Container(
+                                                        width: 250.h,
+                                                        height: 50.v,
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.white,
+                                                          borderRadius: BorderRadius.circular(25),
+                                                        ),
+                                                        child: Row(
+                                                          children: [
+                                                            Container(
+                                                              width: 45.h,
+                                                              height: 45.v,
+                                                              margin: EdgeInsets.only(left:10.h),
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                image:DecorationImage(
+                                                                  image: NetworkImage(searchResults[index]['photo']!),
+                                                                  fit: BoxFit.cover,
                                                                 ),
                                                               ),
                                                             ),
-                                                          ),
-                                                        ],
+                                                            Expanded(
+                                                              child: Center(
+                                                                child: Text(
+                                                                  searchResults[index]['name']!,
+                                                                  style:TextStyle(
+                                                                    fontSize: 20.fSize,
+                                                                    fontWeight:FontWeight.w700,
+                                                                    color: Color(0xFF545453),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                SizedBox(width: 5.h),
-                                                IconButton(
-                                                  icon: searchResults[index]['hasRequested'] == 'true'
-                                                      ? Image.asset('assets/images/delFriend.png')
-                                                      : Icon(Icons.person_add, color: Color(0xFFA7BA89)),
-                                                  iconSize: 30.adaptSize,
-                                                  onPressed: () {
-                                                    sendFriendRequest(index);
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                        },
-                                      ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(width: 5.h),
+
+                                                  // 顯示對應的圖標或按鈕
+                                                  isFriend
+                                                      ? IconButton(
+                                                          icon: Image.asset('assets/images/delFriend.png'),
+                                                          iconSize:30.adaptSize,
+                                                          onPressed: () {
+                                                            // showDelConfirmationDialog(
+                                                            //     context, int.parse(searchResults[index]['id']!), index);
+                                                          },
+                                                        )
+                                                      : isReceivedByMe
+                                                          ? Row(
+                                                              children: [
+                                                                IconButton(
+                                                                  padding: EdgeInsets.only(left: 12.h),
+                                                                  icon: Image.asset('assets/images/acceptFriend.png'),
+                                                                  onPressed:() {
+                                                                    int whoInviteMe = int.parse(friendRequests.firstWhere((request) => request['id'] == searchedUserId)['id']!);
+                                                                    acceptFriend(whoInviteMe, index);
+                                                                  },
+                                                                ),
+                                                                SizedBox(width: 5.h),
+                                                                IconButton(
+                                                                  padding: EdgeInsets.only(left:12.h),
+                                                                  icon: Image.asset('assets/images/delFriend.png'),
+                                                                  onPressed:() {
+                                                                    int whoInviteMe = int.parse(friendRequests.firstWhere((request) =>
+                                                                        request['id'] ==searchedUserId)['id']!);
+                                                                    rejectFriend(whoInviteMe,index);
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            )
+                                                          : isSentByMe
+                                                              ? Text(
+                                                                  '已送出',
+                                                                  style: TextStyle(
+                                                                    color: Colors.grey,
+                                                                    fontSize:16,
+                                                                    fontWeight:FontWeight.bold,
+                                                                  ),
+                                                                )
+                                                              : IconButton(
+                                                                  icon: Icon(Icons.person_add_alt,color: Color(0xFFA7BA89)),
+                                                                  iconSize: 30.adaptSize,
+                                                                  onPressed:() {
+                                                                    sendFriendRequest(index);
+                                                                  },
+                                                                ),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
                                 ),
                               ],
                             ),
@@ -614,8 +763,7 @@ class _AddFriendState extends State<AddFriend> {
                                                   SizedBox(width: 5.h),
                                                   IconButton(
                                                     padding: EdgeInsets.only(left: 12.h),
-                                                    icon: Image.asset(
-                                                        'assets/images/acceptFriend.png'),
+                                                    icon: Image.asset('assets/images/acceptFriend.png'),
                                                     onPressed: () {
                                                       int whoInviteMe = int.parse(friendRequests[index]['id']!);
                                                       print('whoInviteMe: $whoInviteMe');
@@ -625,8 +773,7 @@ class _AddFriendState extends State<AddFriend> {
                                                   SizedBox(width: 5.h),
                                                   IconButton(
                                                     padding: EdgeInsets.only(left: 12.h),
-                                                    icon: Image.asset(
-                                                        'assets/images/delFriend.png'),
+                                                    icon: Image.asset('assets/images/delFriend.png'),
                                                     onPressed: () {
                                                       int whoInviteMe = int.parse(friendRequests[index]['id']!);
                                                       print('whoInviteMe: $whoInviteMe');
@@ -804,8 +951,11 @@ TextStyle buttonTextStylePrimary = TextStyle(
     height: 1.0);
 
 /*
-前端修改:
-- 114，如果對方已加我好友，當我搜尋對方時，icon 要是 "勾勾" 或 "叉叉"
-- new! 292 335 pop 回上一頁的時候，ui 的 icon 數字要變
+前端:
+- 送出交友邀請後要變成已送出
+- 接收別人的好友邀請後要重新進入friendPage才會刷新好友名單
+- 搜尋不到寄邀請給我的用戶
 
+後端:
+- icon數字抓錯 現在抓成已處理的(status = 1)
 */
