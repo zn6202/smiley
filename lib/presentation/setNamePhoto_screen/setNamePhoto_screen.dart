@@ -102,7 +102,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
 
   Future<String?> getFirebaseId() async {
     final Avatar = await SharedPreferences.getInstance();
-    return Avatar.getString('firebaseId');
+    return Avatar.getString('firebaseUid');
   }
 
   Future<void> saveStatus(String status) async {
@@ -125,6 +125,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   // 添加完成的處理函數
   void addComplete() async {
     // 獲取導航傳遞過來的Firebase UID
+    print('歡迎進入註冊後頭貼設定');
     firebaseId = await getFirebaseId();
     print('firebaseId 是 = $firebaseId');
     if (firebaseId == null) {
@@ -311,9 +312,9 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                                       : NetworkImage(
                                               'http://163.22.32.24/smiley_backend/img/photo/$selectedAvatarPath')
                                           as ImageProvider<Object>
-                                      // : NetworkImage(
-                                      //         'http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath')
-                                      //     as ImageProvider<Object>
+                                  // : NetworkImage(
+                                  //         'http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath')
+                                  //     as ImageProvider<Object>
                                   : AssetImage(
                                           'assets/images/default_avatar_9.png')
                                       as ImageProvider<Object>,

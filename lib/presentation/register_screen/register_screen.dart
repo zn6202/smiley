@@ -87,28 +87,42 @@ class _RegisterScreenState extends State<RegisterScreen> {
   // google 註冊(如果已經註冊過就會直接登入)
   Future<void> signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email'],
-      );
-      
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
+      if (googleUser == null) {
+        print('使用者取消了 Google 登入');
+        return;
+      }
+
+      // 如果需要登出，應該在 GoogleSignIn 的實例上調用 signOut
+      await GoogleSignIn().signOut(); // 正確的 signOut 方法
+      print('User signed out from GoogleSignIn');
+
+      final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
+
+      // 登入 Firebase
       final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
       final bool isNewUser = userCredential.additionalUserInfo?.isNewUser ?? false;
 
-      // 確認使用者 id
-      firebaseId = credential.idToken;
-      print("註冊成功! 使用者的ID: ${firebaseId}");
+      // 確認使用者的 Firebase UID
+      final User? firebaseUser = userCredential.user;
+      if (firebaseUser == null) {
+        print('Firebase 使用者無法取得');
+        return;
+      }
 
+      // 正確使用 Firebase UID
+      final String firebaseUid = firebaseUser.uid;
+      print("註冊成功! Firebase UID: $firebaseUid");
+
+      // 儲存 Firebase UID 到 SharedPreferences
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('firebaseId', firebaseId!);
+      await prefs.setString('firebaseUid', firebaseUid);
 
       if (isNewUser) {
         print("使用者是新註冊的");
@@ -117,14 +131,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         print("使用者已經註冊過");
         // 已註冊過的用戶，導航到 diaryMainScreen
-        Navigator.pushNamed(context, AppRoutes.homeScreen);
+        Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
       }
     } catch (e) {
       print('Google sign in error: $e');
-      // 處理登入錯誤
-      // 可以顯示錯誤訊息給用戶或者執行其他處理邏輯
+      // 處理登入錯誤，可以顯示錯誤訊息給用戶或者執行其他處理邏輯
     }
   }
+
 
 
   // 全局表單鍵

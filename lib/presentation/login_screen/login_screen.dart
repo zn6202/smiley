@@ -70,51 +70,63 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  // google 登入(如果已經註冊過就會直接登入)
+  /// Google 登入 (如果已經註冊過就會直接登入)
   Future<void> signInWithGoogle() async {
     try {
+      // Google 登入並取得使用者資訊
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
-      final GoogleSignInAuthentication? googleAuth =
-          await googleUser?.authentication;
+      if (googleUser == null) {
+        print('Google 登入取消');
+        return;
+      }
 
+      final GoogleSignInAuthentication? googleAuth = await googleUser.authentication;
+
+      // 使用獲取到的 Google 凭證登入 Firebase
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      firebaseId = credential.idToken;
-      print("登入成功! 使用者的ID: ${firebaseId}");
-      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // 使用憑證登入 Firebase 並取得 UserCredential
+      final UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // 從 userCredential 中提取 Firebase UID
+      final String firebaseUid = userCredential.user?.uid ?? '';
+      if (firebaseUid.isEmpty) {
+        print('獲取 Firebase UID 失敗');
+        return;
+      }
+
+      print("登入成功! 使用者的 Firebase UID: $firebaseUid");
 
       // 從伺服器獲取 user_id 並存儲到 SharedPreferences
-      await _fetchAndSaveUserId(firebaseId);
+      await _fetchAndSaveUserId(firebaseUid);
 
       status = 'member';
       await saveStatus(status!);
 
-      // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+      // 登入成功後導航到 DiaryMainScreen
+      _navigateToDiaryMainScreen();
     } catch (e) {
       print('Google sign in error: $e');
-      // 處理登入錯誤
-      // 可以顯示錯誤訊息給用戶或者執行其他處理邏輯
+      // 處理登入錯誤，可以顯示錯誤訊息給用戶或者執行其他處理邏輯
     }
   }
 
   Future<void> _fetchAndSaveUserId(String? firebaseUid) async {
-    final response = await http.post(
-      Uri.parse(API.getUid), // 替換為你的 API 路徑
-      body: {
-        'firebase_user_id': firebaseUid,
-      },
-    );
-    print('Response body: ${response.body}');
+    try {
+      final response = await http.post(
+        Uri.parse(API.getUid), // 替換為你的 API 路徑
+        body: {
+          'firebase_user_id': firebaseUid,
+        },
+      );
 
-    if (response.statusCode == 200) {
-      try {
+      print('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
         var responseData = jsonDecode(response.body);
         if (responseData['success'] == true) {
           int userId = responseData['user_id'];
@@ -127,14 +139,22 @@ class _LoginScreenState extends State<LoginScreen> {
         } else {
           print('伺服器返回錯誤: ${responseData['message']}');
         }
-      } catch (e) {
-        print('JSON 解析錯誤: $e');
-        // 顯示錯誤訊息給用戶或執行其他處理邏輯
+      } else {
+        print('請求失敗，狀態碼: ${response.statusCode}');
       }
-    } else {
-      print('請求失敗，狀態碼: ${response.statusCode}');
+    } catch (e) {
+      print('HTTP 請求或 JSON 解析錯誤: $e');
+      // 顯示錯誤訊息給用戶或執行其他處理邏輯
     }
   }
+
+  void _navigateToDiaryMainScreen() {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+    );
+  }
+
 
   // 定義切換密碼可見性的方法
   void togglePasswordVisibility() {
