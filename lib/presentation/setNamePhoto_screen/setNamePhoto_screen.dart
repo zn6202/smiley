@@ -30,10 +30,13 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   String? firebaseId; // Firebase用戶ID
   String? sourcePage; // 紀錄導航來源頁面
   final picker = ImagePicker(); // 圖片選擇器實例
-  String?
-      selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
+  String? selectedAvatarPath; // 選擇的預設頭像路徑(從 defaultAvatar.dart 傳來的預設圖片路徑，沒選擇的話就是 dafault_avatar_9 )
   String? defaultUserName;
   String? status;
+  String? setNameStatus = '';
+  String? setNameError;
+  String? setAvatarStatus = '';
+  String? setAvatarError;
 
   @override
   void initState() {
@@ -123,7 +126,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   // }
 
   // 添加完成的處理函數
-  void addComplete() async {
+  Future<void> addComplete() async {
     // 獲取導航傳遞過來的Firebase UID
     print('歡迎進入註冊後頭貼設定');
     firebaseId = await getFirebaseId();
@@ -132,9 +135,30 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       print('Error是: firebaseId is null');
       return;
     }
-    if (selectedAvatarPath == null) {
-      print('Error是: selectedAvatarPath is null');
+    if (_controller.text.trim().isEmpty) {
+      setState(() {
+        setNameStatus = 'nameUndifined';
+        setNameError = '名字尚未輸入';
+      });
+      print('Error是: 未輸入名字 setNameStatus 是 = $setNameStatus'); // 要跳出紅字顯示藥書名字
       return;
+    }else{
+      setState(() {
+        setNameStatus = 'save';
+      });
+    }
+
+    if (selectedAvatarPath == null) {
+      setState(() {
+        setAvatarStatus = 'avatarUndifined';
+        setAvatarError = '尚未選擇大頭貼';
+      });
+      print('Error是: selectedAvatarPath is null setAvatarStatus 是 = $setAvatarStatus');
+      return;
+    }else{
+      setState(() {
+        setAvatarStatus = 'save';
+      });
     }
 
     // 設置請求的URI
@@ -147,24 +171,26 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
       0,
       firebaseId!,
       _controller.text.trim(),
-      _image != null ? _image!.path.split('/').last : selectedAvatarPath!,
+      _image != null
+          ? _image!.path.split('/').last
+          : selectedAvatarPath!, // 若 selectedAvatarPath 為 null 使用默認圖片
     );
 
     // 添加文本字段到請求
     user.toJson().forEach((key, value) {
       request.fields[key] = value;
     });
-    print('Request fields: ${request.fields}');
+    print('Request fields 是: ${request.fields}');
 
-    // 如果有選擇圖片，添加圖片到請求
     if (_image != null) {
       var pic = await http.MultipartFile.fromPath("photo", _image!.path);
       request.files.add(pic);
       print('Image Path: ${_image!.path}');
     } else {
       // 使用默認圖片
+      // request.fields['photo'] = 'default_avatar.png'; // 確保傳遞默認圖片名稱
       request.fields['default_photo'] = 'true';
-      print('Using default image: ${selectedAvatarPath}');
+      print('Using default image 是:${selectedAvatarPath}');
     }
 
     // 發送請求並處理回應
@@ -179,7 +205,8 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
         // await saveAlbumPhoto(_image!.path);
         status = 'member';
         await saveStatus(status!);
-        print("Congratulations, you are SignUp Successfully.");
+        print(
+            "Congratulations, you are SignUp Successfully.setNameStatus 是 = $setNameStatus.setAvatarStatus 是 = $setAvatarStatus");
         //在此添加保存图片到本地存储的程式
       } else {
         print("Error Occurred: ${result['message']}");
@@ -316,7 +343,7 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                                   //         'http://192.168.56.1/smiley_backend/img/photo/$selectedAvatarPath')
                                   //     as ImageProvider<Object>
                                   : AssetImage(
-                                          'assets/images/default_avatar_9.png')
+                                          'assets/images/default.png')
                                       as ImageProvider<Object>,
                         ),
                       ),
@@ -324,24 +351,62 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                   ),
                 ),
                 SizedBox(height: 40.v),
-                Container(
-                  width: 254.h,
-                  height: 44.v,
-                  child: TextField(
-                    controller: _controller,
-                    textAlignVertical: TextAlignVertical.center,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person, color: Color(0xFFA7BA89)),
-                      hintText: 'me',
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: EdgeInsets.symmetric(vertical: 0.v),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide.none,
+                Column(
+                  children: [
+                    // if (setNameStatus == 'nameUndifined') // 當名字為空時顯示紅色提示
+                    //   Padding(
+                    //     padding: EdgeInsets.only(bottom: 8.0),
+                    //     child: Text(
+                    //       setNameError  ?? '',
+                    //       style: TextStyle(
+                    //         color: Colors.red,
+                    //         fontSize: 16.fSize,
+                    //       ),
+                    //     ),
+                    //   )
+                    // else
+                    //   Padding(
+                    //     padding: EdgeInsets.only(bottom: 8.0),
+                    //   ),
+                    SizedBox(
+                      height: 57.v,
+                      child: Center(
+                        child: (setNameStatus == 'nameUndifined')
+                            ? Text(
+                                setNameError!,
+                                style: TextStyle(
+                                    color: Colors.red, fontSize: 16.fSize),
+                              )
+                            : (setAvatarStatus == 'avatarUndifined')
+                              ? Text(
+                                  setAvatarError!,
+                                  style: TextStyle(
+                                      color: Colors.red, fontSize: 16.fSize),
+                                )
+                              : null,
                       ),
                     ),
-                  ),
+                    Container(
+                      width: 254.h,
+                      height: 44.v,
+                      child: TextField(
+                        controller: _controller,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          prefixIcon:
+                              Icon(Icons.person, color: Color(0xFFA7BA89)),
+                          hintText: 'me',
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: EdgeInsets.symmetric(vertical: 0.v),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 40.v),
                 Container(
@@ -356,9 +421,21 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
                         Navigator.pushNamed(context, AppRoutes.setting);
                       } else {
                         FocusScope.of(context).requestFocus(FocusNode());
-                        await Future.delayed(Duration(milliseconds: 500));
-                        addComplete();
-                        Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
+                        // await Future.delayed(Duration(milliseconds: 500));
+                        await addComplete(); //
+                        print("在前端 setNameStataus 是 $setNameStatus setAvatarStataus 是 $setAvatarStatus");
+                        if (setNameStatus != 'nameUndifined' && setAvatarStatus != 'avatarUndifined') {
+                          // 確保 context 是有效的
+                          if (Navigator.canPop(context)) {
+                            Navigator.pushNamed(
+                                context, AppRoutes.diaryMainScreen);
+                          } else {
+                            // 如果無法導航，打印錯誤信息
+                            print('無法導航到指定的路由');
+                          }
+                        } else {
+                          print('setNameStatus 是 nameUndifined 或 setAvatarStatus 是 avatarUndifined，導航被阻止');
+                        }
                       }
                     },
                     child: Text(
@@ -387,3 +464,4 @@ class _SetNamePhotoState extends State<SetNamePhoto> {
   }
 }
 // 後端: 301 改 ip 位址 163.22.32.24
+//

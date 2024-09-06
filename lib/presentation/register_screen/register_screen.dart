@@ -51,7 +51,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // 登入成功後導航到下一個畫面，這裡假設登入成功後要跳轉到首頁
         
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('firebaseId', firebaseId!);
+        await prefs.setString('firebaseUid', firebaseId!);
 
         Navigator.pushNamed(context, AppRoutes.setNamePhoto);
       }

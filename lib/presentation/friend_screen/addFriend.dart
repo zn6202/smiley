@@ -55,7 +55,7 @@ class _AddFriendState extends State<AddFriend> {
     return prefs.getString('user_id');
   }
 
-  Future<void> fetchFriends() async {
+  Future<void> fetchFriends() async { // 取得好友名單
     final String? userId = await getUserId();
     // print("進入呈現好友列表函式 $userId");
 
@@ -108,7 +108,7 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  Future<void> fetchFriendRequests() async {
+  Future<void> fetchFriendRequests() async { // 取得有交友邀請關係的名單
     final String? userId = await getUserId();
     print("進入加好友的邀請好友列表函式 $userId");
 
@@ -176,8 +176,8 @@ class _AddFriendState extends State<AddFriend> {
         });
 
         print("我發出的好友邀請列表 有: $sentFriendRequests");
-        print("想加我的好友列表 有: $friendRequests");
-        print("想加我的好友列表 有: $receivedFriendRequests");
+        print("想加我的好友列表1 有: $friendRequests"); // 跟列表2一模一樣
+        print("想加我的好友列表2 有: $receivedFriendRequests");
         print("想加我好友的 id 有: $invitedListMember");
       } else {
         print('User not found or invalid success flag');
@@ -191,14 +191,10 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  Future<void> searchUsers(String query) async {
-    //搜尋用戶後端資料
+  Future<void> searchUsers(String query) async { // 輸入後搜尋的用戶後端資料
     final String? userId = await getUserId();
     print("進入搜尋好友函式");
-    // 以 aaa 為例:
-    // 想加 aaa 好友的 id 有: [39, 23]，如果 aaa 在加好友搜尋 39 或 23，右邊顯示的 icon 要換
-    // invitedListMember = [39, 23]
-    if (invitedListMember.contains(query.toString())) {
+    if (receivedFriendRequests.contains(query.toString())) {
       setState(() {
         // 顯示的人
       });
@@ -232,7 +228,9 @@ class _AddFriendState extends State<AddFriend> {
           });
           print('找不到該用戶.');
           print('搜尋的 query: $query');
-          print('invitedListMember: $invitedListMember');
+          print('invitedListMemberId: $invitedListMember');
+          print('invitedListMemberId: $receivedFriendRequests');
+
         }
       } else {
         throw Exception('Failed to load user');
@@ -240,7 +238,7 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  void acceptFriend(int userInvite, int index) async {
+  void acceptFriend(int userInvite, int index) async { // 接受好友邀請
     final String? userId = await getUserId();
     print("進入接受好友函式: $userInvite 邀請 $userId");
 
@@ -278,7 +276,7 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  void rejectFriend(int userInvite, int index) async {
+  void rejectFriend(int userInvite, int index) async { // 拒絕好友邀請
     final String? userId = await getUserId();
     print("進入拒絕好友函式: $userId 要拒絕 $userInvite 的邀請");
 
@@ -308,7 +306,7 @@ class _AddFriendState extends State<AddFriend> {
     }
   }
 
-  void sendFriendRequest(int index) async {
+  void sendFriendRequest(int index) async { // 發送好友邀請
     final String? userId = await getUserId();
     final friendId = searchResults[index]['id'];
     print("進入搜尋好友函式 userId: $userId , friendId: $friendId");
@@ -350,8 +348,7 @@ class _AddFriendState extends State<AddFriend> {
         final result = json.decode(response.body);
         if (result['success']) {
           setState(() {
-            searchResults[index]['hasRequested'] =
-                'false'; //false 為還不是好友(撤銷邀請，對方拒絕)
+            searchResults[index]['hasRequested'] = 'false'; //false 為還不是好友(撤銷邀請，對方拒絕)
           });
           print('撤銷好友邀請成功!');
         } else {
@@ -556,7 +553,9 @@ class _AddFriendState extends State<AddFriend> {
                                             bool isFriend = friends.any((friend) => friend['id'].toString() == searchResults[index]['id'].toString());
                                             bool isSentByMe = sentFriendRequests.any((request) => request['id'] == searchedUserId);
                                             bool isReceivedByMe = friendRequests.any((request) => request['id'] == searchedUserId);
-
+                                            bool hasRequested = searchResults[index]['hasRequested'] == 'true'; // 是否送出邀請
+                                            bool isRequestSent = isSentByMe || hasRequested;
+                                            
                                             // 檢查
                                             print('目前的好友列表: $friends');
                                             print('目前收到的好友邀請: $receivedFriendRequests'); //friendRequests
@@ -580,7 +579,7 @@ class _AddFriendState extends State<AddFriend> {
                                                         ),
                                                       ),
                                                       Container(
-                                                        width: 250.h,
+                                                        width: 215.h,
                                                         height: 50.v,
                                                         decoration: BoxDecoration(
                                                           color: Colors.white,
@@ -652,15 +651,20 @@ class _AddFriendState extends State<AddFriend> {
                                                                 ),
                                                               ],
                                                             )
-                                                          : isSentByMe
-                                                              ? Text(
-                                                                  '已送出',
-                                                                  style: TextStyle(
-                                                                    color: Colors.grey,
-                                                                    fontSize:16,
-                                                                    fontWeight:FontWeight.bold,
-                                                                  ),
-                                                                )
+                                                          : isRequestSent
+                                                              ?TextButton(
+                                                                    onPressed: () {
+                                                                      if (searchResults[index]['hasRequested'] == 'true') {
+                                                                        sendFriendRequest(index); // 執行撤銷邀請的部分
+                                                                      }
+                                                                    },
+                                                                    child: Text(
+                                                                      
+                                                                      '取消邀請', // 按鈕文本
+                                                                      textAlign: TextAlign.center, // 文本居中對齊
+                                                                      style: buttonTextStylePrimary,
+                                                                    ),
+                                                                  )                                                       
                                                               : IconButton(
                                                                   icon: Icon(Icons.person_add_alt,color: Color(0xFFA7BA89)),
                                                                   iconSize: 30.adaptSize,
@@ -952,9 +956,9 @@ TextStyle buttonTextStylePrimary = TextStyle(
 
 /*
 前端:
-- 送出交友邀請後要變成已送出
+- 送出交友邀請後要變成已送出 - 已解決
 - 接收別人的好友邀請後要重新進入friendPage才會刷新好友名單
-- 搜尋不到寄邀請給我的用戶
+- 搜尋不到寄邀請給我的用戶 - 已解決
 
 後端:
 - icon數字抓錯 現在抓成已處理的(status = 1)

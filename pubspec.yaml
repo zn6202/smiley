@@ -45,6 +45,7 @@ flutter:
     - assets/images/diary.svg
     - assets/images/default_avatar.png
     - assets/images/Record.png
+    - assets/images/default.png
     - assets/images/friend.png
     - assets/images/friend_y.png
     - assets/images/edit.png
