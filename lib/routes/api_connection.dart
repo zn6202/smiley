@@ -38,6 +38,7 @@ class API
   static const getReply = "$hostConnect/comment/getReply.php";
   static const getCommentSum = "$hostConnect/comment/getCommentSum.php";
   static const getFlower = "$hostConnect/flower/getFlower.php";
+  static const getPerfume = "$hostConnect/flower/getPerfume.php";
   static const getInvitedSum = "$hostConnect/user/getInvitedSum.php";
   static const getMusic = "$hostConnect/music/getMusic.php";
 

@@ -68,18 +68,18 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  Future<void> disposeMusic() async {
-    print('音樂暫停且資源釋放中 isPlaying: $isPlaying');
-    WidgetsBinding.instance.removeObserver(this);
-    if (isPlaying == true) {
-      await player?.pause(); // 確保音樂暫停完成
-      saveMusicStatus(false);
-      saveMusicTalk(' \\ 點我去聽音樂 ! /');
-      saveMusicDialog(
-          "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
-    }
-    player?.dispose(); // 釋放資源
-  }
+  // Future<void> disposeMusic() async {
+  //   print('音樂暫停且資源釋放中 isPlaying: $isPlaying');
+  //   WidgetsBinding.instance.removeObserver(this);
+  //   if (isPlaying == true) {
+  //     await player?.pause(); // 確保音樂暫停完成
+  //     saveMusicStatus(false);
+  //     saveMusicTalk(' \\ 點我去聽音樂 ! /');
+  //     saveMusicDialog(
+  //         "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+  //   }
+  //   player?.dispose(); // 釋放資源
+  // }
 
 // 設置播放器監聽器
   // void _setupPlayerListeners() {
@@ -183,8 +183,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             String musicEmoDialog = result['music_dialog'];
             String musicEmoAngMon = result['music_photo'];
 
-            
-            print("音樂撥放成功 musicPath: $musicPath musicEmoDialog: $musicEmoDialog musicEmoAngMon: $musicEmoAngMon");
+            print(
+                "音樂撥放成功 musicPath: $musicPath musicEmoDialog: $musicEmoDialog musicEmoAngMon: $musicEmoAngMon");
 
             player ??= AudioPlayer();
             await player?.setUrl(musicPath);
@@ -352,7 +352,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         // 這裡是下方功能鍵嗎?
         currentIndex: _currentIndex,
         onTap: (index) async {
-          await disposeMusic(); // 等待 disposeMusic 完成
+          // await disposeMusic(); // 等待 disposeMusic 完成
           setState(() {
             _currentIndex = index;
           });
@@ -384,6 +384,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           top: 182.v,
           child: GestureDetector(
             onTap: () {
+              print('音樂暫停且資源釋放中 isPlaying: $isPlaying'); // 拉到左右返回見的時候會跑到這裡
+              WidgetsBinding.instance.removeObserver(this);
+              if (isPlaying == true) {
+                player?.pause(); //音樂暫停
+                saveMusicStatus(false);
+                saveMusicTalk(' \\ 點我去聽音樂 ! /');
+                saveMusicDialog(
+                    "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+              }
+              player?.dispose(); // 釋放音樂資源
               Navigator.pushNamed(context, AppRoutes.diaryMainScreen);
             },
             child: Transform.rotate(
@@ -456,6 +466,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           child: GestureDetector(
             onTap: () {
               if (!hasDiaryToday) {
+                print('音樂暫停且資源釋放中 isPlaying: $isPlaying'); // 拉到左右返回見的時候會跑到這裡
+                WidgetsBinding.instance.removeObserver(this);
+                if (isPlaying == true) {
+                  player?.pause(); //音樂暫停
+                  saveMusicStatus(false);
+                  saveMusicTalk(' \\ 點我去聽音樂 ! /');
+                  saveMusicDialog(
+                      "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+                }
+                player?.dispose(); // 釋放音樂資源
                 Navigator.pushNamed(context, AppRoutes.addDiaryScreen);
               } else {
                 // 可以在這裡添加一些提示，比如顯示一個 SnackBar
@@ -509,11 +529,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         Positioned(
           right: 203.h,
           top: 403.v,
-          child: Image.asset(
-            'assets/images/home/tea.png',
-            width: 57.h,
-            height: 70.v,
-            fit: BoxFit.contain,
+          child: GestureDetector(
+            onTap: () {
+              showPerfumeDialog(context);
+            },
+            child: Image.asset(
+              'assets/images/home/tea.png',
+              width: 57.h,
+              height: 70.v,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
         //音響
@@ -536,11 +561,231 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
+  void showPerfumeDialog(BuildContext context) async {
+    // 先從本地存儲中獲取今天的花名和花語
+    final prefs = await SharedPreferences.getInstance();
+    final String? perfumeName = prefs.getString('perfumeName');
+    final String? perfume = prefs.getString('perfume');
+    final String? perfumeImage = prefs.getString('perfumeImage');
+    final String? lastFetchPerfumeDate = prefs.getString('lastFetchPerfumeDate');
+    print('進入每日香氛函式');
+    print('花名:$perfumeName 香氛味道:$perfume 圖像:$perfumeImage');
+
+    // 如果今天還沒寫日記，顯示先寫日記
+    if (!hasDiaryToday) {
+        print('先寫日記');
+        _showNotPerfumeDialog(context);
+    } // 今天已寫日記，今天非第一次點擊
+    else if(perfumeName != null &&
+        perfume != null &&
+        perfumeImage != null &&
+        lastFetchPerfumeDate == DateTime.now().toIso8601String().substring(0, 10)) {
+        print('取得舊的香氛');
+        _showPerfumeDialog(context, perfumeName, perfume, perfumeImage);
+
+    } // 今天已寫日記，今天第一次點擊
+    else {
+      print('取得新的香氛');
+      final String? userId = await getUserId();
+      // 否則從後端請求新的花名和花語
+      final response = await http.post(
+        Uri.parse(API.getPerfume),
+        body: {
+          'user_id': userId,
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final name = data['name'];
+        final meaning = data['meaning'];
+        final perfume = data['perfume'];
+        final image = data['image'];
+
+        // 更新本地存儲
+        await prefs.setString('perfumeName', name);
+        await prefs.setString('perfume', perfume);
+        await prefs.setString('perfumeMeaning', meaning);
+        await prefs.setString('perfumeImage', image);
+        await prefs.setString(
+            'lastFetchPerfumeDate', DateTime.now().toIso8601String().substring(0, 10));
+
+        // 顯示對話框
+        _showPerfumeDialog(context, name, perfume, image);
+      } else {
+        // 處理錯誤
+        print('Failed to load flower data');
+      }
+    }
+  }
+
+  void _showPerfumeDialog(
+    BuildContext context, String name, String perfume, String image) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 16.v),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 標題文本
+                Text(
+                  '精油', // 固定標題
+                  textAlign: TextAlign.center,
+                  style: dialogTitleStyle,
+                ),
+                SizedBox(height: 10.v),
+
+                // 中間分割線
+                Container(
+                  width: 244.5.h,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1.h,
+                        color: Color(0xFFDADADA), // 灰色邊框
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.v),
+
+                // 說明文本 (天竺葵)
+                Text(
+                  '今天適合你的精油是 「$name」',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18.fSize, // 調整字體大小
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 10.v),
+
+                // 精油詳細說明
+                Text(
+                  perfume,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16.fSize, // 調整字體大小
+                    color: Colors.black87,
+                    height: 1.5, // 行距調整
+                  ),
+                ),
+                SizedBox(height: 20.v),
+                Padding(
+                  padding: EdgeInsets.only(top: 10.v),
+                  child: Text(
+                    '\\ 點我去植芳園官網 ! /',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16.fSize,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF717171),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10.v),
+                SizedBox(height: 10.v),
+                // 可點擊的精油圖片
+                GestureDetector(
+                  onTap: () {
+                    // 點擊圖片後跳轉到指定網址
+                    launchUrl(Uri.parse('https://waterpine.tw/%E6%A4%8D%E8%8A%B3%E5%9C%92/'));
+                  },
+                  child: Image.network(
+                    'http://163.22.32.24/smiley_backend/img/angel/$image',
+                    height: 120.v, // 調整圖片高度
+                    width: 120.h,  // 調整圖片寬度
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showNotPerfumeDialog(
+    BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 16.v),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 標題文本
+                Text(
+                  '精油', // 固定標題
+                  textAlign: TextAlign.center,
+                  style: dialogTitleStyle,
+                ),
+                SizedBox(height: 10.v),
+
+                // 中間分割線
+                Container(
+                  width: 244.5.h,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1.h,
+                        color: Color(0xFFDADADA), // 灰色邊框
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.v),
+
+                // 說明文本 (天竺葵)
+                Text(
+                  '寫日記得知最佳精油',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18.fSize, // 調整字體大小
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 10.v),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+
   void showFlowerDialog(BuildContext context) async {
     // 先從本地存儲中獲取今天的花名和花語
     final prefs = await SharedPreferences.getInstance();
     final String? flowerName = prefs.getString('flowerName');
     final String? flowerMeaning = prefs.getString('flowerMeaning');
+    final String? flowerPerfume = prefs.getString('flowerPerfume');
     final String? flowerImage = prefs.getString('flowerImage');
     final String? lastFetchDate = prefs.getString('lastFetchDate');
     print('進入每日隨機花語函式');
@@ -561,11 +806,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         final data = jsonDecode(response.body);
         final name = data['name'];
         final meaning = data['meaning'];
+        final perfume = data['perfume'];
         final image = data['image'];
 
         // 更新本地存儲
         await prefs.setString('flowerName', name);
         await prefs.setString('flowerMeaning', meaning);
+        await prefs.setString('flowerPerfume', perfume);
         await prefs.setString('flowerImage', image);
         await prefs.setString(
             'lastFetchDate', DateTime.now().toIso8601String().substring(0, 10));
@@ -605,7 +852,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 SizedBox(
                   width: double.infinity,
                   child: Text(
-                    name,
+                    '今日隨機花語',
                     textAlign: TextAlign.center,
                     style: dialogTitleStyle,
                   ),
@@ -619,6 +866,19 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                         width: 1.h,
                         color: Color(0xFFDADADA),
                       ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.v),
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    '「$name」',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18.fSize, // 調整字體大小
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
                     ),
                   ),
                 ),

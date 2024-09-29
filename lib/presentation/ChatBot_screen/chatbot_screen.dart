@@ -55,18 +55,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
       curve: Curves.easeOut,                          // 淡出滑動
     );
   }
-  void _sendDiary(MessageProvider messageProvider) {
-    setState(() {
-        String diaryMessage = messageProvider.getUserDiary();
-        _messages.add({'role': 'user',                             //   使用者名稱
-                       'content': "新的日記！"});
-        messageProvider.sendUserDiaryToAssistant(diaryMessage);    //   將訊息傳送給Python機器人後端
-        messageProvider.isSending = true;
-      });
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _scrollToBottom();
-      });
-  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -150,6 +139,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                     child: Consumer<MessageProvider>(                                  // 當接收到機器人回覆時刷新介面，拉到最底部
                       builder: (context, messageProvider, child) {
                         _messages = messageProvider.messages;
+                        print("_message:$_messages");
                         WidgetsBinding.instance.addPostFrameCallback((_) {
                           _scrollToBottom();
                         });

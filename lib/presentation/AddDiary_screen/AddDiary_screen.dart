@@ -67,6 +67,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   String dialogMessage = '分析情緒中，請稍後...';
   String angelUrl = "";
   String monsterUrl = "";
+  
 
   // 抓取當前 user_id
   Future<String?> getUserId() async {
@@ -79,7 +80,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     return content.replaceAll('\n', ' ');
   }
 
-  Future<void> submitDiary(BuildContext context) async {
+  Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) async {
     // 顯示等待對話框
     showWaitingDialog(context);
 
@@ -87,6 +88,10 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     final String date =
         DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
     final String? userId = await getUserId();
+
+    // 傳送日記給小助手
+    String diaryMessage = await messageProvider.getUserDiary(content);    //   將日記訊息改成模型能解讀的型態
+    await messageProvider.sendUserDiaryToAssistant(diaryMessage);         //   將日記訊息傳送給Python機器人後端
 
     print("進入提交日記函式 content: $content date:$date userId:$userId");
 
@@ -536,6 +541,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final messageProvider = Provider.of<MessageProvider>(context);
         // 返回一個自定義的 Dialog 小部件
         return Dialog(
           // 設置對話框的形狀和圓角
@@ -634,7 +640,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
                         child: TextButton(
                           onPressed: () {
                             Navigator.of(context).pop();
-                            submitDiary(context); // 提交日記
+                            submitDiary(context, messageProvider); // 提交日記
                           },
                           child: Text(
                             '完成', // 按鈕文本
@@ -734,6 +740,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final messageProvider = Provider.of<MessageProvider>(context);
         // 返回一個自定義的 Dialog 小部件
         return Dialog(
           // 設置對話框的形狀和圓角
@@ -743,7 +750,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
           child: GestureDetector(
             onTap: () {
               Navigator.of(context).pop();
-              submitDiary(context); // 呼叫提交日記方法
+              submitDiary(context, messageProvider); // 呼叫提交日記方法
             },
             child: Container(
               width: 304.h, // 設置對話框的寬度
