@@ -531,7 +531,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           top: 403.v,
           child: GestureDetector(
             onTap: () {
-              showPerfumeDialog(context);
+              showPerfumeDialog(context); // 修改
             },
             child: Image.asset(
               'assets/images/home/tea.png',
@@ -1003,6 +1003,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
 /*
 當我按撥放後，沒有按暫停，就按下方功能鍵去其他頁面，音樂要自動暫停加釋放資源。想辦法進到 disposeMusic()
+534 香氛的函式位置要換
 */
 
 /**
