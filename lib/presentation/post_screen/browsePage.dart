@@ -206,7 +206,7 @@ class _BrowsePageState extends State<BrowsePage> {
         } else if (snapshot.hasError) {
           return Center(child: Text("Error: ${snapshot.error}"));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return Center(child: Text("No posts available"));
+          return _buildNoPostsWidget();
         }
 
         final posts = snapshot.data!;
@@ -226,6 +226,63 @@ class _BrowsePageState extends State<BrowsePage> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildNoPostsWidget() {
+
+    // 獲取台灣當地的日期（UTC+8）
+    DateTime now = DateTime.now().toUtc().add(Duration(hours: 8));
+    String formattedDate = DateFormat('yyyy.MM.dd').format(now);
+    Color textColor = Color(0xFFA7BA89);
+    
+    return Padding(
+      padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 日期
+          Padding(
+            padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+            child:Text(
+            formattedDate,
+            style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+              ),
+            ),
+          ),
+
+          SizedBox(height: 30),
+
+          // 圖片和文字
+          Center( 
+            child: Column(
+              children: [
+                // 圖片
+                Image.asset(
+                  'assets/images/noPost.png',
+                  width: 200,
+                  height: 300,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 26), // 調整圖片和文字之間的間距
+                // 文字
+                Text(
+                  "近三天內沒有新貼文...\n趕快發布貼文讓好友知道你在想甚麼吧！",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
