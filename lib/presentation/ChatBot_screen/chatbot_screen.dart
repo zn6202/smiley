@@ -61,13 +61,13 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Padding(
-        padding: const EdgeInsets.only(top:50.0),
+        padding: const EdgeInsets.only(top:69.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // 標題框
-              SizedBox(height: 32),
+              SizedBox(height: 37),
               // // 暫時日記按鈕
               // Consumer<MessageProvider>(                                  // 當接收到機器人回覆時刷新介面，拉到最底部
               //   builder: (context, messageProvider, child) {
@@ -128,7 +128,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                 // 聊天室框
                 child: Container(
                   width: 330,
-                  height: 600,
+                  height: 641,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -267,7 +267,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                                         controller: _controller,             //     文字輸入內容
                                         decoration: const InputDecoration(   //     輸入框裝飾模樣
                                           border: InputBorder.none,
-                                          hintText: '跟小助手聊聊天',              //       提示訊息
+                                          hintText: '輸入訊息',              //       提示訊息
                                           hintStyle: TextStyle(
                                             color: Color.fromARGB(255, 164, 164, 164),
                                             fontSize: 18,

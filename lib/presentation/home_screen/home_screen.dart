@@ -267,6 +267,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -275,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             scrollDirection: Axis.horizontal,
             child: Container(
               width: 780,
-              height: 844,
+              height: screenHeight,
               child: Stack(
                 children: [
                   // 背景圖片 1 (60% 高度)
@@ -285,29 +286,29 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                     child: Image.asset(
                       'assets/images/home/background_1.jpg',
                       width: 780,
-                      height: 844 * 0.6,
+                      height: screenHeight * 0.6,
                       fit: BoxFit.cover,
                     ),
                   ),
                   // 背景圖片 2 (5% 高度)
                   Positioned(
                     left: 0,
-                    top: 844 * 0.6,
+                    top: screenHeight * 0.6,
                     child: Image.asset(
                       'assets/images/home/background_2.png',
                       width: 780,
-                      height: 844 * 0.05,
+                      height: screenHeight * 0.05,
                       fit: BoxFit.cover,
                     ),
                   ),
                   // 背景圖片 3 (35% 高度)
                   Positioned(
                     left: 0,
-                    top: 844 * 0.65,
+                    top: screenHeight * 0.65,
                     child: Image.asset(
                       'assets/images/home/background_3.jpg',
                       width: 780,
-                      height: 844 * 0.35,
+                      height: screenHeight * 0.35,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -351,6 +352,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       bottomNavigationBar: CustomBottomNavigationBar(
         // 這裡是下方功能鍵嗎?
         currentIndex: _currentIndex,
+        
         onTap: (index) async {
           // await disposeMusic(); // 等待 disposeMusic 完成
           setState(() {
