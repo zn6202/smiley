@@ -514,6 +514,22 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   Widget _buildRightPage() {
     return Stack(
       children: [
+        //畫
+        Positioned(
+          right: 33.h,
+          top: 170.v,
+          child: GestureDetector(
+            onTap: () {
+              showPerfumeDialog(context); // 修改
+            },
+            child: Image.asset(
+              'assets/images/home/paint.png',
+              width: 223.h,
+              height: 252.v,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
         //桌
         Positioned(
           right: 143.h,
