@@ -25,7 +25,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   String titleText = '今日日記的情緒佔比';
   List<FlSpot> positiveEmotionData = [];
   List<FlSpot> negativeEmotionData = [];
-  Map<String, dynamic> testData = {}; // 日
+  Map<String, dynamic> todayData = {}; // 日
   Map<String, dynamic> dailyData = {}; // 週月
   List<double> positiveSums = [];
   List<double> negativeSums = [];
@@ -89,8 +89,8 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     DateTime firstDayOfLastMonth = DateTime(firstDayOfThisMonth.year, firstDayOfThisMonth.month - 1, 1);
     // 上個月的最後一天
     DateTime lastDayOfLastMonth = DateTime(firstDayOfLastMonth.year, firstDayOfLastMonth.month + 1, 0);
-    // 計算上個月有幾天
-    int daysDifference = lastDayOfLastMonth.difference(firstDayOfLastMonth).inDays;
+    // 計算上個月有幾天(會少一天因為是計算間隔)
+    int daysDifference = lastDayOfLastMonth.difference(firstDayOfLastMonth).inDays ;
     // 今日星期幾
     int weekDay = endDate.weekday;
     String weekDayName;
@@ -135,7 +135,6 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
     double positiveResult = 0;
     double negativeResult = 0;
 
-
     // 為星期一，顯示新的上週折線圖；為月初，顯示新的上個月折線圖
     if ((isSelected[1] && weekDayName=="星期一") || (isSelected[2] && isStartOfMonth)) {
       int days = isSelected[1] ? 6 : 28;
@@ -146,30 +145,11 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       for (int i = 0; i <= days; i++) {
         DateTime currentDate = startDate.add(Duration(days: i));
         dailyData = await analysisResult(currentDate); // 去後端拿資料
-        if(dailyData['happiness']!='null'){
-          time++;
-          positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
-              (dailyData['like']?.toDouble() ?? 0.0);
-          negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
-              (dailyData['disgust']?.toDouble() ?? 0.0) +
-              (dailyData['anger']?.toDouble() ?? 0.0);
-          mul = 100.0/(positiveSum + negativeSum);
-
-          positiveResult = positiveSum * mul;
-          negativeResult = negativeSum * mul;
-
-          // 取到小數點後一位
-          positiveResult = double.parse(positiveResult.toStringAsFixed(1));
-          negativeResult = double.parse(negativeResult.toStringAsFixed(1));
-        }else{ // 如果那一天無分析結果的話，正負值為?
-          // positiveResult = 50;
-          // negativeResult = 50;
-          continue;
-        }
-        positiveSums.add(positiveResult);
-        negativeSums.add(negativeResult);
+        time = addEmotionResults(dailyData, time);
       }
-      print('有寫日記的天數: $time positiveSums: $positiveSums negativeSums: $negativeSums');
+      print(positiveResult);
+      print(negativeResult);
+      print('有寫日記的天數0: $time positiveSums: $positiveSums negativeSums: $negativeSums');
       if (time == 0 ){
         setState(() {
           haveDiary = false;
@@ -190,36 +170,13 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       print('上一週的星期一: $lastMonday');
       print('上一週的星期天: $lastSunday');
       int time = 0;
-
       //週分析
       for (int i = 0; i < 7; i++) {
         DateTime currentDate = lastMonday.add(Duration(days: i));
         dailyData = await analysisResult(currentDate); // 去後端拿資料
-
-        if (dailyData['happiness']!=null){
-          time++;
-          positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
-              (dailyData['like']?.toDouble() ?? 0.0);
-          negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
-              (dailyData['disgust']?.toDouble() ?? 0.0) +
-              (dailyData['anger']?.toDouble() ?? 0.0);
-          mul = 100.0/(positiveSum + negativeSum);
-
-          positiveResult = positiveSum * mul;
-          negativeResult = negativeSum * mul;
-
-          // 取到小數點後一位
-          positiveResult = double.parse(positiveResult.toStringAsFixed(1));
-          negativeResult = double.parse(negativeResult.toStringAsFixed(1));
-        }else{ // 如果那一天無分析結果的話，正負值為?
-          // positiveResult = 50.0;
-          // negativeResult = 50.0;
-          continue;
-        }
-        positiveSums.add(positiveResult);
-        negativeSums.add(negativeResult);
+        time = addEmotionResults(dailyData, time);
       }
-      print('有寫日記的天數: $time positiveSums: $positiveSums negativeSums: $negativeSums');
+      print('有寫日記的天數(週): $time positiveSums: $positiveSums negativeSums: $negativeSums');
       if (time == 0 ){
         setState(() {
           haveDiary = false;
@@ -227,12 +184,14 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       }else{
         setState(() {
           positiveEmotionData = [
-            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), positiveSums[i])
+            for (int i = 0; i <= 6; i++) FlSpot(i.toDouble(), positiveSums[i])
           ];
           negativeEmotionData = [
-            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), negativeSums[i])
+            for (int i = 0; i <= 6; i++) FlSpot(i.toDouble(), negativeSums[i])
           ];
           haveDiary = true;
+          print('週分析正面： $positiveEmotionData');
+          print('週分析負面： $negativeEmotionData');
         });
       }
     } else if (isSelected[2]){ // 不是月初，顯示舊的上個月的折線圖
@@ -246,31 +205,9 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       for (int i = 0; i <= daysDifference; i++) {
         DateTime currentDate = firstDayOfLastMonth.add(Duration(days: i));
         dailyData = await analysisResult(currentDate); // 去後端拿資料
-
-        if (dailyData['happiness']!= null){
-          time++;
-          positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
-              (dailyData['like']?.toDouble() ?? 0.0);
-          negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
-              (dailyData['disgust']?.toDouble() ?? 0.0) +
-              (dailyData['anger']?.toDouble() ?? 0.0);
-          mul = 100.0/(positiveSum + negativeSum);
-
-          positiveResult = positiveSum * mul;
-          negativeResult = negativeSum * mul;
-
-          // 取到小數點後一位
-          positiveResult = double.parse(positiveResult.toStringAsFixed(1));
-          negativeResult = double.parse(negativeResult.toStringAsFixed(1));
-        }else{ // 如果那一天無分析結果的話，正負值為?
-          // positiveResult = 50.0;
-          // negativeResult = 50.0;
-          continue;
-        }
-        positiveSums.add(positiveResult);
-        negativeSums.add(negativeResult);
+        time = addEmotionResults(dailyData, time);
       }
-      print('有寫日記的天數: $time positiveSums: $positiveSums negativeSums: $negativeSums');
+      print('有寫日記的天數(月): $time positiveSums: $positiveSums negativeSums: $negativeSums');
       if (time == 0 ){
         setState(() {
           haveDiary = false;
@@ -278,17 +215,18 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       }else{
         setState(() {
           positiveEmotionData = [
-            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), positiveSums[i])
+            for (int i = 0; i <= daysDifference; i++) FlSpot(i.toDouble(), positiveSums[i])
           ];
           negativeEmotionData = [
-            for (int i = 0; i < time; i++) FlSpot(i.toDouble(), negativeSums[i])
+            for (int i = 0; i <= daysDifference; i++) FlSpot(i.toDouble(), negativeSums[i])
           ];
           haveDiary = true;
+          print('月分析正面： $positiveEmotionData');
+          print('月分析負面： $negativeEmotionData');
         });
       }
     }else { // 今日
-      DateTime currentDate = DateTime.now();
-      testData = await analysisResult(currentDate); // 去後端拿資料
+    // 計算方式
       // ex:
       //   happiness = 5, like = 0            >>> 正面總數: 5
       //   sad = 20, disgust = 0, angry = 15  >>> 正面總數: 35
@@ -298,89 +236,103 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
 
       //   happiness = 12.5, like = 0, sad = 50.0, disgust = 0, angry = 37.5 >>> 總和 100
       //   other(不顯示在今日圖表)
-      int emoSum = testData['happiness'] + testData['like'] + testData['sadness']+ testData['disgust'] + testData['anger'];
-      testData['happiness'] = double.parse((testData['happiness'] * 100 / emoSum).toStringAsFixed(1));
-      testData['like'] = double.parse((testData['like'] * 100 / emoSum).toStringAsFixed(1));
-      testData['sadness'] = double.parse((testData['sadness'] * 100 / emoSum).toStringAsFixed(1));
-      testData['disgust'] = double.parse((testData['disgust'] * 100 / emoSum).toStringAsFixed(1));
-      testData['anger'] = double.parse((testData['anger'] * 100 / emoSum).toStringAsFixed(1));
-
-      if (testData['happiness']!=null){
-        setState(() {
-          pieChartSections = [
-            PieChartSectionData(
-              color: Color(0xFFA7BA89),
-              value: testData['happiness']?.toDouble() ?? 0.0,
-              title: '${testData['happiness']}%',
-              radius: 50,
-              titleStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF72805C),
-              ),
-            ),
-            PieChartSectionData(
-              color: Color(0xFFDCDE76),
-              value: testData['like']?.toDouble() ?? 0.0,
-              title: '${testData['like']}%',
-              radius: 50,
-              titleStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF949551),
-              ),
-            ),
-            PieChartSectionData(
-              color: Color(0xFFD1BA7E),
-              value: testData['sadness']?.toDouble() ?? 0.0,
-              title: '${testData['sadness']}%',
-              radius: 50,
-              titleStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF8F8059),
-              ),
-            ),
-            PieChartSectionData(
-              color: Color(0xFF7FA99B),
-              value: testData['disgust']?.toDouble() ?? 0.0,
-              title: '${testData['disgust']}%',
-              radius: 50,
-              titleStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF546F66),
-              ),
-            ),
-            PieChartSectionData(
-              color: Color(0xFF394A51),
-              value: testData['anger']?.toDouble() ?? 0.0,
-              title: '${testData['anger']}%',
-              radius: 50,
-              titleStyle: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF6D8E9B),
-              ),
-            ),
-          ];
-          double positiveSum = (testData['happiness']?.toDouble() ?? 0.0) +
-              (testData['like']?.toDouble() ?? 0.0);
-          double negativeSum = (testData['sadness']?.toDouble() ?? 0.0) +
-              (testData['disgust']?.toDouble() ?? 0.0) +
-              (testData['anger']?.toDouble() ?? 0.0);
-
-          positiveEmotionData = [FlSpot(0, positiveSum)];
-          negativeEmotionData = [FlSpot(0, negativeSum)];
-
-          haveDiary = true;
-        });
-      }else{
-        setState(() {
-          haveDiary = false;
-        });
-      }
+      // 計算情緒數值
+      DateTime currentDate = DateTime.now();
+      todayData = await analysisResult(currentDate); // 去後端拿資料
+      createDailyAnalysis(todayData);
+      print('今日分析圖表完今日分析圖表完成！');
     }
+  }
+
+  // 產生日分析圓餅圖資料
+  void createDailyAnalysis(Map<String, dynamic>todayData){
+    List<Color> colors = [ //圖
+      Color(0xFFA7BA89), Color(0xFFDCDE76), Color(0xFFD1BA7E),
+      Color(0xFF7FA99B), Color(0xFF394A51),
+    ];
+    List<Color> textColors = [ // 數字
+      Color(0xFF72805C), Color(0xFF949551), Color(0xFF8F8059),
+      Color(0xFF546F66), Color(0xFF6D8E9B),
+    ];
+    List<String> emoType = ['happiness', 'like', 'sadness', 'disgust', 'anger'];
+    int emoSum = todayData.values.take(5).fold(0, (sum, value) => sum + value as int);
+    
+    for (String key in emoType) {
+      todayData[key] = double.parse((todayData[key] * 100 / emoSum).toStringAsFixed(1));
+    }
+    if (todayData['happiness']!=null){ // 如果今天有日記
+      setState(() {
+        pieChartSections = [];
+        double positiveSum = 0.0;
+        double negativeSum = 0.0;
+
+        for (int i = 0; i < emoType.length; i++) {
+          String key = emoType[i];
+          double percentage = todayData[key] ?? 0.0;
+          
+          pieChartSections.add(PieChartSectionData(
+            color: colors[i],
+            value: percentage,
+            title: '${percentage}%',
+            radius: 50,
+            titleStyle: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: textColors[i],
+            ),
+          ));
+
+          if (i < 2) { // positive emotions
+            positiveSum += percentage;
+          } else { // negative emotions
+            negativeSum += percentage;
+          }
+        }
+        // positiveEmotionData = [FlSpot(0, positiveSum)];
+        // negativeEmotionData = [FlSpot(0, negativeSum)];
+        haveDiary = true;
+        // print('DailyPositiveEmotionData：$positiveEmotionData');
+        // print('DailyNegativeEmotionData：$negativeEmotionData');
+      });
+    }else{
+      setState(() {
+        haveDiary = false;
+      });
+    }
+  }
+
+  // 計算並加入正面、負面情緒結果的函數
+  int addEmotionResults(Map<String, dynamic> dailyData, int time) {
+    double positiveSum = 0;
+    double negativeSum = 0;
+    double mul = 0;
+    double positiveResult = 0;
+    double negativeResult = 0;
+
+    if (dailyData['happiness'] != null) {
+      time++; // 增加 time 的值，表示有日記數據
+      positiveSum = (dailyData['happiness']?.toDouble() ?? 0.0) +
+          (dailyData['like']?.toDouble() ?? 0.0);
+      negativeSum = (dailyData['sadness']?.toDouble() ?? 0.0) +
+          (dailyData['disgust']?.toDouble() ?? 0.0) +
+          (dailyData['anger']?.toDouble() ?? 0.0);
+      mul = 100.0 / (positiveSum + negativeSum);
+
+      positiveResult = positiveSum * mul;
+      negativeResult = negativeSum * mul;
+
+      // 取到小數點後一位
+      positiveResult = double.parse(positiveResult.toStringAsFixed(1));
+      negativeResult = double.parse(negativeResult.toStringAsFixed(1));
+    } else {
+      // 如果沒有日記數據，正負值為 0
+      positiveResult = 0;
+      negativeResult = 0;
+    }
+    // 將結果添加到數據陣列中
+    positiveSums.add(positiveResult);
+    negativeSums.add(negativeResult);
+    return time;
   }
 
   void updateDateRangeAndTitle() {
@@ -416,7 +368,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Color(0xFFF4F4E6),
       body: Padding(
         padding: EdgeInsets.all(16.adaptSize),
         child: SingleChildScrollView(
@@ -515,13 +467,13 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
               SizedBox(height: 30.v),
               Center(
                 child: Container(
-                  width: 322.h,
+                  width: 340.h,
                   height: 600.v,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
                   ),
-                  padding: EdgeInsets.all(40.adaptSize),
+                  padding: EdgeInsets.all(30.adaptSize),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
@@ -545,254 +497,12 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                       SizedBox(height: 40.v),
                       haveDiary
                           ? isSelected[1] || isSelected[2]
-                              ? Column(
+                              ? isSelected[1]
+                                ?buildWeeklyAnalysis(negativeEmotionData, positiveEmotionData) // 週分析 
+                                :buildMonthlyAnalysis(negativeEmotionData, positiveEmotionData) // 月分析 
+                              : Column(//日分析
                                   children: [
-                                    Container(
-                                      height: 200.v,
-                                      child: LineChart(LineChartData(
-                                        minY: 0,
-                                        maxY: 100,
-                                        gridData: FlGridData(
-                                          show: true,
-                                          getDrawingHorizontalLine: (value) {
-                                            return FlLine(
-                                              color: Color(0xFFD3D3D3),
-                                              strokeWidth: 1,
-                                            );
-                                          },
-                                          drawVerticalLine: false,
-                                          horizontalInterval: 10,
-                                        ),
-                                        titlesData: FlTitlesData(
-                                          leftTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: true,
-                                              reservedSize: 40,
-                                              getTitlesWidget: (value, meta) {
-                                                switch (value.toInt()) {
-                                                  case 0:
-                                                    return Text(
-                                                      '0%',
-                                                      style: TextStyle(
-                                                        fontSize: 15.fSize,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF545453),
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                    );
-                                                  case 20:
-                                                    return Text(
-                                                      '20%',
-                                                      style: TextStyle(
-                                                        fontSize: 15.fSize,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF545453),
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                    );
-                                                  case 40:
-                                                    return Text(
-                                                      '40%',
-                                                      style: TextStyle(
-                                                        fontSize: 15.fSize,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF545453),
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                    );
-                                                  case 60:
-                                                    return Text(
-                                                      '60%',
-                                                      style: TextStyle(
-                                                        fontSize: 15.fSize,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF545453),
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                    );
-                                                  case 80:
-                                                    return Text(
-                                                      '80%',
-                                                      style: TextStyle(
-                                                        fontSize: 15.fSize,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF545453),
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                    );
-                                                  case 100:
-                                                    return Text(
-                                                      '100%',
-                                                      style: TextStyle(
-                                                        fontSize: 15.fSize,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            Color(0xFF545453),
-                                                      ),
-                                                      textAlign:
-                                                          TextAlign.right,
-                                                    );
-                                                  default:
-                                                    return Text('');
-                                                }
-                                              },
-                                              interval: 20,
-                                            ),
-                                          ),
-                                          topTitles: AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          rightTitles: AxisTitles(
-                                            sideTitles:
-                                                SideTitles(showTitles: false),
-                                          ),
-                                          bottomTitles: AxisTitles(
-                                            sideTitles: SideTitles(
-                                              showTitles: false, //橫軸標籤未改好 先關閉
-                                              getTitlesWidget: (value, meta) {
-                                                switch (value.toInt()) {
-                                                  case 0:
-                                                    return Text('一');
-                                                  case 1:
-                                                    return Text('二');
-                                                  case 2:
-                                                    return Text('三');
-                                                  case 3:
-                                                    return Text('四');
-                                                  case 4:
-                                                    return Text('五');
-                                                  case 5:
-                                                    return Text('六');
-                                                  case 6:
-                                                    return Text('日');
-                                                  default:
-                                                    return Text('');
-                                                }
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        borderData: FlBorderData(show: false),
-                                        lineBarsData: [
-                                          LineChartBarData(
-                                            spots: positiveEmotionData,
-                                            isCurved: true,
-                                            color: Color(0xFF7DA8E8),
-                                            barWidth: 4,
-                                            belowBarData:
-                                                BarAreaData(show: false),
-                                            dotData: FlDotData(show: false),
-                                          ),
-                                          LineChartBarData(
-                                            spots: negativeEmotionData,
-                                            isCurved: true,
-                                            color: Color(0xFFA7BA89),
-                                            barWidth: 4,
-                                            belowBarData:
-                                                BarAreaData(show: false),
-                                            dotData: FlDotData(show: false),
-                                          ),
-                                        ],
-                                      )),
-                                    ),
-                                    SizedBox(height: 60.v),
-                                    Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Column(
-                                          children: [
-                                            Container(
-                                              width: 60.h,
-                                              height: 32.v,
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFFA7BA89),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                "正面",
-                                                style: TextStyle(
-                                                  fontSize: 20.fSize,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFFFFFFFF),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            SizedBox(height: 8.v),
-                                            Text(
-                                              "開心\n喜歡",
-                                              style: TextStyle(
-                                                fontSize: 20.fSize,
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFFA7BA89),
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(width: 20.h),
-                                        Column(
-                                          children: [
-                                            Container(
-                                              width: 60.h,
-                                              height: 32.v,
-                                              decoration: BoxDecoration(
-                                                color: Color(0xFF7DA8E8),
-                                                borderRadius:
-                                                    BorderRadius.circular(20),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                "負面",
-                                                style: TextStyle(
-                                                  fontSize: 20.fSize,
-                                                  fontWeight: FontWeight.w700,
-                                                  color: Color(0xFFFFFFFF),
-                                                ),
-                                                textAlign: TextAlign.center,
-                                              ),
-                                            ),
-                                            SizedBox(height: 8.v),
-                                            Text(
-                                              "悲傷\n噁心\n憤怒",
-                                              style: TextStyle(
-                                                fontSize: 20.fSize,
-                                                fontWeight: FontWeight.w700,
-                                                color: Color(0xFF7DA8E8),
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                )
-                              : Column(
-                                  children: [
-                                    Container(
+                                    Container(//圓餅圖
                                       height: 200.v,
                                       child: PieChart(
                                         PieChartData(
@@ -804,7 +514,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                       ),
                                     ),
                                     SizedBox(height: 30.v),
-                                    Center(
+                                    Center(// 底下文字
                                       child: Column(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -907,6 +617,366 @@ class Indicator extends StatelessWidget {
   }
 }
 
+// 週分析
+Widget buildWeeklyAnalysis(  List<FlSpot> negativeEmotionData,   List<FlSpot> positiveEmotionData) {
+  return Column(
+    children: [
+      Container(
+        height: 180.v,
+        width: 300,
+        child: LineChart(LineChartData(
+          minX: -1, 
+          maxX: 7, 
+          minY: 0,
+          maxY: 100,
+          gridData: FlGridData(
+            show: true,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Color(0xFF545453),
+                strokeWidth: 0.5,
+              );
+            },
+            drawVerticalLine: false,
+            horizontalInterval: 10,
+          ),
+          extraLinesData: ExtraLinesData(
+            horizontalLines: [
+              HorizontalLine(
+                y: 0, 
+                color: Color(0xFF545453),
+                strokeWidth: 0.5,
+              ),
+              HorizontalLine(
+                y: 100, 
+                color: Color(0xFF545453),
+                strokeWidth: 0.5,
+              ),
+            ],
+          ),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, meta) {
+                  if (value % 20 == 0) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 6),
+                      child: Text(
+                        '${value.toInt()}%',
+                        style: TextStyle(
+                          fontSize: 13.fSize,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF545453),
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    );
+                  }
+                  return Text('');
+                },
+                interval: 10,
+              ),
+            ),
+            topTitles: AxisTitles(
+              sideTitles:
+                  SideTitles(showTitles: false),
+            ),
+            rightTitles: AxisTitles(
+              sideTitles:
+                  SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  switch (value.toInt()) {
+                    case -1:
+                      return Text(''); // 左側空白
+                    case 0:
+                      return Text('一');
+                    case 1:
+                      return Text('二');
+                    case 2:
+                      return Text('三');
+                    case 3:
+                      return Text('四');
+                    case 4:
+                      return Text('五');
+                    case 5:
+                      return Text('六');
+                    case 6:
+                      return Text('日');
+                    case 7:
+                      return Text(''); // 右側空白
+                    default:
+                      return Text('');
+                  }
+                }
+              ),
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          lineBarsData: [
+            LineChartBarData(
+              spots: negativeEmotionData
+                  .where((data) => data.y != 0.0)
+                  .map((data) => FlSpot(data.x, data.y))
+                  .toList(),
+              isCurved: true,
+              color: Color(0xFF7DA8E8),
+              barWidth: 3,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+            LineChartBarData(
+              spots: positiveEmotionData
+                  .where((data) => data.y != 0.0)
+                  .map((data) => FlSpot(data.x, data.y))
+                  .toList(),
+              isCurved: true,
+              color: Color(0xFFA7BA89),
+              barWidth: 3,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+          ],
+        )),
+      ),
+      SizedBox(height: 45.v),
+      buildEmotionLegend(),
+    ],
+  );
+}
+
+// 月分析
+Widget buildMonthlyAnalysis(List<FlSpot> negativeEmotionData, List<FlSpot> positiveEmotionData) {
+  // 獲取當前月份的每週一日期
+  DateTime now = DateTime.now();
+  // 當月第一天
+  DateTime firstDayOfLastMonth = DateTime(now.year, now.month-1, 1);
+  // 當月最後一天
+  DateTime lastDayOfLastMonth = DateTime(now.year, now.month , 0);
+  // 上個月有幾天(計算結果會少一天)
+  int daysInLastMonth = lastDayOfLastMonth.day;
+  // 找到第一個禮拜一
+  DateTime firstMonday = firstDayOfLastMonth;
+  while (firstMonday.weekday != DateTime.monday) {
+    firstMonday = firstMonday.add(Duration(days: 1));
+  }
+  // 生成每週一的日期列表
+  List<DateTime> mondays = [];
+  for (DateTime date = firstMonday; date.isBefore(lastDayOfLastMonth.add(Duration(days: 1))); date = date.add(Duration(days: 7))) {
+    mondays.add(date);
+  }
+  print('上個月第一個週一為s： $firstMonday');
+  print('上個月的每週一為s：$mondays');
+  return Column(
+    children: [
+      Container(
+        height: 180.v,
+        width: 300,
+        child: LineChart(LineChartData(
+          minX: 1, // 範圍開始於 0
+          maxX: daysInLastMonth.toDouble() , // 範圍結束於 29
+          minY: 0,
+          maxY: 100,
+          gridData: FlGridData(
+            show: true,
+            getDrawingHorizontalLine: (value) {
+              return FlLine(
+                color: Color(0xFF545453),
+                strokeWidth: 0.5,
+              );
+            },
+            drawVerticalLine: false,
+            horizontalInterval: 10,
+          ),
+          extraLinesData: ExtraLinesData(
+            horizontalLines: [
+              HorizontalLine(
+                y: 0, 
+                color: Color(0xFF545453),
+                strokeWidth: 0.5,
+              ),
+              HorizontalLine(
+                y: 100, 
+                color: Color(0xFF545453),
+                strokeWidth: 0.5,
+              ),
+            ],
+          ),
+          titlesData: FlTitlesData(
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 40,
+                getTitlesWidget: (value, meta) {
+                  if (value % 20 == 0) {
+                    return Padding(
+                      padding: EdgeInsets.only(right: 6),
+                      child: Text(
+                        '${value.toInt()}%',
+                        style: TextStyle(
+                          fontSize: 13.fSize,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF545453),
+                        ),
+                        textAlign: TextAlign.right,
+                      ),
+                    );
+                  }
+                  return Text('');
+                },
+                interval: 10,
+              ),
+            ),
+            topTitles: AxisTitles(
+              sideTitles:
+                  SideTitles(showTitles: false),
+            ),
+            rightTitles: AxisTitles(
+              sideTitles:
+                  SideTitles(showTitles: false),
+            ),
+            bottomTitles: AxisTitles( 
+              sideTitles: SideTitles(
+                showTitles: true,
+                getTitlesWidget: (value, meta) {
+                  // value 是 X 軸的數值，代表某天
+                  int dayOfMonth = value.toInt(); 
+                  for (DateTime monday in mondays) {
+                    int mondayDayOfMonth = monday.day; // 每週一的日子
+                    if (dayOfMonth == mondayDayOfMonth) {
+                      // 如果 X 軸的天數與某週一的日子相同，顯示日期
+                      DateFormat dateFormat = DateFormat('M/d'); 
+                      return Text(
+                        dateFormat.format(monday), // 顯示每週一的日期
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }
+                  }
+                  // 如果不是每週一，不顯示任何東西
+                  return Text('');
+                },
+                interval: 1, 
+              ),
+            ),
+          ),
+          borderData: FlBorderData(show: false),
+          lineBarsData: [
+            LineChartBarData(
+              spots: negativeEmotionData
+                  .where((data) => data.y != 0.0)
+                  .map((data) => FlSpot(data.x, data.y))
+                  .toList(),
+              isCurved: true,
+              color: Color(0xFF7DA8E8),
+              barWidth: 3,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+            LineChartBarData(
+              spots: positiveEmotionData
+                  .where((data) => data.y != 0.0)
+                  .map((data) => FlSpot(data.x, data.y))
+                  .toList(),
+              isCurved: true,
+              color: Color(0xFFA7BA89),
+              barWidth: 3,
+              belowBarData: BarAreaData(show: false),
+              dotData: FlDotData(show: false),
+            ),
+          ],
+        )),
+      ),
+      SizedBox(height: 45.v),
+      buildEmotionLegend(),
+    ],
+  );
+}
+
+Widget buildEmotionLegend() {
+  return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Column(
+        children: [
+          Container(
+            width: 60.h,
+            height: 32.v,
+            decoration: BoxDecoration(
+              color: Color(0xFFA7BA89),
+              borderRadius:
+              BorderRadius.circular(20),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              "正面",
+              style: TextStyle(
+                fontSize: 20.fSize,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFFFFFFF),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 8.v),
+          Text(
+            "開心\n喜歡",
+            style: TextStyle(
+              fontSize: 20.fSize,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFFA7BA89),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+      SizedBox(width: 20.h),
+      Column(
+        children: [
+          Container(
+            width: 60.h,
+            height: 32.v,
+            decoration: BoxDecoration(
+              color: Color(0xFF7DA8E8),
+              borderRadius:
+              BorderRadius.circular(20),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              "負面",
+              style: TextStyle(
+                fontSize: 20.fSize,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFFFFFFFF),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(height: 8.v),
+          Text(
+            "悲傷\n噁心\n憤怒",
+            style: TextStyle(
+              fontSize: 20.fSize,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF7DA8E8),
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    ],
+  );
+}
+
 // 自定義標籤 Widget
 class CustomLabel extends StatelessWidget {
   final String text;
@@ -941,13 +1011,8 @@ class CustomLabel extends StatelessWidget {
 /*
 前端
 - 折線圖
-  * 沒有0/100的灰線
-  * 縱軸距離圖表太近
-  * 橫軸標籤未改好 -> new! 要不要變成圖表的畫面可以左右滑動(x 軸寫 1~當月最後一天)?
-  * 以月 橫軸顯示區間 資料標籤標日期
-  * new! 數值是對的，但線的位置怪怪的
+  * new! 數值是對的，但線的位置怪怪的 
   * new! 當上週或上月只有寫過一篇日記，要標示出點點。
-  * new!(done) 月跟週的 title 日期範圍怪怪的，剛好變數有用到，就順便改好了~ 麻煩確認一下ㄌ
 - 無資料時要顯示對應文字
   * new! 當上週或上月都沒寫日記的話，問號下面的文字看要不要改成 "上一週無日記記錄" / "上個月無日記記錄"~
 
