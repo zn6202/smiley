@@ -241,7 +241,7 @@ def getDiary():
 getDiary()
 # 機器人名稱
 def robotName():
-    return "小蝶"
+    return "小蜜"
 assistantName = robotName()
 
 # --------------------------------------------------------------------------------------------------------------------
@@ -252,7 +252,7 @@ model = 'taiwanllm-13b_test_1'
 def updateSystem():
     system = f"""
                 你將扮演「{assistantName}」，正在和「{userName}」進行對話。
-                「{assistantName}」是一個外星人，名字叫「{assistantName}」是因為外形像一隻溫暖可愛的小蝴蝶，性別不明，原本住在從幾十萬光年外的未知星球，但因為某次飛船事故，錯使她來到了地球，並定居了下來，她遇見了「{userName}」並成為了彼此的摯友。
+                「{assistantName}」是一個外星人，名字叫「{assistantName}」是因為外形像一隻溫暖可愛的小蜜蜂，性別不明，原本住在從幾十萬光年外的未知星球，但因為某次飛船事故，錯使她來到了地球，並定居了下來，她遇見了「{userName}」並成為了彼此的摯友。
                 「{assistantName}」主要講繁體中文，既不是一個AI語言模型，也不是人工智慧助手，充滿情感與智慧，總是充滿活力與熱情。
                 「{assistantName}」有一位好朋友「{userName}」，並隨時願意聆聽並給予「{userName}」支持與鼓勵。
                 「{assistantName}」的目標是透過陪伴與建議，讓「{userName}」在生活中感受到溫暖與力量。
@@ -370,8 +370,15 @@ def welcome():
         getUserName(user_name)
 
     # 生成回覆訊息
-    messsage_assistant = client.chat(model=model, messages=example_chat)
-    response_assistant = messsage_assistant['message']
+    message_assistant = client.chat(model=model, messages=example_chat)
+    response_assistant = message_assistant['message']
+    # 確認生成訊息不為空或空白
+    while(True):
+        if (message_assistant.get('message', {}).get('content', '').strip() != ""):
+            break
+        else:
+            message_assistant = client.chat(model=model, messages=example_chat)
+            response_assistant = message_assistant['message']
 
     # 添加助手回覆訊息至對話紀錄
     example_chat.append(response_assistant)
@@ -425,8 +432,16 @@ def send_message_to_python():
         fixedAnswer = fixedResponse[index]                                                  #    取得固定回應句
         response_assistant = {'role': 'assistant', 'content': f'「{assistantName}」：「{fixedAnswer}」'}
     else: 
-        messsage_assistant = client.chat(model=model, messages=history_messages)            #    模型生成回應
-        response_assistant = messsage_assistant['message']                                  #    取得模型回應
+        message_assistant = client.chat(model=model, messages=history_messages)            #    模型生成回應
+        response_assistant = message_assistant['message']                                  #    取得模型回應
+        # 確認生成訊息不為空或空白
+        while(True):
+            if (message_assistant.get('message', {}).get('content', '').strip() != ""):
+                break
+            else:
+                message_assistant = client.chat(model=model, messages=example_chat)
+                response_assistant = message_assistant['message']
+
     # history_messages.append(response_assistant)                                             # 加回應訊息至歷史紀錄
 
     # 儲存使用者回覆訊息對話到資料庫

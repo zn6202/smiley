@@ -89,9 +89,7 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
         DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
     final String? userId = await getUserId();
 
-    // 傳送日記給小助手
-    String diaryMessage = await messageProvider.getUserDiary(content);    //   將日記訊息改成模型能解讀的型態
-    await messageProvider.sendUserDiaryToAssistant(diaryMessage);         //   將日記訊息傳送給Python機器人後端
+    
 
     print("進入提交日記函式 content: $content date:$date userId:$userId");
 
@@ -150,6 +148,9 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     } else {
       print('日記提交失敗...');
     }
+    // 傳送日記給小助手
+    String diaryMessage = await messageProvider.getUserDiary(content);    //   將日記訊息改成模型能解讀的型態
+    await messageProvider.sendUserDiaryToAssistant(diaryMessage);         //   將日記訊息傳送給Python機器人後端
   }
 
   Widget build(BuildContext context) {
