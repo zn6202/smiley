@@ -80,7 +80,7 @@ class _PostPageState extends State<PostPage> {
         'angel': angelFileName ?? '',
         'title': title,
         'date': date,
-        'content': content,
+        'content': content.replaceAll('\n', ''),
       },
     );
     if (response.statusCode == 200) {

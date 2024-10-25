@@ -85,7 +85,7 @@ class MessageProvider with ChangeNotifier {
     _addMessage(responseMessage);
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5001/send_message_to_python'),
+        Uri.parse('http://163.22.32.24:5001/send_message_to_python'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: jsonEncode({'user_id': userID, 'user_name': userName, 'messages': messageContent}),
       );

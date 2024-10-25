@@ -12,7 +12,10 @@ import re
 import mysql.connector
 
 # Flask
+from flask_cors import CORS
 app = Flask(__name__)
+CORS(app)
+
 
 # --------------------------------------------------------------------------------------------------------------------
 # 使用者個人化設定
@@ -161,8 +164,7 @@ class AboutTime:
             return "晚上好"
         else:
             return "晚上好"
-# 使用者登入後的第一句話
-firstMsg = AboutTime.firstMessage()
+
 # 取得天氣預報
 def getWeather():
     allCountyWeatherFocast = WeatherForcast()
@@ -334,8 +336,8 @@ example_chat = [{'role': 'system', 'content': updateSystem()},
                     {'role': 'user', 'content': f"「{userName}」：「午安」"},
                     {'role': 'assistant', 'content': f"{assistantName}：午安午安～{userName}今天午餐吃什麼呢？"},
                     {'role': 'user', 'content': f"「{userName}」：「晚安」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：晚安～在忙些什麼嗎？"},
-                    {'role': 'user', 'content': f"「{userName}」：「{AboutTime.firstMessage()}」"},]
+                    {'role': 'assistant', 'content': f"{assistantName}：晚安～在忙些什麼嗎？"},]
+                    # {'role': 'user', 'content': f"「{userName}」：「{AboutTime.firstMessage()}」"},
                     #{'role': 'user', 'content': f"yo！"},]，我在2024年8月14日寫了一篇日記
                     # {'role': 'user', 'content': f"嗨～{assistantName}{AboutTime.firstMessage()}"},]
 
@@ -363,6 +365,12 @@ def welcome():
     if userChatHistory != []:
         example_chat = example_chat[:1] + userChatHistory + example_chat[1:]
 
+    # 使用者登入後的第一句話
+    firstMsg = AboutTime.firstMessage()
+    # 將使用者問候語加入歷史對話
+    user_message = {'role': 'user', 'content': f"「{userName}」：「{firstMsg}」"}
+    example_chat.append(user_message)
+
     # 檢查使用者是否更名
     if (user_name != userName):
         for conversation in example_chat:
@@ -380,15 +388,21 @@ def welcome():
             message_assistant = client.chat(model=model, messages=example_chat)
             response_assistant = message_assistant['message']
 
+    # 去除多餘空白
+    response_assistant['content'].replace(" ", "")
+    response_assistant_clean = response_assistant
+
+    print(f"response_assistant_clean:{response_assistant_clean}")
+
     # 添加助手回覆訊息至對話紀錄
-    example_chat.append(response_assistant)
+    example_chat.append(response_assistant_clean)
 
     # 儲存對話到資料庫
-    saveToDB_RobotChat(user_id, "user", AboutTime.firstMessage(), AboutTime.getCurrentTime_forSQL())
-    saveToDB_RobotChat(user_id, "assistant", response_assistant["content"], AboutTime.getCurrentTime_forSQL())
+    saveToDB_RobotChat(user_id, "user", firstMsg, AboutTime.getCurrentTime_forSQL())
+    saveToDB_RobotChat(user_id, "assistant", response_assistant_clean["content"], AboutTime.getCurrentTime_forSQL())
 
     print(f"example_chat: {example_chat}")
-    return jsonify({'response': response_assistant["content"]})
+    return jsonify({'response': response_assistant_clean["content"]})
 
 # 接收使用者訊息，並回傳助手回覆訊息
 @app.route('/send_message_to_python', methods=['POST'])
@@ -442,15 +456,19 @@ def send_message_to_python():
                 message_assistant = client.chat(model=model, messages=example_chat)
                 response_assistant = message_assistant['message']
 
+    # 去除多餘空白
+    response_assistant['content'].replace(" ", "")
+    response_assistant_clean = response_assistant
+
     # history_messages.append(response_assistant)                                             # 加回應訊息至歷史紀錄
 
     # 儲存使用者回覆訊息對話到資料庫
     saveToDB_RobotChat(user_id, "user", user_message, AboutTime.getCurrentTime_forSQL())
     # 儲存助手回覆訊息對話到資料庫
-    saveToDB_RobotChat(user_id, "assistant", response_assistant["content"], AboutTime.getCurrentTime_forSQL())
+    saveToDB_RobotChat(user_id, "assistant", response_assistant_clean["content"], AboutTime.getCurrentTime_forSQL())
 
     print(history_messages)
-    return jsonify({'response': response_assistant["content"]})                             # 回傳json化的模型回應訊息
+    return jsonify({'response': response_assistant_clean["content"]})                             # 回傳json化的模型回應訊息
 
 # 儲存對話至後端資料庫
 def saveToDB_RobotChat(user_id, role, sentence, time):
@@ -484,4 +502,4 @@ def saveToDB_RobotChat(user_id, role, sentence, time):
     return True
 
 if __name__ == '__main__':
-    app.run(port=5001, debug=False)
+    app.run(host='0.0.0.0', port=5001, debug=False)

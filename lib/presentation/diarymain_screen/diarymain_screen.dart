@@ -169,6 +169,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
     );
   }
 
+  @override
   Widget _buildAddDiary() {
     return Container(
       decoration: BoxDecoration(
@@ -205,6 +206,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                   } else if (snapshot.hasData &&
                       snapshot.data != null &&
                       snapshot.data!['diary'] != null) {
+                    // 若有日記，顯示日記內容
                     return SingleChildScrollView(
                       child: Column(
                         children: [
@@ -222,7 +224,8 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                               ),
                             ),
                           ),
-                          if (showEmotionBlock && emotionImages.isNotEmpty)
+                          // 如果當天是今天且有情緒圖像，顯示情緒圖像區塊
+                          if (emotionImages.isNotEmpty)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: emotionImages
@@ -233,6 +236,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
                       ),
                     );
                   } else {
+                    // 沒有日記的處理
                     bool isToday = _isToday(selectedDate);
 
                     if (isToday) {
@@ -291,6 +295,7 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
       ),
     );
   }
+
 
   Future<Map<String, dynamic>> _getTestDiaryData(DateTime date) async {
     final String? userId = await getUserId();
@@ -474,10 +479,6 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 /*
  1. 非當日之前的日記顯示畫面
     o 無日記 -> 直接反灰 無法點選
- 2. new! 按提交日記後，分析中的框框可以拿掉，
-         然後提交鍵變成不能按(綠框綠自無背景)，且文字改成分析中。
-         分析完成後的畫面跟原本一樣。
- 3. new! '月曆' 時，日記沒有出現小天使小怪獸，一定要日記往上拉在往下拉才會在 '月曆' 時看到小天使小怪獸。
  */
 
 /*
