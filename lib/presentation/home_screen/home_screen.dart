@@ -275,60 +275,60 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Container(
-              width: 780,
+              width: 780.h,
               height: screenHeight,
               child: Stack(
                 children: [
                   // 背景圖片 1 (60% 高度)
                   Positioned(
-                    left: 0,
-                    top: 0,
+                    left: 0.h,
+                    top: 0.v,
                     child: Image.asset(
                       'assets/images/home/background_1.jpg',
-                      width: 780,
+                      width: 780.h,
                       height: screenHeight * 0.6,
                       fit: BoxFit.cover,
                     ),
                   ),
                   // 背景圖片 2 (5% 高度)
                   Positioned(
-                    left: 0,
+                    left: 0.h,
                     top: screenHeight * 0.6,
                     child: Image.asset(
                       'assets/images/home/background_2.png',
-                      width: 780,
+                      width: 780.h,
                       height: screenHeight * 0.05,
                       fit: BoxFit.cover,
                     ),
                   ),
                   // 背景圖片 3 (35% 高度)
                   Positioned(
-                    left: 0,
+                    left: 0.h,
                     top: screenHeight * 0.65,
                     child: Image.asset(
                       'assets/images/home/background_3.jpg',
-                      width: 780,
+                      width: 780.h,
                       height: screenHeight * 0.35,
                       fit: BoxFit.cover,
                     ),
                   ),
                   // 左側頁面內容 (390x844)
                   Positioned(
-                    left: 0,
-                    top: 0,
+                    left: 0.h,
+                    top: 0.v,
                     child: Container(
-                      width: 390,
-                      height: 844,
+                      width: 390.h,
+                      height: 844.v,
                       child: _buildLeftPage(),
                     ),
                   ),
                   // 右側頁面內容 (390x844)
                   Positioned(
-                    left: 390,
-                    top: 0,
+                    left: 390.h,
+                    top: 0.v,
                     child: Container(
-                      width: 390,
-                      height: 844,
+                      width: 390.h,
+                      height: 844.v,
                       child: _buildRightPage(),
                     ),
                   ),
@@ -402,8 +402,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
               angle: -5 * 3.1415927 / 180,
               child: Image.asset(
                 'assets/images/home/calendar.png',
-                width: 188.0,
-                height: 211.0,
+                width: 188.h,
+                height: 211.v,
                 fit: BoxFit.contain,
               ),
             ),
@@ -493,7 +493,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     behavior: SnackBarBehavior.floating,
-                    margin: EdgeInsets.all(10),
+                    margin: EdgeInsets.all(10.h),
                   ),
                 );
               }
@@ -692,7 +692,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   style: TextStyle(
                     fontSize: 16.fSize, // 調整字體大小
                     color: Colors.black87,
-                    height: 1.5, // 行距調整
+                    height: 1.5.v, // 行距調整
                   ),
                 ),
                 SizedBox(height: 20.v),
@@ -978,7 +978,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                       musicTalk, //" \\ 點我去聽音樂 ! /", // '\'使用兩個反斜杠來顯示一個反斜杠
                       style: TextStyle(
                         fontSize: 12.fSize,
-                        height: 1.75,
+                        height: 1.75.v,
                         fontFamily: 'Inter',
                         fontWeight: FontWeight.w700,
                         color: Color(0xFF9C9C94),

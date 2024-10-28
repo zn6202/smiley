@@ -170,8 +170,8 @@ class _BrowsePageState extends State<BrowsePage> {
     OverlayEntry overlayEntry = OverlayEntry(
       builder: (context) => Center(
         child: Container(
-          width: 100,
-          height: 50,
+          width: 100.h,
+          height: 50.v,
           decoration: BoxDecoration(
             color: Colors.black.withOpacity(0.7),
             borderRadius: BorderRadius.circular(10),
@@ -181,7 +181,7 @@ class _BrowsePageState extends State<BrowsePage> {
             message,
             style: TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: 12.fSize,
               decoration: TextDecoration.none,
             ),
             textAlign: TextAlign.center,
@@ -237,24 +237,24 @@ class _BrowsePageState extends State<BrowsePage> {
     Color textColor = Color(0xFFA7BA89);
     
     return Padding(
-      padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+      padding: EdgeInsets.only(top: 50.v, left: 16.h, right: 16.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 日期
           Padding(
-            padding: const EdgeInsets.only(top: 50, left: 16, right: 16),
+            padding: EdgeInsets.only(top: 50.v, left: 16.h, right: 16.h),
             child:Text(
             formattedDate,
             style: TextStyle(
-            fontSize: 28,
+            fontSize: 28.fSize,
             fontWeight: FontWeight.w600,
             color: textColor,
               ),
             ),
           ),
 
-          SizedBox(height: 30),
+          SizedBox(height: 30.v),
 
           // 圖片和文字
           Center( 
@@ -263,17 +263,17 @@ class _BrowsePageState extends State<BrowsePage> {
                 // 圖片
                 Image.asset(
                   'assets/images/noPost.png',
-                  width: 200,
-                  height: 300,
+                  width: 200.h,
+                  height: 300.v,
                   fit: BoxFit.contain,
                 ),
-                SizedBox(height: 26), // 調整圖片和文字之間的間距
+                SizedBox(height: 26.v), // 調整圖片和文字之間的間距
                 // 文字
                 Text(
                   "近三天內沒有新貼文...\n趕快發布貼文讓好友知道你在想甚麼吧！",
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 18.fSize,
                     fontWeight: FontWeight.w600,
                     color: textColor,
                   ),
@@ -303,14 +303,14 @@ class _BrowsePageState extends State<BrowsePage> {
                     children: [
                       Padding(
                         padding:
-                            const EdgeInsets.only(top: 50, left: 16, right: 16),
+                            EdgeInsets.only(top: 50.v, left: 16.h, right: 16.h),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               post.date,
                               style: TextStyle(
-                                fontSize: 28, // 調整文本的字體大小
+                                fontSize: 28.fSize, // 調整文本的字體大小
                                 fontWeight: FontWeight.w600,
                                 color: textColor,
                               ),
@@ -322,8 +322,8 @@ class _BrowsePageState extends State<BrowsePage> {
                                   // icon本人
                                   icon: Image.asset(
                                     'assets/images/comments.png',
-                                    width: 30, // 調整圖標的大小
-                                    height: 30,
+                                    width: 30.h, // 調整圖標的大小
+                                    height: 30.v,
                                     color: textColor,
                                   ),
                                   onPressed: () {
@@ -345,8 +345,8 @@ class _BrowsePageState extends State<BrowsePage> {
                                     top: 0,
                                     child: Container(
                                       // 留言數輛
-                                      width: 14, // 調整圓形容器的大小
-                                      height: 14,
+                                      width: 14.h, // 調整圓形容器的大小
+                                      height: 14.v,
                                       decoration: BoxDecoration(
                                         color: textColor,
                                         shape: BoxShape.circle,
@@ -356,7 +356,7 @@ class _BrowsePageState extends State<BrowsePage> {
                                           '${commentSum}', // 後端回傳的留言數量
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 10, // 調整字體大小
+                                            fontSize: 10.fSize, // 調整字體大小
                                             fontWeight: FontWeight.w600,
                                           ),
                                           textAlign: TextAlign.center,
@@ -371,11 +371,11 @@ class _BrowsePageState extends State<BrowsePage> {
                       ),
                       Padding(
                         // 日記標題
-                        padding: const EdgeInsets.only(left: 16, right: 16),
+                        padding: EdgeInsets.only(left: 16.h, right: 16.h),
                         child: Text(
                           post.title,
                           style: TextStyle(
-                            fontSize: 50,
+                            fontSize: 50.fSize,
                             fontWeight: FontWeight.w700,
                             color: textColor,
                           ),
@@ -383,15 +383,15 @@ class _BrowsePageState extends State<BrowsePage> {
                       ),
                       if (!isMyPost)
                         Padding(
-                          padding: const EdgeInsets.only(top: 10, left: 16),
+                          padding: EdgeInsets.only(top: 10.v, left: 16.h),
                           child: Container(
-                            width: 146,
-                            height: 42,
+                            width: 146.h,
+                            height: 42.v,
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.5),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+                            padding: EdgeInsets.fromLTRB(20.h, 10.v, 20.h, 10.v),
                             child: Row(
                               children: [
                                 Container(
@@ -406,7 +406,7 @@ class _BrowsePageState extends State<BrowsePage> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                SizedBox(width: 8.h),
                                 Expanded(
                                   child: Text(
                                     post.userName,
@@ -421,7 +421,7 @@ class _BrowsePageState extends State<BrowsePage> {
                             ),
                           ),
                         ),
-                      const SizedBox(height: 40),
+                      SizedBox(height: 40.v),
                       Center(
                         child: GestureDetector(
                           onTap: () {
@@ -442,9 +442,9 @@ class _BrowsePageState extends State<BrowsePage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 30),
+                      SizedBox(height: 30.v),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: EdgeInsets.symmetric(horizontal: 16.h),
                         child: Center(
                           child: Text(
                             post.content,
@@ -458,10 +458,10 @@ class _BrowsePageState extends State<BrowsePage> {
                         ),
                       ),
                       if (!isMyPost) ...[
-                        SizedBox(height: 90),
+                        SizedBox(height: 90.v),
                         _buildCommentSection(textColor),
                       ],
-                      SizedBox(height: 56),
+                      SizedBox(height: 56.v),
                     ],
                   ),
                 ),

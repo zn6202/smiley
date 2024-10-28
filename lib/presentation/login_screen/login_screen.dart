@@ -192,30 +192,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         // 第一個 Logo 圖像
                         CustomImageView(
                           imagePath: ImageConstant.imgExport1,
-                          height: 71.v,
+                          height: 92.v,
                           width: 73.h,
-                          margin: EdgeInsets.only(
-                            top: 10.v,
-                            bottom: 11.v,
-                          ),
                         ),
                         // 第二個 Logo 圖像
                         CustomImageView(
                           imagePath: ImageConstant.imgExport3,
                           height: 92.v,
                           width: 101.h,
-                          margin: EdgeInsets.only(left: 4.h),
                         ),
                         // 第三個 Logo 圖像
                         CustomImageView(
                           imagePath: ImageConstant.imgExport2,
-                          height: 70.v,
+                          height: 92.v,
                           width: 79.h,
-                          margin: EdgeInsets.only(
-                            left: 4.h,
-                            top: 10.v,
-                            bottom: 11.v,
-                          ),
                         )
                       ],
                     ),
@@ -420,3 +410,6 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, AppRoutes.registerScreen);
   }
 }
+
+/*
+1. logo被切 */
