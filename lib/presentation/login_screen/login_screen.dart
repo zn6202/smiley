@@ -192,24 +192,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center, // 水平置中
                       children: [
+                        Image.asset(
+                          'assets/images/login-logo.png',
+                          width: 262.h,
+                          height: 90.v,
+                          fit: BoxFit.contain,
+                        ),
                         // 第一個 Logo 圖像
-                        CustomImageView(
-                          imagePath: ImageConstant.imgExport1,
-                          height: 92.v,
-                          width: 80.h,
-                        ),
-                        // 第二個 Logo 圖像
-                        CustomImageView(
-                          imagePath: ImageConstant.imgExport3,
-                          height: 92.v,
-                          width: 101.h,
-                        ),
-                        // 第三個 Logo 圖像
-                        CustomImageView(
-                          imagePath: ImageConstant.imgExport2,
-                          height: 92.v,
-                          width: 79.h,
-                        )
+                        // CustomImageView(
+                        //   imagePath: ImageConstant.imgExport1,
+                        //   height: 92.v,
+                        //   width: 80.h,
+                        // ),
+                        // // 第二個 Logo 圖像
+                        // CustomImageView(
+                        //   imagePath: ImageConstant.imgExport3,
+                        //   height: 92.v,
+                        //   width: 101.h,
+                        // ),
+                        // // 第三個 Logo 圖像
+                        // CustomImageView(
+                        //   imagePath: ImageConstant.imgExport2,
+                        //   height: 92.v,
+                        //   width: 79.h,
+                        // )
                       ],
                     ),
                   ),
