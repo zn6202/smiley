@@ -58,11 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
       status = 'member';
       await saveStatus(status!);
-
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      // );
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = '帳號密碼輸入錯誤';
@@ -108,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await saveStatus(status!);
 
       // 登入成功後導航到 DiaryMainScreen
-      _navigateToDiaryMainScreen();
+      _navigateToHomeScreen();
     } catch (e) {
       print('Google sign in error: $e');
       // 處理登入錯誤，可以顯示錯誤訊息給用戶或者執行其他處理邏輯
@@ -148,10 +151,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _navigateToDiaryMainScreen() {
+  void _navigateToHomeScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      MaterialPageRoute(builder: (context) => HomeScreen()),
     );
   }
 
@@ -193,7 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         CustomImageView(
                           imagePath: ImageConstant.imgExport1,
                           height: 92.v,
-                          width: 73.h,
+                          width: 80.h,
                         ),
                         // 第二個 Logo 圖像
                         CustomImageView(
@@ -412,4 +415,4 @@ class _LoginScreenState extends State<LoginScreen> {
 }
 
 /*
-1. logo被切 */
+1. logo被切 左右*/
