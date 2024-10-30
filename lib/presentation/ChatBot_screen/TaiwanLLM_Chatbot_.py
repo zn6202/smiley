@@ -427,6 +427,8 @@ def send_message_to_python():
     # 找尋是否有歷史對話紀錄，若有則添加
     userChatHistory = getChatHistory(user_id)
     print(f"userChatHistory: {userChatHistory}")
+    print(f"對話紀錄查詢完成")
+
     if userChatHistory != []:
         history_messages = example_chat + userChatHistory
 
@@ -435,10 +437,13 @@ def send_message_to_python():
         for conversation in history_messages:
             conversation['content'] = conversation['content'].replace(userName, user_name)
         getUserName(user_name)
+    print(f"使用者名稱查詢完畢")
 
     # 添加使用者回覆訊息至對話紀錄
     response_user = {'role': 'user', 'content': f'「{userName}」：「{user_message}」'}     # 將使用者訊息轉為模型可讀取型態
     history_messages.append(response_user)                                                 #    加使用者訊息到歷史紀錄
+    print(f"新增對話紀錄完畢")
+
 
     # 判斷是否為固定問答句
     if (user_message in fixedMessage):

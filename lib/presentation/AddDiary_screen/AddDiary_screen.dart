@@ -63,11 +63,11 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
   // 用於保存選定的日期，初始為當前日期。
   DateTime? selectedDate = DateTime.now();
   bool isSubmitted = false; // 表示日記是否已提交
-  bool isWaiting = false; // 表示是否正在等待分析
   String submittedContent = ""; // 保存提交的日記內容
   String dialogMessage = '分析情緒中，請稍後...';
   String angelUrl = "";
   String monsterUrl = "";
+  
 
   // 抓取當前 user_id
   Future<String?> getUserId() async {
@@ -80,22 +80,18 @@ class _AddDiaryScreenState extends State<AddDiaryScreen> {
     return content.replaceAll('\n', ' ');
   }
 
-Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) async {
-  try {
-    // 確保在開始時重置狀態
-    setState(() {
-      isWaiting = true;
-      dialogMessage = '分析情緒中，請稍後...';
-    });
-
+  Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) async {
     // 顯示等待對話框
-    if (mounted && context.mounted) {
-      showWaitingDialog(context);
-    }
+    showWaitingDialog(context);
 
     final String content = _formatContent(_textController.text).trimRight();
-    final String date = DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
+    final String date =
+        DateFormat('yyyy-MM-dd').format(selectedDate ?? DateTime.now());
     final String? userId = await getUserId();
+
+    
+
+    print("進入提交日記函式 content: $content date:$date userId:$userId");
 
     // BERT 分析請求
     final responseBERT = await http.post(
@@ -104,99 +100,58 @@ Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) 
       body: jsonEncode({"uid": userId, "article": content}),
     );
 
-    if (!mounted || !context.mounted) {
-      return; // 如果組件已被銷毀，直接返回
+    // 關閉等待對話框
+    if (context.mounted) {
+      print('Closing waiting dialog');
+      Navigator.of(context).pop(); // 關閉等待對話框
     }
 
     if (responseBERT.statusCode == 200) {
       final resultBERT = json.decode(responseBERT.body);
       print("BERT result = $resultBERT");
       print('BERT分析成功!');
-      
+      angelUrl = resultBERT['angel'];
+      monsterUrl = resultBERT['monster'];
+
+      // 更新對話框內容，顯示分析結果
       setState(() {
-        angelUrl = resultBERT['angel'];
-        monsterUrl = resultBERT['monster'];
+        dialogMessage = '分析成功！結果已出爐。';
       });
-
-      // 日記提交請求
-      final response = await http.post(
-        Uri.parse(API.diary),
-        body: {
-          'user_id': userId,
-          'content': content,
-          'date': date,
-        },
-      );
-
-      if (!mounted || !context.mounted) {
-        return; // 再次檢查組件狀態
-      }
-
-      if (response.statusCode == 200) {
-        final result = json.decode(response.body);
-        print("result = $result");
-
-        // 傳送日記給小助手
-        String diaryMessage = await messageProvider.getUserDiary(content);
-        await messageProvider.sendUserDiaryToAssistant(diaryMessage);
-
-        // 確保仍然掛載
-        if (!mounted || !context.mounted) {
-          return;
-        }
-
-        // 使用 BuildContext 的擴展方法獲取 Navigator
-        final navigator = Navigator.of(context);
-        
-        // 關閉等待對話框
-        navigator.pop();
-
-        // 更新狀態
-        setState(() {
-          isSubmitted = true;
-          submittedContent = content;
-          isWaiting = false;
-        });
-
-        // 確保狀態更新完成後再顯示完成對話框
-        await Future.delayed(Duration(milliseconds: 300));
-        
-        if (mounted && context.mounted) {
-          completeDialog(context);
-        }
-        
-        print('日記提交成功!');
-      } else {
-        throw Exception('日記提交失敗');
-      }
     } else {
-      throw Exception('BERT分析失敗');
-    }
-  } catch (e) {
-    print("發生錯誤: $e");
-    
-    // 確保錯誤處理時組件仍然存在
-    if (mounted && context.mounted) {
-      // 獲取 navigator 實例
-      final navigator = Navigator.of(context);
-      
-      // 如果等待對話框開啟，則關閉它
-      if (isWaiting) {
-        navigator.pop();
-      }
-      
+      print(
+          'BERT分析失敗... 狀態碼: ${responseBERT.statusCode}, 響應: ${responseBERT.body}');
+
+      // 更新對話框內容，顯示失敗信息
       setState(() {
-        isWaiting = false;
         dialogMessage = '分析失敗，請重試。';
       });
-      
-      // 顯示失敗對話框
-      failDialog(context);
     }
-  }
-}
+    // 日記提交請求
+    final response = await http.post(
+      Uri.parse(API.diary), // 解析字串變成 URI 對象
+      body: {
+        'user_id': userId,
+        'content': content,
+        'date': date,
+      },
+    );
 
-  
+    if (response.statusCode == 200) {
+      final result = json.decode(response.body); // response 會接收小怪獸路徑，待處理
+      print("result = $result");
+
+      setState(() {
+        isSubmitted = true;
+        submittedContent = content;
+      });
+      print('日記提交成功!');
+    } else {
+      print('日記提交失敗...');
+    }
+    // 傳送日記給小助手
+    String diaryMessage = await messageProvider.getUserDiary(content);    //   將日記訊息改成模型能解讀的型態
+    await messageProvider.sendUserDiaryToAssistant(diaryMessage);         //   將日記訊息傳送給Python機器人後端
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -206,13 +161,12 @@ Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) 
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        shadowColor: Colors.transparent,
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/images/img_arrow_left.svg',
           ),
           onPressed: () async {
-            if (isWaiting) {
+            if (isSubmitted) {
               Navigator.of(context).pop();
             } else {
               if (_textController.text.trim().isEmpty) {
@@ -281,29 +235,22 @@ Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) 
                   height: 40.v,
                   width: 114.h,
                   decoration: ShapeDecoration(
-                    color: isWaiting ? Colors.transparent : Color(0xFFA7BA89),
+                    color: Color(0xFFA7BA89),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
-                      side: isWaiting
-                          ? BorderSide(color: Color(0xFFA7BA89), width: 1.5)
-                          : BorderSide.none,
                     ),
                   ),
                   child: Center(
                     child: TextButton(
-                      onPressed: isWaiting
-                          ? null
-                          : () {
-                              FocusScope.of(context).requestFocus(FocusNode());
-                              showSaveConfirmationDialog(context);
-                            },
+                      onPressed: () {
+                        FocusScope.of(context).requestFocus(FocusNode());
+                        showSaveConfirmationDialog(
+                            context); // 完成"日記"、"分析"、"小天使小怪獸" 的後端
+                      },
                       child: Text(
-                        isWaiting ? '分析中' : '完成',
+                        '完成', // 按鈕上的文字。
                         textAlign: TextAlign.center,
-                        style: isWaiting
-                            ? buttonTextStyleWhite.copyWith(
-                                color: Color(0xFFA7BA89))
-                            : buttonTextStyleWhite,
+                        style: buttonTextStyleWhite,
                       ),
                     ),
                   ),
@@ -865,66 +812,58 @@ Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) 
     );
   }
 
-  // 修改 showWaitingDialog 方法，確保它可以被正確關閉
   void showWaitingDialog(BuildContext context) {
-    setState(() {
-      isWaiting = true;
-    });
-    
     showDialog(
       context: context,
-      // barrierDismissible: false, // 防止用戶點擊外部關閉對話框
-      builder: (BuildContext dialogContext) { // 使用單獨的 dialogContext
-        return WillPopScope(
-          onWillPop: () async => false, // 防止返回鍵關閉對話框
-          child: Dialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(24.0),
-            ),
-            child: Container(
-              width: 304.h,
-              height: 160.0.v,
-              padding: EdgeInsets.symmetric(horizontal: 23.h, vertical: 23.v),
-              decoration: ShapeDecoration(
-                color: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
+      // barrierDismissible: false, // 不允許用戶點擊對話框外部關閉
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24.0),
+          ),
+          child: Container(
+            width: 304.h,
+            height: 160.0.v,
+            padding: EdgeInsets.symmetric(horizontal: 23.h, vertical: 23.v),
+            decoration: ShapeDecoration(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(24.0),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      '分析情緒中',
-                      textAlign: TextAlign.center,
-                      style: dialogTitleStyle,
-                    ),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    '分析情緒中',
+                    textAlign: TextAlign.center,
+                    style: dialogTitleStyle,
                   ),
-                  SizedBox(height: 10.v),
-                  Container(
-                    width: 244.5.h,
-                    decoration: ShapeDecoration(
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          width: 1.h,
-                          color: Color(0xFFDADADA),
-                        ),
+                ),
+                SizedBox(height: 10.v),
+                Container(
+                  width: 244.5.h,
+                  decoration: ShapeDecoration(
+                    shape: RoundedRectangleBorder(
+                      side: BorderSide(
+                        width: 1.h,
+                        color: Color(0xFFDADADA),
                       ),
                     ),
                   ),
-                  SizedBox(height: 10.v),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      '聽說多微笑會變漂亮耶~\n要不要笑一個ㄚ',
-                      textAlign: TextAlign.center,
-                      style: dialogContentStyle,
-                    ),
+                ),
+                SizedBox(height: 10.v),
+                SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    '聽說多微笑會變漂亮耶~\n要不要笑一個ㄚ',
+                    textAlign: TextAlign.center,
+                    style: dialogContentStyle,
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -935,8 +874,8 @@ Future<void> submitDiary(BuildContext context, MessageProvider messageProvider) 
 
 /*
 前端修正:
-- 分析完成後 等待dialog自己關掉
-- 等待分析期間 無法返回
+- 等待中dialog無法關閉
+- 成功dialog
 */
 
 /*

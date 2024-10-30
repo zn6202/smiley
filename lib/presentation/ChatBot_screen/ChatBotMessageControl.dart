@@ -61,14 +61,17 @@ class MessageProvider with ChangeNotifier {
     await _fetchUserData();
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5001/welcome'),
+        Uri.parse('http://163.22.32.24/welcome'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: jsonEncode({'user_id': userID, 'user_name': userName}),
       );
       if (response.statusCode == 200) {
         final jsonResponseDecoded = jsonDecode(response.body);
         final jsonResponseContent = jsonResponseDecoded["response"] as String;
-        final responseMessage = {'role': 'assistant', 'content': jsonResponseContent};
+        final responseMessage = {
+          'role': 'assistant',
+          'content': jsonResponseContent
+        };
         _addMessage(responseMessage);
       } else {
         _handleError();
@@ -85,14 +88,21 @@ class MessageProvider with ChangeNotifier {
     _addMessage(responseMessage);
     try {
       final response = await http.post(
-        Uri.parse('http://163.22.32.24:5001/send_message_to_python'),
+        Uri.parse('http://163.22.32.24/send_message_to_python'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
-        body: jsonEncode({'user_id': userID, 'user_name': userName, 'messages': messageContent}),
+        body: jsonEncode({
+          'user_id': userID,
+          'user_name': userName,
+          'messages': messageContent
+        }),
       );
       if (response.statusCode == 200) {
         final jsonResponseDecoded = jsonDecode(response.body);
         final jsonResponseContent = jsonResponseDecoded["response"] as String;
-        final assistantMessage = {'role': 'assistant', 'content': jsonResponseContent};
+        final assistantMessage = {
+          'role': 'assistant',
+          'content': jsonResponseContent
+        };
         _addMessage(assistantMessage);
         return assistantMessage;
       } else {
@@ -109,20 +119,28 @@ class MessageProvider with ChangeNotifier {
     return "我寫了一篇日記：${diaryMessage}";
   }
 
-  Future<Map<String, String>> sendUserDiaryToAssistant(String diaryContent) async {
+  Future<Map<String, String>> sendUserDiaryToAssistant(
+      String diaryContent) async {
     isSending = true;
     await _fetchUserData();
     print("傳送日記給小助手...：$diaryContent");
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:5001/send_message_to_python'),
+        Uri.parse('http://163.22.32.24:5001/send_message_to_python'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
-        body: jsonEncode({'user_id': userID, 'user_name': userName, 'messages': diaryContent}),
+        body: jsonEncode({
+          'user_id': userID,
+          'user_name': userName,
+          'messages': diaryContent
+        }),
       );
       if (response.statusCode == 200) {
         final jsonResponseDecoded = jsonDecode(response.body);
         final jsonResponseContent = jsonResponseDecoded["response"] as String;
-        final assistantMessage = {'role': 'assistant', 'content': jsonResponseContent};
+        final assistantMessage = {
+          'role': 'assistant',
+          'content': jsonResponseContent
+        };
         _messages.add({'role': 'user', 'content': "新的日記！"});
         _addMessage(assistantMessage);
         return assistantMessage;

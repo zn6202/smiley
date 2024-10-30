@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
 import 'package:smiley/core/app_export.dart';
@@ -301,7 +301,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
       // 今日
       DateTime currentDate = DateTime.now();
       testData = await analysisResult(currentDate); // 去後端拿資料
-      // ex:
+      // ex: 
       //   happiness = 5, like = 0            >>> 正面總數: 5
       //   sad = 20, disgust = 0, angry = 15  >>> 正面總數: 35
       //   other = 60                         >>> 中立總數: 60
@@ -330,58 +330,58 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         setState(() {
           pieChartSections = [
             PieChartSectionData(
-              color: Color(0xFFA7BA89),
+              color: Color(0xFFFFE153),
               value: testData['happiness']?.toDouble() ?? 0.0,
               title: '${testData['happiness']}%',
-              radius: 50,
+              radius: 50.adaptSize,
               titleStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF72805C),
+                color: Color(0xFF706220),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFFDCDE76),
+              color: Color(0xFFECA8A4),
               value: testData['like']?.toDouble() ?? 0.0,
               title: '${testData['like']}%',
-              radius: 50,
+              radius: 50.adaptSize,
               titleStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF949551),
+                color: Color(0xFFA85450),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFFD1BA7E),
+              color: Color(0xFF7DA8E8),
               value: testData['sadness']?.toDouble() ?? 0.0,
               title: '${testData['sadness']}%',
-              radius: 50,
+              radius: 50.adaptSize,
               titleStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF8F8059),
+                color: Color(0xFF375C94),
               ),
             ),
             PieChartSectionData(
               color: Color(0xFF7FA99B),
               value: testData['disgust']?.toDouble() ?? 0.0,
               title: '${testData['disgust']}%',
-              radius: 50,
+              radius: 50.adaptSize,
               titleStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF546F66),
+                color: Color(0xFF5A7C71),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFF394A51),
+              color: Color(0xFFEC5D5D),
               value: testData['anger']?.toDouble() ?? 0.0,
               title: '${testData['anger']}%',
-              radius: 50,
+              radius: 50.adaptSize,
               titleStyle: TextStyle(
-                fontSize: 18,
+                fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF6D8E9B),
+                color: Color(0xFF6B1F1F),
               ),
             ),
           ];
@@ -726,7 +726,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                           LineChartBarData(
                                             spots: negativeEmotionData,
                                             isCurved: true,
-                                            color: Color(0xFFA7BA89),
+                                            color: Color(0xFFFBBC05),
                                             barWidth: 4,
                                             belowBarData:
                                                 BarAreaData(show: false),
@@ -748,7 +748,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                               width: 60.h,
                                               height: 32.v,
                                               decoration: BoxDecoration(
-                                                color: Color(0xFFA7BA89),
+                                                color: Color(0xFFFBBC05),
                                                 borderRadius:
                                                     BorderRadius.circular(20),
                                               ),
@@ -769,7 +769,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                               style: TextStyle(
                                                 fontSize: 20.fSize,
                                                 fontWeight: FontWeight.w700,
-                                                color: Color(0xFFA7BA89),
+                                                color: Color(0xFFFBBC05),
                                               ),
                                               textAlign: TextAlign.center,
                                             ),
@@ -833,15 +833,15 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Indicator(
-                                              color: Color(0xFFA7BA89),
+                                              color: Color(0xFFFFE153),
                                               text: '開心'),
                                           SizedBox(height: 8.v),
                                           Indicator(
-                                              color: Color(0xFFDCDE76),
+                                              color: Color(0xFFECA8A4),
                                               text: '喜歡'),
                                           SizedBox(height: 8.v),
                                           Indicator(
-                                              color: Color(0xFFD1BA7E),
+                                              color: Color(0xFF7DA8E8),
                                               text: '悲傷'),
                                           SizedBox(height: 8.v),
                                           Indicator(
@@ -849,7 +849,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                               text: '噁心'),
                                           SizedBox(height: 8.v),
                                           Indicator(
-                                              color: Color(0xFF394A51),
+                                              color: Color(0xFFEC5D5D),
                                               text: '憤怒'),
                                         ],
                                       ),

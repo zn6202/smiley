@@ -61,13 +61,13 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
     return Scaffold(
       backgroundColor: backgroundColor,
       body: Padding(
-        padding: const EdgeInsets.only(top:69.0),
+        padding: EdgeInsets.only(top:69.v),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               // 標題框
-              SizedBox(height: 37),
+              SizedBox(height: 37.v),
               // // 暫時日記按鈕
               // Consumer<MessageProvider>(                                  // 當接收到機器人回覆時刷新介面，拉到最底部
               //   builder: (context, messageProvider, child) {
@@ -123,12 +123,12 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
               //   ),
               // ),
               // 聊天欄
-              SizedBox(height: 32),
+              SizedBox(height: 32.v),
               Center(
                 // 聊天室框
                 child: Container(
-                  width: 330,
-                  height: 641,
+                  width: 330.h,
+                  height: 641.v,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(24),
@@ -194,7 +194,7 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                                               alignment: Alignment.centerRight,
                                               child:
                                                 Container(
-                                                  padding: EdgeInsets.only(top:10.0,bottom: 10.0, left: 15.0, right: 15.0),
+                                                  padding: EdgeInsets.only(top:10.v,bottom: 10.v, left: 15.h, right: 15.h),
                                                   decoration: BoxDecoration(
                                                   border: Border.all(
                                                       color: const Color(0xFFA7BA89)),

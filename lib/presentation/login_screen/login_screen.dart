@@ -58,11 +58,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
       status = 'member';
       await saveStatus(status!);
-
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+      // Navigator.pushReplacement(
+      //   context,
+      //   MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      // );
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = '帳號密碼輸入錯誤';
@@ -108,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
       await saveStatus(status!);
 
       // 登入成功後導航到 DiaryMainScreen
-      _navigateToDiaryMainScreen();
+      _navigateToHomeScreen();
     } catch (e) {
       print('Google sign in error: $e');
       // 處理登入錯誤，可以顯示錯誤訊息給用戶或者執行其他處理邏輯
@@ -148,10 +151,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  void _navigateToDiaryMainScreen() {
+  void _navigateToHomeScreen() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => DiaryMainScreen()),
+      MaterialPageRoute(builder: (context) => HomeScreen()),
     );
   }
 
@@ -192,30 +195,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         // 第一個 Logo 圖像
                         CustomImageView(
                           imagePath: ImageConstant.imgExport1,
-                          height: 71.v,
-                          width: 73.h,
-                          margin: EdgeInsets.only(
-                            top: 10.v,
-                            bottom: 11.v,
-                          ),
+                          height: 92.v,
+                          width: 80.h,
                         ),
                         // 第二個 Logo 圖像
                         CustomImageView(
                           imagePath: ImageConstant.imgExport3,
                           height: 92.v,
                           width: 101.h,
-                          margin: EdgeInsets.only(left: 4.h),
                         ),
                         // 第三個 Logo 圖像
                         CustomImageView(
                           imagePath: ImageConstant.imgExport2,
-                          height: 70.v,
+                          height: 92.v,
                           width: 79.h,
-                          margin: EdgeInsets.only(
-                            left: 4.h,
-                            top: 10.v,
-                            bottom: 11.v,
-                          ),
                         )
                       ],
                     ),
@@ -420,3 +413,6 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.pushNamed(context, AppRoutes.registerScreen);
   }
 }
+
+/*
+1. logo被切 左右*/
