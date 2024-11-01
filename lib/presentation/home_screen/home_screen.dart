@@ -12,6 +12,8 @@ import 'package:just_audio/just_audio.dart';
 import 'dart:async'; // for TimeoutException
 import 'dart:io'; // for SocketExecption
 
+bool _isInitialized = false;
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -50,6 +52,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     saveMusicDialog(
         "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
     _initializeMusicStatus();
+    if (_isInitialized == false) {
+      final messageProvider =
+          Provider.of<MessageProvider>(context, listen: false);
+      messageProvider.fetchWelcomeMessage();
+      _isInitialized = true;
+    }
+
     // _setupPlayerListeners(); // 設置播放器監聽器
   }
 
@@ -352,7 +361,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       bottomNavigationBar: CustomBottomNavigationBar(
         // 這裡是下方功能鍵嗎?
         currentIndex: _currentIndex,
-        
+
         onTap: (index) async {
           // await disposeMusic(); // 等待 disposeMusic 完成
           setState(() {
@@ -580,22 +589,23 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final String? perfumeName = prefs.getString('perfumeName');
     final String? perfume = prefs.getString('perfume');
     final String? perfumeImage = prefs.getString('perfumeImage');
-    final String? lastFetchPerfumeDate = prefs.getString('lastFetchPerfumeDate');
+    final String? lastFetchPerfumeDate =
+        prefs.getString('lastFetchPerfumeDate');
     print('進入每日香氛函式');
     print('花名:$perfumeName 香氛味道:$perfume 圖像:$perfumeImage');
 
     // 如果今天還沒寫日記，顯示先寫日記
     if (!hasDiaryToday) {
-        print('先寫日記');
-        _showNotPerfumeDialog(context);
+      print('先寫日記');
+      _showNotPerfumeDialog(context);
     } // 今天已寫日記，今天非第一次點擊
-    else if(perfumeName != null &&
+    else if (perfumeName != null &&
         perfume != null &&
         perfumeImage != null &&
-        lastFetchPerfumeDate == DateTime.now().toIso8601String().substring(0, 10)) {
-        print('取得舊的香氛');
-        _showPerfumeDialog(context, perfumeName, perfume, perfumeImage);
-
+        lastFetchPerfumeDate ==
+            DateTime.now().toIso8601String().substring(0, 10)) {
+      print('取得舊的香氛');
+      _showPerfumeDialog(context, perfumeName, perfume, perfumeImage);
     } // 今天已寫日記，今天第一次點擊
     else {
       print('取得新的香氛');
@@ -619,8 +629,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
         await prefs.setString('perfume', perfume);
         await prefs.setString('perfumeMeaning', meaning);
         await prefs.setString('perfumeImage', image);
-        await prefs.setString(
-            'lastFetchPerfumeDate', DateTime.now().toIso8601String().substring(0, 10));
+        await prefs.setString('lastFetchPerfumeDate',
+            DateTime.now().toIso8601String().substring(0, 10));
 
         // 顯示對話框
         _showPerfumeDialog(context, name, perfume, image);
@@ -632,7 +642,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 
   void _showPerfumeDialog(
-    BuildContext context, String name, String perfume, String image) {
+      BuildContext context, String name, String perfume, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -714,12 +724,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 GestureDetector(
                   onTap: () {
                     // 點擊圖片後跳轉到指定網址
-                    launchUrl(Uri.parse('https://waterpine.tw/%E6%A4%8D%E8%8A%B3%E5%9C%92/'));
+                    launchUrl(Uri.parse(
+                        'https://waterpine.tw/%E6%A4%8D%E8%8A%B3%E5%9C%92/'));
                   },
                   child: Image.network(
                     'http://163.22.32.24/smiley_backend/img/angel/$image',
                     height: 120.v, // 調整圖片高度
-                    width: 120.h,  // 調整圖片寬度
+                    width: 120.h, // 調整圖片寬度
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -731,8 +742,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     );
   }
 
-  void _showNotPerfumeDialog(
-    BuildContext context) {
+  void _showNotPerfumeDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -791,7 +801,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       },
     );
   }
-
 
   void showFlowerDialog(BuildContext context) async {
     // 先從本地存儲中獲取今天的花名和花語

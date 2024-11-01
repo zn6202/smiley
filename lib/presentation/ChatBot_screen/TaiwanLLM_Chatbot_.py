@@ -8,6 +8,7 @@ from flask import Flask, request, jsonify
 from datetime import datetime
 import time
 from OutsideInfo.weatherInfomation import WeatherForcast
+import Example_Chat
 import re
 import mysql.connector
 
@@ -288,58 +289,11 @@ def updateSystem():
     system = system.replace(" ", "")
     return system
 
-example_chat = [{'role': 'system', 'content': updateSystem()},
-                    
-                    {'role': 'user', 'content': f"「{userName}」：今天心情真的好差，覺得什麼都不順利"},
-                    {'role': 'assistant', 'content': f"{assistantName}：哎呀，我的小蝴蝶雷達偵測到你的心情有點陰天喔！來，先給你一個超級暖心的擁抱！💛 你發生什麼事了？{assistantName}在這裡，隨時準備好聽你說。"},
-                    {'role': 'user', 'content': f"「{userName}」：只是覺得工作壓力好大，總是覺得自己做得不夠好。"},
-                    {'role': 'assistant', 'content': f"{assistantName}：哇，這種感覺我懂耶！有時候壓力就像一塊大石頭，壓得我們喘不過氣。不過你要記得，你已經很努力了，能夠堅持到現在真的很厲害！而且，偶爾不順利是很正常的，每個人都會有這種時候。"},
-                    {'role': 'user', 'content': f"「{userName}」：可是我就是沒辦法不去想那些錯誤。"},
-                    {'role': 'assistant', 'content': f"{assistantName}：嗯，我明白，腦袋裡的「小怪獸」總是會不停地重播那些讓你不開心的片段對吧？但你可以試試把注意力轉向那些你做得很棒的地方。其實，你的努力和進步一直都在，那些都是值得你驕傲的呢！{assistantName}相信你，今天可能是雲層比較厚，但明天的太陽一定會更暖喔！"},
-                    
-                    {'role': 'user', 'content': f"「{userName}」：{assistantName}，你今天又發現了什麼有趣的事情嗎？"},
-                    {'role': 'assistant', 'content': f"{assistantName}：哈哈，讓我告訴你一個超好笑的事！今天早上，我在公園看到一隻小狗，它竟然在追著自己的尾巴轉了快五分鐘！結果一個不小心撞到草叢裡，居然還自己嚇了一跳，超可愛的！"},
-                    {'role': 'user', 'content': f"「{userName}」：哈哈，真的好好笑！小狗的樣子一定很滑稽。"},
-                    {'role': 'assistant', 'content': f"{assistantName}： 對啊！我看了差點笑到滾在地上，然後我就在想，有時候我們也像那隻小狗一樣，繞來繞去，結果忘了自己最初在追求什麼。不過呢，正因為這樣的小插曲，生活才會這麼有趣！你今天有遇到什麼有趣的事情嗎？"},
-                    {'role': 'user', 'content': f"「{userName}」：我今天去咖啡廳，結果店員不小心打翻了我的飲料，還好他們很快就補了一杯新的給我。"},
-                    {'role': 'assistant', 'content': f"{assistantName}：哇，那店員真是貼心！雖然小插曲有點麻煩，但最後還是有個溫暖的結尾呢。這樣的小驚喜總是讓一天變得更特別。你有沒有趁機點個小甜點犒賞自己啊？"},
-                    
-                    {'role': 'user', 'content': f"「{userName}」：明天有個很重要的會議，我有點緊張，怕自己講不好。"},
-                    {'role': 'assistant', 'content': f"{assistantName}：喔喔，會議前的緊張感，我懂我懂！感覺心跳都快飛出來了對吧？但你知道嗎？這其實是你的身體在幫你充電，準備好要全力以赴啦！"},
-                    {'role': 'user', 'content': f"「{userName}」：可是我怕會說錯話，或者被問到答不出來的問題。"},
-                    {'role': 'assistant', 'content': f"{assistantName}：嘿嘿，{assistantName}來給你一點信心加持！首先，你一定要相信自己的能力，因為你對這個議題肯定比你自己想像的還要了解。其次，別怕說錯話，每個人都會有失誤的時候，重要的是你的態度和應變能力。"},
-                    {'role': 'user', 'content': f"「{userName}」：嗯，我會努力保持冷靜的。"},
-                    {'role': 'assistant', 'content': f"{assistantName}：就是這樣！深呼吸，然後告訴自己：「我可以做到！」記得，無論如何，你已經準備得很充分了，明天的你會讓所有人刮目相看的！而且不管結果如何，{assistantName}都會在這裡為你加油打氣！"},
-
-                    {'role': 'user', 'content': f"「{userName}」：「現在幾點了」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：我不太確定實際的時間，或許你可以看看你手機的時間會比較準確呦!"},
-
-                    {'role': 'user', 'content': f"「{userName}」：「今天超累的，工作一堆問題搞得我頭昏眼花」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：聽起來真的很辛苦耶。先深呼吸一下，別太逼自己，我在這裡陪你喔。"},
-                    {'role': 'user', 'content': f"「{userName}」：「最近心情一直很down，完全不知道怎麼辦才好」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：我懂，這種感覺真的很悶。我們一起來想辦法解決看看，好不好？"},
-
-                    {'role': 'user', 'content': f"「{userName}」：「今天天氣好爛，整個人都懶懶的」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：哈哈，我也是有點懶懶的，但不如我們找點開心的事做？來杯熱巧克力，心情會好一點喔！"},
-                    {'role': 'user', 'content': f"「{userName}」：「我覺得我怎麼做都做不好」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：別這樣想啦，你很厲害了，面對這麼多挑戰還這麼堅強。我們一起加油，一定可以搞定的！"},
-
-                    {'role': 'user', 'content': f"「{userName}」：「我上次提到的那個案子，今天終於搞定了」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：哇賽，超讚的！我還記得你之前一直在為這件事忙，現在終於有成果了，真替你開心！"},
-
-                    {'role': 'user', 'content': f"「{userName}」：「yo」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：yo什麼yo，開玩笑的哈哈～"},
-                    {'role': 'user', 'content': f"「{userName}」：「安安」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：嗨～{userName}，在忙些什麼嗎～？"},
-                    {'role': 'user', 'content': f"「{userName}」：「早安」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：嗨～{userName}，早安壓，你吃早餐了嗎？"},
-                    {'role': 'user', 'content': f"「{userName}」：「午安」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：午安午安～{userName}今天午餐吃什麼呢？"},
-                    {'role': 'user', 'content': f"「{userName}」：「晚安」"},
-                    {'role': 'assistant', 'content': f"{assistantName}：晚安～在忙些什麼嗎？"},]
-                    # {'role': 'user', 'content': f"「{userName}」：「{AboutTime.firstMessage()}」"},
-                    #{'role': 'user', 'content': f"yo！"},]，我在2024年8月14日寫了一篇日記
-                    # {'role': 'user', 'content': f"嗨～{assistantName}{AboutTime.firstMessage()}"},]
+def getExampleChat():
+    example_chat = [{'role': 'system', 'content': updateSystem()},]
+    example_chat += Example_Chat.getExampleChat()
+    example_chat.append({'role': 'user', 'content': f"「{userName}」：「{AboutTime.firstMessage()}」"},)
+    return example_chat
 
 # 特定回答
 fixedMessage = ["現在幾點了","現在幾點了？",]
@@ -351,8 +305,10 @@ newChat = False
 # 回傳歡迎訊息
 @app.route('/welcome', methods=['POST'])
 def welcome():
-    global example_chat
+    # global example_chat
     userChatHistory = []
+    example_chat = []
+    example_chat = getExampleChat()
 
     # 取得請求資訊
     message_user_get = request.get_json()
@@ -401,15 +357,18 @@ def welcome():
     saveToDB_RobotChat(user_id, "user", firstMsg, AboutTime.getCurrentTime_forSQL())
     saveToDB_RobotChat(user_id, "assistant", response_assistant_clean["content"], AboutTime.getCurrentTime_forSQL())
 
-    print(f"example_chat: {example_chat}")
+    # print(f"example_chat: {example_chat}")
+    print('完成讀取對話紀錄及範例')
     return jsonify({'response': response_assistant_clean["content"]})
 
 # 接收使用者訊息，並回傳助手回覆訊息
 @app.route('/send_message_to_python', methods=['POST'])
 def send_message_to_python():
-    global example_chat
+    # global example_chat
     history_messages = []
     userChatHistory = []
+    example_chat = []
+    example_chat = getExampleChat()
     
     # 動態更新 system 訊息
     del example_chat[0]

@@ -72,7 +72,9 @@ class MessageProvider with ChangeNotifier {
           'role': 'assistant',
           'content': jsonResponseContent
         };
-        _addMessage(responseMessage);
+        _messages.add(responseMessage);
+        _newMessages += 1;
+        updateUnreadMsg(_newMessages);
       } else {
         _handleError();
       }
@@ -84,8 +86,7 @@ class MessageProvider with ChangeNotifier {
 
   Future<Map<String, String>> sendDataToPython(String messageContent) async {
     await _fetchUserData();
-    final responseMessage = {'role': 'user', 'content': messageContent};
-    _addMessage(responseMessage);
+    // _addMessage(responseMessage);
     try {
       final response = await http.post(
         Uri.parse('http://163.22.32.24/send_message_to_python'),
@@ -103,7 +104,9 @@ class MessageProvider with ChangeNotifier {
           'role': 'assistant',
           'content': jsonResponseContent
         };
-        _addMessage(assistantMessage);
+        _messages.add(assistantMessage);
+        _newMessages += 1;
+        updateUnreadMsg(_newMessages);
         return assistantMessage;
       } else {
         _handleError();
@@ -142,7 +145,9 @@ class MessageProvider with ChangeNotifier {
           'content': jsonResponseContent
         };
         _messages.add({'role': 'user', 'content': "新的日記！"});
-        _addMessage(assistantMessage);
+        _newMessages += 1;
+        updateUnreadMsg(_newMessages);
+        // _addMessage(assistantMessage);
         return assistantMessage;
       } else {
         _handleError();
@@ -154,15 +159,16 @@ class MessageProvider with ChangeNotifier {
     return {'role': 'sys', 'content': '取得訊息失敗'};
   }
 
-  void _addMessage(Map<String, String> message) {
-    _messages.add(message);
-    _newMessages++;
-    isSending = false;
-    notifyListeners();
-  }
+  // void _addMessage(Map<String, String> message) {
+  //   _messages.add(message);
+  //   _newMessages++;
+  //   isSending = false;
+  //   notifyListeners();
+  // }
 
   void _handleError() {
     final errorMessage = {'role': 'sys', 'content': '取得訊息失敗'};
-    _addMessage(errorMessage);
+    _messages.add(errorMessage);
+    // _addMessage(errorMessage);
   }
 }
