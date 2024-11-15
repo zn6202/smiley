@@ -801,7 +801,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                     LineChartBarData(
                                       spots: negativeEmotionData,
                                       isCurved: true,
-                                      color: Color(0xFFFBBC05),
+                                      color: Color(0xFFA7BA89),
                                       barWidth: 4,
                                       belowBarData:
                                           BarAreaData(show: false),
