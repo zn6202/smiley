@@ -617,15 +617,15 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                             MainAxisAlignment.center,
                                         children: [
                                           Indicator(
-                                              color: Color(0xFFFFE153),
+                                              color: Color(0xFFA7BA89),
                                               text: '開心'),
                                           SizedBox(height: 8.v),
                                           Indicator(
-                                              color: Color(0xFFECA8A4),
+                                              color: Color(0xFFDCDE76),
                                               text: '喜歡'),
                                           SizedBox(height: 8.v),
                                           Indicator(
-                                              color: Color(0xFF7DA8E8),
+                                              color: Color(0xFFD1BA7E),
                                               text: '悲傷'),
                                           SizedBox(height: 8.v),
                                           Indicator(
@@ -633,7 +633,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                               text: '噁心'),
                                           SizedBox(height: 8.v),
                                           Indicator(
-                                              color: Color(0xFFEC5D5D),
+                                              color: Color(0xFF394A51),
                                               text: '憤怒'),
                                         ],
                                       ),
