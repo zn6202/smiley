@@ -20,6 +20,11 @@ import '../presentation/post_screen/postPage.dart';
 import '../presentation/post_screen/browsePage.dart';
 import '../presentation/post_screen/commentPage.dart';
 import '../presentation/home_screen/home_screen.dart';
+import '../presentation/home_screen/chat_screen.dart';
+import '../presentation/home_screen/shop_screen.dart';
+import '../presentation/seller_screen/shome_screen.dart';
+import '../presentation/seller_screen/data_screen.dart';
+import '../presentation/seller_screen/schat_screen.dart';
 
 class AppRoutes {
   static const String welcomeScreen = '/welcome_screen';
@@ -40,7 +45,12 @@ class AppRoutes {
   static const String browsePage = '/browse_page';
   static const String commentPage = '/comment_page';
   static const String homeScreen = '/home_screen';
+  static const String chatScreen = '/chat_screen';
   static const String chatbotScreen = '/ChatBot_screen';
+  static const String shopScreen = '/shop_screen';
+  static const String shomeScreen = '/shome_screen';
+  static const String schatScreen = '/schat_screen';
+  static const String dataScreen = '/data_screen';
   // static const String edit = '/edit';
 
   static Map<String, WidgetBuilder> routes = {
@@ -63,6 +73,11 @@ class AppRoutes {
     homeScreen: (context) => HomeScreen(),
     commentPage: (context) => CommentPage(),
     chatbotScreen: (context) => ChatBotScreen(),
+    chatScreen: (context) => ChatScreen(),
+    shopScreen: (context) => ShopScreen(),
+    shomeScreen: (context) => ShomeScreen(),
+    schatScreen: (context) => SchatScreen(),
+    dataScreen: (context) => DataScreen(),
     // edit: (context) => EditScreen(),
   };
 }
