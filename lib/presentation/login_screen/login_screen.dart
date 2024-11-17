@@ -1,5 +1,6 @@
 import 'dart:convert'; //jsonDecode
 import 'package:flutter/material.dart';
+import 'package:smiley/presentation/friend_screen/friendScreen.dart';
 import 'package:smiley/presentation/home_screen/home_screen.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -58,10 +59,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
       status = 'member';
       await saveStatus(status!);
-      Navigator.pushReplacement(
+      if (credential.user?.uid == 'MCYFz55dsAgMwmyoH3fIcmkqMpb2'){
+        print('我的身分是賣家');
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => Friendscreen()), // Friendscreen() 要修改成賣家頁面~
+        );
+      }else{
+        Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+        );
+      }
       // Navigator.pushReplacement(
       //   context,
       //   MaterialPageRoute(builder: (context) => DiaryMainScreen()),
