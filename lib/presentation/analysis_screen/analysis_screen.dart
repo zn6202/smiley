@@ -801,7 +801,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                     LineChartBarData(
                                       spots: negativeEmotionData,
                                       isCurved: true,
-                                      color: Color(0xFFFBBC05),
+                                      color: Color(0xFFA7BA89),
                                       barWidth: 4,
                                       belowBarData:
                                           BarAreaData(show: false),
@@ -823,7 +823,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                         width: 60.h,
                                         height: 32.v,
                                         decoration: BoxDecoration(
-                                          color: Color(0xFFFBBC05),
+                                          color: Color(0xFFA7BA89),
                                           borderRadius:
                                               BorderRadius.circular(20),
                                         ),
@@ -844,7 +844,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                         style: TextStyle(
                                           fontSize: 20.fSize,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFFFBBC05),
+                                          color: Color(0xFFA7BA89),
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -878,7 +878,7 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
                                         style: TextStyle(
                                           fontSize: 20.fSize,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF7DA8E8),
+                                          color: Color ( 0xFF7DA8E8 ),
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
