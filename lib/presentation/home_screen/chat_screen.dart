@@ -17,7 +17,7 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Map<String, String>> messages = [];
   String? imageUrl;
   String? userId; 
-  String receiverId = '76'; 
+  String receiverId = '76'; //seller
   String? perfumeImage;
 
   @override
