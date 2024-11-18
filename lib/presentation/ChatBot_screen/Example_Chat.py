@@ -1,10 +1,10 @@
+import chatBotUtils
 
-
-def getExampleChat():
-    ### 主題 1：作業做不出來
-    userName = ""
-    assistantName = ""
+def getExampleChat(userName):
+    assistantName = chatBotUtils.getAssistantName()
     example = [
+        ### 主題 1：作業做不出來
+        
         {'role': 'user', 'content': f"「{userName}」：唉，這題真的卡住了，怎麼做都做不出來！"},
         {'role': 'assistant', 'content': f"{assistantName}：嘿嘿～別氣餒嘛！要不要我陪你一起想辦法？有時候兩個腦袋碰在一起靈感會突然冒出來喔！"},
         {'role': 'user', 'content': f"「{userName}」：可是我真的覺得自己怎麼想都想不到啊～"},

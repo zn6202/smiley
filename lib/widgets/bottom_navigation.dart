@@ -27,7 +27,7 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
   Future<void> disposeMusic() async {
     if (widget.audioPlayer != null) {
       if (widget.audioPlayer!.playing) {
-        await widget.audioPlayer!.pause();  // 暫停音樂
+        await widget.audioPlayer!.pause(); // 暫停音樂
         await widget.audioPlayer!.dispose(); // 釋放資源
         print('音樂已暫停並釋放資源');
       } else {
@@ -55,7 +55,6 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
       Navigator.pushNamed(context, AppRoutes.analysis);
     } else if (index == 0) {
       //聊天機器人頁面
-      messageProvider.clearUnread();
       Navigator.pushNamed(context, AppRoutes.chatbotScreen);
     } else {
       widget.onTap(index);
@@ -73,129 +72,142 @@ class _CustomBottomNavigationBarState extends State<CustomBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    final messageProvider = Provider.of<MessageProvider>(context); // 偵測未讀訊息
+    // 使用 Provider 取得 MessageProvider
+    final messageProvider = Provider.of<MessageProvider>(context);
     final routeName = ModalRoute.of(context)?.settings.name;
-    return Container(
-      decoration: BoxDecoration(
-        color: widget.isTransparent ? Colors.transparent : const Color(0xFFFCFCFE),
-      ),
-      child: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => _onTap(index, messageProvider),
-        items: [
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.v),
-              child: Badge(
-                // 顯示未讀訊息在按鈕上
-                label: Text(
-                  '${messageProvider.newMessages}',
-                  style: TextStyle(color: Colors.white, fontSize: 12),
-                ),
-                isLabelVisible:
-                    (messageProvider.newMessages > 0 && routeName != '/ChatBot_screen')
+    // 如果還未初始化，進行初始化，並傳送機器人歡迎訊息
+    if (!messageProvider.isInitialized) {
+      messageProvider.initialize();
+    }
+    // return Consumer<MessageProvider>(
+    //   builder: (context, messageProvider, child) {
+    //     if (routeName == '/ChatBot_screen') {
+    //       messageProvider.clearUnread();
+    //     }
+        return Container(
+          decoration: BoxDecoration(
+            color:
+                widget.isTransparent ? Colors.transparent : const Color(0xFFFCFCFE),
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => _onTap(index, messageProvider),
+            items: [
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.v),
+                  child: Badge(
+                    // 顯示未讀訊息在按鈕上
+                    label: Text(
+                      '${messageProvider.newMessages}',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    isLabelVisible: (messageProvider.newMessages > 0 &&
+                            routeName != '/ChatBot_screen')
                         ? true
                         : false,
-                child: SizedBox(
-                  height: 32.v,
-                  width: 32.h,
-                  child: SvgPicture.asset(
-                    'assets/images/chatRobot.svg',
-                    colorFilter: ColorFilter.mode(
-                      _currentIndex == 0
-                          ? const Color(0xFFA7BA89)
-                          : const Color(0xFFC5C5C5),
-                      BlendMode.srcIn,
+                    child: SizedBox(
+                      height: 32.v,
+                      width: 32.h,
+                      child: SvgPicture.asset(
+                        'assets/images/chatRobot.svg',
+                        colorFilter: ColorFilter.mode(
+                          _currentIndex == 0
+                              ? const Color(0xFFA7BA89)
+                              : const Color(0xFFC5C5C5),
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                label: '',
               ),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.v),
-              child: SizedBox(
-                height: 32.v,
-                width: 32.h,
-                child: SvgPicture.asset(
-                  'assets/images/analyze.svg',
-                  colorFilter: ColorFilter.mode(
-                    _currentIndex == 1
-                        ? const Color(0xFFA7BA89)
-                        : const Color(0xFFC5C5C5),
-                    BlendMode.srcIn,
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.v),
+                  child: SizedBox(
+                    height: 32.v,
+                    width: 32.h,
+                    child: SvgPicture.asset(
+                      'assets/images/analyze.svg',
+                      colorFilter: ColorFilter.mode(
+                        _currentIndex == 1
+                            ? const Color(0xFFA7BA89)
+                            : const Color(0xFFC5C5C5),
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
+                label: '',
               ),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.v),
-              child: SizedBox(
-                height: 38.v,
-                width: 38.h,
-                child: SvgPicture.asset(
-                  widget.isHomeScreen
-                      ? 'assets/images/diary.svg'
-                      : 'assets/images/home.svg',
-                  colorFilter: ColorFilter.mode(
-                    const Color(0xFFC5C5C5),
-                    BlendMode.srcIn,
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.v),
+                  child: SizedBox(
+                    height: 38.v,
+                    width: 38.h,
+                    child: SvgPicture.asset(
+                      widget.isHomeScreen
+                          ? 'assets/images/diary.svg'
+                          : 'assets/images/home.svg',
+                      colorFilter: ColorFilter.mode(
+                        const Color(0xFFC5C5C5),
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
+                label: '',
               ),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.v),
-              child: SizedBox(
-                height: 32.v,
-                width: 32.h,
-                child: SvgPicture.asset(
-                  'assets/images/social.svg',
-                  colorFilter: ColorFilter.mode(
-                    _currentIndex == 3
-                        ? const Color(0xFFA7BA89)
-                        : const Color(0xFFC5C5C5),
-                    BlendMode.srcIn,
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.v),
+                  child: SizedBox(
+                    height: 32.v,
+                    width: 32.h,
+                    child: SvgPicture.asset(
+                      'assets/images/social.svg',
+                      colorFilter: ColorFilter.mode(
+                        _currentIndex == 3
+                            ? const Color(0xFFA7BA89)
+                            : const Color(0xFFC5C5C5),
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
+                label: '',
               ),
-            ),
-            label: '',
-          ),
-          BottomNavigationBarItem(
-            icon: Padding(
-              padding: EdgeInsets.symmetric(vertical: 8.v),
-              child: SizedBox(
-                height: 32.v,
-                width: 32.h,
-                child: SvgPicture.asset(
-                  'assets/images/setting.svg',
-                  colorFilter: ColorFilter.mode(
-                    _currentIndex == 4
-                        ? const Color(0xFFA7BA89)
-                        : const Color(0xFFC5C5C5),
-                    BlendMode.srcIn,
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8.v),
+                  child: SizedBox(
+                    height: 32.v,
+                    width: 32.h,
+                    child: SvgPicture.asset(
+                      'assets/images/setting.svg',
+                      colorFilter: ColorFilter.mode(
+                        _currentIndex == 4
+                            ? const Color(0xFFA7BA89)
+                            : const Color(0xFFC5C5C5),
+                        BlendMode.srcIn,
+                      ),
+                    ),
                   ),
                 ),
+                label: '',
               ),
-            ),
-            label: '',
+            ],
+            type: BottomNavigationBarType.fixed,
+            selectedLabelStyle: TextStyle(fontSize: 0),
+            unselectedLabelStyle: TextStyle(fontSize: 0),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
-        ],
-        type: BottomNavigationBarType.fixed,
-        selectedLabelStyle: TextStyle(fontSize: 0),
-        unselectedLabelStyle: TextStyle(fontSize: 0),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
-    );
-  }
+        );
+      }
+    // );
+  // }
 }

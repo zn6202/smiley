@@ -18,8 +18,8 @@ TextStyle selectedDateStyle = TextStyle(
 const Color calendarBackgroundColor = Color(0xFFF4F4E6);
 const Color addDiaryBackgroundColor = Color(0xFFFFFFFF);
 
-// 此route是否已初始化過一次
-bool _hasInitialized = false; //
+// // 此機器人是否已初始化過一次
+// bool _hasInitialized = false; //
 
 class DiaryMainScreen extends StatefulWidget {
   @override
@@ -33,30 +33,16 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
   List<String> emotionImages = [];
   bool showEmotionBlock = false;
 
-  // 聊天機器人資料
-  Map<String, String>? welcomeMessage; // 歡迎訊息
-  // 初始化執行程序
-  @override
-  Future<void> didChangeDependencies() async {
-    super.didChangeDependencies();
-    // 判斷是否初始化過一次了
-    if (!_hasInitialized) {
-      _hasInitialized = true;
-      _fetchEmotionData();
-      final messageProvider =
-          Provider.of<MessageProvider>(context, listen: false);
-        messageProvider.fetchWelcomeMessage(); // 取得助手機器人歡迎訊息
-    }
-  }
-  void dispose() {
-    super.dispose(); 
-  } //
-
   @override
   void initState() {
     super.initState();
     _fetchEmotionData();
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  } //
 
   Future<String?> getUserId() async {
     final prefs = await SharedPreferences.getInstance();
@@ -65,6 +51,12 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // 使用 Provider 取得 MessageProvider
+    final messageProvider = Provider.of<MessageProvider>(context);
+    // 如果還未初始化，進行初始化，並傳送機器人歡迎訊息
+    if (!messageProvider.isInitialized) {
+      messageProvider.initialize();
+    }
     return Scaffold(
       backgroundColor: calendarBackgroundColor,
       body: Stack(
@@ -295,7 +287,6 @@ class _DiaryMainScreenState extends State<DiaryMainScreen> {
       ),
     );
   }
-
 
   Future<Map<String, dynamic>> _getTestDiaryData(DateTime date) async {
     final String? userId = await getUserId();

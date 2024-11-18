@@ -11,9 +11,21 @@ class MessageProvider with ChangeNotifier {
   String userID = "";
   String userName = 'User';
   bool isSending = false;
+  bool isInitialized = false;
+  bool newMessage = false;
 
   List<Map<String, String>> get messages => _messages;
   int get newMessages => _newMessages;
+
+  // 初始化方法
+  void initialize() {
+    if (!isInitialized) {
+      // 執行初始化邏輯
+      print("MessageProvider 被初始化");
+      isInitialized = true;
+      fetchWelcomeMessage();
+    }
+  }
 
   void clearUnread() {
     _newMessages = 0;
@@ -22,7 +34,15 @@ class MessageProvider with ChangeNotifier {
 
   void updateUnreadMsg(int value) {
     _newMessages = value;
+    newMessage = true;
+    isSending = false;
     notifyListeners();
+  }
+
+  void _handleError() {
+    final errorMessage = {'role': 'sys', 'content': '取得訊息失敗'};
+    _messages.add(errorMessage);
+    isSending = false;
   }
 
   Future<String?> _getUserId() async {
@@ -58,10 +78,13 @@ class MessageProvider with ChangeNotifier {
   }
 
   Future<void> fetchWelcomeMessage() async {
+    newMessage = false;
+    isSending = true;
     await _fetchUserData();
     try {
       final response = await http.post(
         Uri.parse('http://163.22.32.24/welcome'),
+        // Uri.parse('http://10.0.2.2:5001/welcome'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: jsonEncode({'user_id': userID, 'user_name': userName}),
       );
@@ -84,12 +107,14 @@ class MessageProvider with ChangeNotifier {
     }
   }
 
-  Future<Map<String, String>> sendDataToPython(String messageContent) async {
+  Future<void> sendDataToPython(String messageContent) async {
+    newMessage = false;
     await _fetchUserData();
     // _addMessage(responseMessage);
     try {
       final response = await http.post(
         Uri.parse('http://163.22.32.24/send_message_to_python'),
+        // Uri.parse('http://10.0.2.2:5001/send_message_to_python'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: jsonEncode({
           'user_id': userID,
@@ -107,7 +132,6 @@ class MessageProvider with ChangeNotifier {
         _messages.add(assistantMessage);
         _newMessages += 1;
         updateUnreadMsg(_newMessages);
-        return assistantMessage;
       } else {
         _handleError();
       }
@@ -115,21 +139,21 @@ class MessageProvider with ChangeNotifier {
       print('Error sending data to Python: $e');
       _handleError();
     }
-    return {'role': 'sys', 'content': '取得訊息失敗'};
   }
 
   String getUserDiary(String diaryMessage) {
     return "我寫了一篇日記：${diaryMessage}";
   }
 
-  Future<Map<String, String>> sendUserDiaryToAssistant(
-      String diaryContent) async {
+  Future<void> sendUserDiaryToAssistant(String diaryContent) async {
+    newMessage = false;
     isSending = true;
     await _fetchUserData();
     print("傳送日記給小助手...：$diaryContent");
     try {
       final response = await http.post(
         Uri.parse('http://163.22.32.24:5001/send_message_to_python'),
+        // Uri.parse('http://10.0.2.2:5001/send_message_to_python'),
         headers: {'Content-Type': 'application/json; charset=utf-8'},
         body: jsonEncode({
           'user_id': userID,
@@ -145,10 +169,9 @@ class MessageProvider with ChangeNotifier {
           'content': jsonResponseContent
         };
         _messages.add({'role': 'user', 'content': "新的日記！"});
+        _messages.add(assistantMessage);
         _newMessages += 1;
         updateUnreadMsg(_newMessages);
-        // _addMessage(assistantMessage);
-        return assistantMessage;
       } else {
         _handleError();
       }
@@ -156,19 +179,5 @@ class MessageProvider with ChangeNotifier {
       print('Error sending user diary to assistant: $e');
       _handleError();
     }
-    return {'role': 'sys', 'content': '取得訊息失敗'};
-  }
-
-  // void _addMessage(Map<String, String> message) {
-  //   _messages.add(message);
-  //   _newMessages++;
-  //   isSending = false;
-  //   notifyListeners();
-  // }
-
-  void _handleError() {
-    final errorMessage = {'role': 'sys', 'content': '取得訊息失敗'};
-    _messages.add(errorMessage);
-    // _addMessage(errorMessage);
   }
 }

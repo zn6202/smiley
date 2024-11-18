@@ -12,8 +12,6 @@ import 'package:just_audio/just_audio.dart';
 import 'dart:async'; // for TimeoutException
 import 'dart:io'; // for SocketExecption
 
-bool _isInitialized = false;
-
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
@@ -52,13 +50,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     saveMusicDialog(
         "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
     _initializeMusicStatus();
-    if (_isInitialized == false) {
-      final messageProvider =
-          Provider.of<MessageProvider>(context, listen: false);
-      messageProvider.fetchWelcomeMessage();
-      _isInitialized = true;
-    }
-
+    // final messageProvider =
+    //     Provider.of<MessageProvider>(context, listen: false);
+    // if (messageProvider.welcomeSent == false) {
+    //   setState(() {
+    //     messageProvider.fetchWelcomeMessage();
+    //   });
+    // }
     // _setupPlayerListeners(); // 設置播放器監聽器
   }
 
@@ -277,6 +275,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
+    // 使用 Provider 取得 MessageProvider
+    final messageProvider = Provider.of<MessageProvider>(context);
+    // 如果還未初始化，進行初始化，並傳送機器人歡迎訊息
+    if (!messageProvider.isInitialized) {
+      messageProvider.initialize();
+    }
     return Scaffold(
       extendBody: true,
       body: Stack(

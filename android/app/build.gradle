@@ -14,8 +14,8 @@ if (localPropertiesFile.exists()) {
         localProperties.load(reader)
     }
 }
-def flutterVersionCode = '10'
-def flutterVersionName = '1.0.10'
+def flutterVersionCode = '23'
+def flutterVersionName = '1.0.23'
 
 //def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 //if (flutterVersionCode == null) {
