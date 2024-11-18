@@ -17,7 +17,8 @@ class _ChatScreenState extends State<ChatScreen> {
   List<Map<String, String>> messages = [];
   String? imageUrl;
   String? userId; 
-  String? receiverId; 
+  String receiverId = '76'; 
+  String? perfumeImage;
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> initializeData() async {
     await loadSharedPreferencesData();
-    if (userId != null && receiverId != null) {
+    if (userId != null ) {
       List<Map<String, dynamic>> fetchedMessages = await _chatService.fetchMessages(userId!, receiverId!);
       setState(() {
         messages = fetchedMessages.map((msg) => {
@@ -46,11 +47,13 @@ class _ChatScreenState extends State<ChatScreen> {
   Future<void> loadSharedPreferencesData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      receiverId = prefs.getString('receiver_id');
       userId = prefs.getString('user_id');
+      perfumeImage = prefs.getString('perfumeImage');
+
     });
     print('聊天對象為 $receiverId');
     print('User ID: $userId');
+    print('商家頭貼為：$perfumeImage');
   }
 
   void _scrollToBottom() {
@@ -202,9 +205,20 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget _buildChosenIcon(String sender) {
     switch (sender) {
       case '76': // 商家
-        return imageUrl != null
-            ? Image.network(imageUrl!)
-            : Image.asset('assets/images/Lightning.png');
+        if (perfumeImage != null && perfumeImage!.isNotEmpty) {
+          // 使用網絡圖片
+          return Image.network(
+            'http://163.22.32.24/smiley_backend/img/angel/$perfumeImage',
+            errorBuilder: (context, error, stackTrace) => Icon(Icons.error),
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return CircularProgressIndicator();
+            },
+          );
+        } else {
+          // 使用占位符
+          return Image.asset('assets/images/placeholder.png');
+        }
       case 'sys':
         return const Icon(Icons.error);
       default: // 用戶
