@@ -189,15 +189,15 @@ class _ShopScreenState extends State<ShopScreen> {
   }
     // 精油名稱及圖片路徑列表
   final List<Map<String, String>> essentialOils = [
-    {"name": "薰衣草精油", "image": "anger_2.png"},
-    {"name": "玫瑰精油", "image": "anger_2.png"},
-    {"name": "茶樹精油", "image": "anger_2.png"},
-    {"name": "檸檬精油", "image": "anger_2.png"},
-    {"name": "薄荷精油", "image": "anger_2.png"},
-    {"name": "尤加利精油", "image": "anger_2.png"},
-    {"name": "甜橙精油", "image": "anger_2.png"},
-    {"name": "洋甘菊精油", "image": "anger_2.png"},
-    {"name": "佛手柑精油", "image": "anger_2.png"},
-    {"name": "檀香精油", "image": "anger_2.png"},
+    {"name": "薰衣草精油", "image": "happiness_5.png"},
+    {"name": "玫瑰精油", "image": "like_3.png"},
+    {"name": "雪松精油", "image": "happiness_2.png"},
+    {"name": "檸檬精油", "image": "disgust_5.png"},
+    {"name": "薄荷精油", "image": "disgust_2.png"},
+    {"name": "香蜂草精油", "image": "disgust_3.png"},
+    {"name": "香橙精油", "image": "happiness_6.png"},
+    {"name": "洋甘菊精油", "image": "disgust_4.png"},
+    {"name": "鼠尾草精油", "image": "happiness_3.png"},
+    {"name": "天竺葵精油", "image": "happiness_1.png"},
   ];
 }

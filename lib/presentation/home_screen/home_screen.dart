@@ -264,8 +264,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  
-
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
@@ -594,11 +592,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     final String? perfumeName = prefs.getString('perfumeName');
     final String? perfume = prefs.getString('perfume');
+    final String? meaning = prefs.getString('meaning');
     final String? perfumeImage = prefs.getString('perfumeImage');
     final String? lastFetchPerfumeDate =
         prefs.getString('lastFetchPerfumeDate');
     print('進入每日香氛函式');
-    print('花名:$perfumeName 香氛味道:$perfume 圖像:$perfumeImage');
+    print('花名:$perfumeName 功效；$meaning 使用方式:$perfume 圖像:$perfumeImage');
 
     // 如果今天還沒寫日記，顯示先寫日記
     if (!hasDiaryToday) {
@@ -607,11 +606,12 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     } // 今天已寫日記，今天非第一次點擊
     else if (perfumeName != null &&
         perfume != null &&
+        meaning != null &&
         perfumeImage != null &&
         lastFetchPerfumeDate ==
             DateTime.now().toIso8601String().substring(0, 10)) {
       print('取得舊的香氛');
-      _showPerfumeDialog(context, perfumeName, perfume, perfumeImage);
+      _showPerfumeDialog(context, perfumeName, perfume, perfumeImage, meaning);
     } // 今天已寫日記，今天第一次點擊
     else {
       print('取得新的香氛');
@@ -639,7 +639,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
             DateTime.now().toIso8601String().substring(0, 10));
 
         // 顯示對話框
-        _showPerfumeDialog(context, name, perfume, image);
+        _showPerfumeDialog(context, name, perfume, image, meaning);
       } else {
         // 處理錯誤
         print('Failed to load flower data');
@@ -647,104 +647,114 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-void _showPerfumeDialog(
-  BuildContext context, String name, String perfume, String image) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20.v),
-        ),
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(26.0.v),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Fixed Title
-                Text(
-                  '精油',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
+  void _showPerfumeDialog(BuildContext context, String name, String perfume,
+      String image, String meaning) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.v),
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.all(26.0.v),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Fixed Title
+                  Text(
+                    '精油',
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                // 分割線
-                Container(
-                  width: 244.5.h,
-                  decoration: ShapeDecoration(
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        width: 1.h,
-                        color: Color(0xFFDADADA),
+                  SizedBox(height: 10),
+                  // 分割線
+                  Container(
+                    width: 244.5.h,
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          width: 1.h,
+                          color: Color(0xFFDADADA),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 8.v),
-                // Subtitle
-                Text(
-                  '今天適合你的精油是 「$name」',
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black,
+                  SizedBox(height: 8.v),
+                  // Subtitle
+                  Text(
+                    '今天適合你的精油是 「$name」',
+                    style: TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20),
-                // Image
-                Image.network(
-                  'http://163.22.32.24/smiley_backend/img/angel/$image',
-                  height: 100.0.v,
-                  width: 100.0.v,
-                  fit: BoxFit.contain,
-                ),
-                SizedBox(height: 20.v),
-                // Description
-                Text(
-                  perfume,
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: Colors.black87,
-                    height: 1.5.v, // Line spacing
+                  SizedBox(height: 20),
+                  // Image
+                  Image.network(
+                    'http://163.22.32.24/smiley_backend/img/angel/$image',
+                    height: 100.0.v,
+                    width: 100.0.v,
+                    fit: BoxFit.contain,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                SizedBox(height: 20.v),
-                // 芳療師聊天室
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      AppRoutes.chatScreen,
-                      arguments: {
-                        'imageUrl': 'http://163.22.32.24/smiley_backend/img/angel/$image',
-                      },
-                    );
-                  },
-                  child: styledContainer("與芳療師聊聊"),
-                ),
-                SizedBox(height: 10.v),
-                //香氛商場
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.shopScreen);
-                  },
-                  child: styledContainer('去植芳園商場逛逛'),
-                ),
-              ],
+                  SizedBox(height: 20.v),
+                  // Description
+                  Text(
+                    meaning, //功效
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black87,
+                      height: 1.5.v, // Line spacing
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20.v),
+                  Text(
+                    perfume, // 使用方式
+                    style: TextStyle(
+                      fontSize: 16.0,
+                      color: Colors.black87,
+                      height: 1.5.v, // Line spacing
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 20.v),
+                  // 芳療師聊天室
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.chatScreen,
+                        arguments: {
+                          'imageUrl':
+                              'http://163.22.32.24/smiley_backend/img/angel/$image',
+                        },
+                      );
+                    },
+                    child: styledContainer("與芳療師聊聊"),
+                  ),
+                  SizedBox(height: 10.v),
+                  //香氛商場
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pushNamed(context, AppRoutes.shopScreen);
+                    },
+                    child: styledContainer('去植芳園商場逛逛'),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 
   void _showNotPerfumeDialog(BuildContext context) {
     showDialog(
@@ -805,18 +815,19 @@ void _showPerfumeDialog(
     );
   }
 
-  Widget styledContainer(String text) { //花語的按鈕樣式
+  Widget styledContainer(String text) {
+    //花語的按鈕樣式
     return Container(
       width: 253.0.v,
-      padding: EdgeInsets.all(10.0.v), 
+      padding: EdgeInsets.all(10.0.v),
       decoration: BoxDecoration(
-        color: Color(0xFFA7BA89), 
-        borderRadius: BorderRadius.circular(20.0.v), 
+        color: Color(0xFFA7BA89),
+        borderRadius: BorderRadius.circular(20.0.v),
         boxShadow: [
           BoxShadow(
             color: Color.fromRGBO(0, 0, 0, 0.25),
-            offset: Offset(0.v, 4.v), 
-            blurRadius: 4.0.v, 
+            offset: Offset(0.v, 4.v),
+            blurRadius: 4.0.v,
           ),
         ],
       ),
@@ -883,8 +894,9 @@ void _showPerfumeDialog(
       }
     }
   }
-  
-  void _showDialog(BuildContext context, String name, String meaning, String image) {
+
+  void _showDialog(
+      BuildContext context, String name, String meaning, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
