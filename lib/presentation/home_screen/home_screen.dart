@@ -645,106 +645,104 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
-  void _showPerfumeDialog(
-      BuildContext context, String name, String perfume, String image) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(24.0),
-          ),
-          child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 20.h, vertical: 16.v),
-            decoration: ShapeDecoration(
-              color: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24.0),
-              ),
-            ),
+void _showPerfumeDialog(
+  BuildContext context, String name, String perfume, String image) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20.v),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(26.0.v),
             child: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // 標題文本
+                // Fixed Title
                 Text(
-                  '精油', // 固定標題
-                  textAlign: TextAlign.center,
-                  style: dialogTitleStyle,
+                  '精油',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-                SizedBox(height: 10.v),
-
-                // 中間分割線
+                SizedBox(height: 10),
+                // 分割線
                 Container(
                   width: 244.5.h,
                   decoration: ShapeDecoration(
                     shape: RoundedRectangleBorder(
                       side: BorderSide(
                         width: 1.h,
-                        color: Color(0xFFDADADA), // 灰色邊框
+                        color: Color(0xFFDADADA),
                       ),
                     ),
                   ),
                 ),
-                SizedBox(height: 16.v),
-
-                // 說明文本 (天竺葵)
+                SizedBox(height: 8.v),
+                // Subtitle
                 Text(
                   '今天適合你的精油是 「$name」',
-                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 18.fSize, // 調整字體大小
+                    fontSize: 18.0,
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
-                ),
-                SizedBox(height: 10.v),
-
-                // 精油詳細說明
-                Text(
-                  perfume,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16.fSize, // 調整字體大小
-                    color: Colors.black87,
-                    height: 1.5.v, // 行距調整
-                  ),
+                ),
+                SizedBox(height: 20),
+                // Image
+                Image.network(
+                  'http://163.22.32.24/smiley_backend/img/angel/$image',
+                  height: 100.0.v,
+                  width: 100.0.v,
+                  fit: BoxFit.contain,
                 ),
                 SizedBox(height: 20.v),
-                Padding(
-                  padding: EdgeInsets.only(top: 10.v),
-                  child: Text(
-                    '\\ 點我去植芳園官網 ! /',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 16.fSize,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xFF717171),
-                    ),
+                // Description
+                Text(
+                  perfume,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.black87,
+                    height: 1.5.v, // Line spacing
                   ),
+                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: 10.v),
-                SizedBox(height: 10.v),
-                // 可點擊的精油圖片
+                SizedBox(height: 20.v),
+                // 芳療師聊天室
                 GestureDetector(
                   onTap: () {
-                    // 點擊圖片後跳轉到指定網址
-                    launchUrl(Uri.parse(
-                        'https://waterpine.tw/%E6%A4%8D%E8%8A%B3%E5%9C%92/'));
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.chatScreen,
+                      arguments: {
+                        'imageUrl': 'http://163.22.32.24/smiley_backend/img/angel/$image',
+                      },
+                    );
                   },
-                  child: Image.network(
-                    'http://163.22.32.24/smiley_backend/img/angel/$image',
-                    height: 120.v, // 調整圖片高度
-                    width: 120.h, // 調整圖片寬度
-                    fit: BoxFit.contain,
-                  ),
+                  child: styledContainer("與芳療師聊聊"),
+                ),
+                SizedBox(height: 10.v),
+                //香氛商場
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.shopScreen);
+                  },
+                  child: styledContainer('去植芳園商場逛逛'),
                 ),
               ],
             ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
 
   void _showNotPerfumeDialog(BuildContext context) {
     showDialog(
@@ -772,7 +770,6 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   style: dialogTitleStyle,
                 ),
                 SizedBox(height: 10.v),
-
                 // 中間分割線
                 Container(
                   width: 244.5.h,
@@ -803,6 +800,39 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
           ),
         );
       },
+    );
+  }
+
+  Widget styledContainer(String text) { //花語的按鈕樣式
+    return Container(
+      width: 253.0.v,
+      padding: EdgeInsets.all(10.0.v), 
+      decoration: BoxDecoration(
+        color: Color(0xFFA7BA89), 
+        borderRadius: BorderRadius.circular(20.0.v), 
+        boxShadow: [
+          BoxShadow(
+            color: Color.fromRGBO(0, 0, 0, 0.25),
+            offset: Offset(0.v, 4.v), 
+            blurRadius: 4.0.v, 
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center, // 設置主軸對齊方式
+        crossAxisAlignment: CrossAxisAlignment.center, // 設置交叉軸對齊方式
+        children: [
+          Text(
+            text, // 使用傳入的文字內容
+            style: TextStyle(
+              fontSize: 16.0,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
@@ -851,9 +881,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       }
     }
   }
-
-  void _showDialog(
-      BuildContext context, String name, String meaning, String image) {
+  
+  void _showDialog(BuildContext context, String name, String meaning, String image) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -1027,12 +1056,4 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   }
 }
 
-/*
-當我按撥放後，沒有按暫停，就按下方功能鍵去其他頁面，音樂要自動暫停加釋放資源。想辦法進到 disposeMusic()
-*/
-
-/**
-後端修改:
-- 剛寫完案返回會無更新
-- 音樂
- */
+// 703可以改文字 兩段和在一起 後端處理可以分開接後再前端猴變新增一個變數儲存顯示 真的要切就複製702-710就好

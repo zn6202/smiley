@@ -12,24 +12,26 @@ dependencies:
   cached_network_image: ^3.3.0
   flutter_svg: ^2.0.9
   intl: ^0.19.0
-  connectivity_plus: ^5.0.2
+  connectivity_plus: ^6.1.0
   calendar_date_picker2: ^1.0.2
-  firebase_core: ^2.31.0
-  firebase_auth: ^4.19.5
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
   google_sign_in: ^6.2.1
   http: ^1.2.1
   image_picker: ^1.1.1
   provider: ^6.0.3
-  cloud_firestore: ^4.17.4
+  cloud_firestore: ^5.4.4
   path_provider: ^2.0.2
   shared_preferences: ^2.2.3
   get: ^4.6.6
-  fl_chart: ^0.68.0
-  google_fonts: ^4.0.5
+  fl_chart: ^0.69.0
+  google_fonts: ^6.2.1
   sliding_up_panel: ^2.0.0+1
   path: ^1.9.0
   url_launcher: ^6.1.10
   just_audio: ^0.9.40
+  web_socket_channel: ^2.4.0
+  animated_text_kit: ^4.2.1
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
@@ -100,6 +102,14 @@ flutter:
     - assets/images/comments_5.png
     - assets/images/comments_6.png
     - assets/images/img_send.png
+    - assets/shop/oil.png
+    - assets/shop/list.png
+    - assets/shop/search.png
+    - assets/shop/cart.png
+    - assets/shop/shopBack.png
+    - assets/store/functionList.png
+    - assets/store/chat.png
+    - assets/store/home.png
   fonts: 
     - family: Inter
       fonts: 
@@ -107,3 +117,4 @@ flutter:
           weight: 600
         - asset: assets/fonts/InterBold.ttf
           weight: 700
+  
