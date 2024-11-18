@@ -264,6 +264,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
     }
   }
 
+  
+
   Future<void> _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);

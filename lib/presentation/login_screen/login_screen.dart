@@ -1,6 +1,6 @@
 import 'dart:convert'; //jsonDecode
 import 'package:flutter/material.dart';
-import 'package:smiley/presentation/friend_screen/friendScreen.dart';
+import 'package:smiley/presentation/seller_screen/shome_screen.dart';
 import 'package:smiley/presentation/home_screen/home_screen.dart';
 import '../../core/app_export.dart';
 import '../../widgets/custom_elevated_button.dart';
@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
         print('我的身分是賣家');
         Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Friendscreen()), // Friendscreen() 要修改成賣家頁面~
+        MaterialPageRoute(builder: (context) => ShomeScreen()), // Friendscreen() 要修改成賣家頁面~
         );
       }else{
         Navigator.pushReplacement(

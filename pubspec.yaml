@@ -30,7 +30,6 @@ dependencies:
   path: ^1.9.0
   url_launcher: ^6.1.10
   just_audio: ^0.9.40
-  web_socket_channel: ^2.4.0
   animated_text_kit: ^4.2.1
 dev_dependencies: 
   flutter_test: 
