@@ -331,58 +331,58 @@ class _AnalysisScreenState extends State<AnalysisScreen> {
         setState(() {
           pieChartSections = [
             PieChartSectionData(
-              color: Color(0xFFFFE153),
+              color: Color ( 0xFFA7BA89 ),
               value: testData['happiness']?.toDouble() ?? 0.0,
               title: '${testData['happiness']}%',
               radius: 50.adaptSize,
               titleStyle: TextStyle(
                 fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF706220),
+                color:  Color ( 0xFF72805C ),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFFECA8A4),
+              color: Color ( 0xFFDCDE76 ),
               value: testData['like']?.toDouble() ?? 0.0,
               title: '${testData['like']}%',
               radius: 50.adaptSize,
               titleStyle: TextStyle(
                 fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFA85450),
+                color: Color ( 0xFF949551 ),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFF7DA8E8),
+              color: Color ( 0xFFD1BA7E ),
               value: testData['sadness']?.toDouble() ?? 0.0,
               title: '${testData['sadness']}%',
               radius: 50.adaptSize,
               titleStyle: TextStyle(
                 fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF375C94),
+                color: Color ( 0xFF8F8059 ),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFF7FA99B),
+              color: Color ( 0xFF7FA99B ),
               value: testData['disgust']?.toDouble() ?? 0.0,
               title: '${testData['disgust']}%',
               radius: 50.adaptSize,
               titleStyle: TextStyle(
                 fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF5A7C71),
+                color: Color ( 0xFF546F66 ),
               ),
             ),
             PieChartSectionData(
-              color: Color(0xFFEC5D5D),
+              color: Color ( 0xFF394A51 ),
               value: testData['anger']?.toDouble() ?? 0.0,
               title: '${testData['anger']}%',
               radius: 50.adaptSize,
               titleStyle: TextStyle(
                 fontSize: 18.fSize,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF6B1F1F),
+                color: Color ( 0xFF6D8E9B ),
               ),
             ),
           ];
