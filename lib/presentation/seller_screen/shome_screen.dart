@@ -94,27 +94,48 @@ class _ShomeScreenState extends State<ShomeScreen> {
       ),
       body: Padding(
         padding: EdgeInsets.all(16.0.v),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 18.0.v,
-          mainAxisSpacing: 18.0.v,
-          childAspectRatio: 2,
-          children: messageList.map((message) {
-            return buildGridItem(
-              message['random_numbers'], // 使用從訊息清單中取得的頭貼
-              message['sender_id'], // 使用發送者的 ID
-              message['unread_count'].toString() // 顯示未讀數量
-            );
-          }).toList(),
-          //   randomNumbers.map((number) {
-          //   return buildGridItem(
-          //       'assets/images/default_avatar_$number.png',
-          //       '23', //客戶ID
-          //       number.toString() // 每個用戶未讀訊息的數量
-          //       );
-          // }).toList(),
-        ),
+        child: messageList.isEmpty
+            ? Center(
+                child: Text(
+                  "今日沒有訊息",
+                  style: TextStyle(
+                    fontSize: 18.0.v,
+                    fontWeight: FontWeight.bold, // 設置粗體
+                    color: Colors.grey,
+                  ),
+                ),
+              )
+            : GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 18.0.v,
+                mainAxisSpacing: 18.0.v,
+                childAspectRatio: 2,
+                children: messageList.map((message) {
+                  return buildGridItem(
+                    message['random_numbers'], // 使用從訊息清單中取得的頭貼
+                    message['sender_id'], // 使用發送者的 ID
+                    message['unread_count'].toString(), // 顯示未讀數量
+                  );
+                }).toList(),
+              ),
       ),
+
+      // body: Padding(
+      //   padding: EdgeInsets.all(16.0.v),
+      //   child: GridView.count(
+      //     crossAxisCount: 2,
+      //     crossAxisSpacing: 18.0.v,
+      //     mainAxisSpacing: 18.0.v,
+      //     childAspectRatio: 2,
+      //     children: messageList.map((message) {
+      //       return buildGridItem(
+      //           message['random_numbers'], // 使用從訊息清單中取得的頭貼
+      //           message['sender_id'], // 使用發送者的 ID
+      //           message['unread_count'].toString() // 顯示未讀數量
+      //           );
+      //     }).toList(),
+      //   ),
+      // ),
     );
   }
 
@@ -126,17 +147,29 @@ class _ShomeScreenState extends State<ShomeScreen> {
 
   Future<void> saveClientID(String clientId) async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-        'receiver_id', clientId); // Save client_id as receiver_id
+    await prefs.setString('receiver_id', clientId);
     print('Saved receiver_id: $clientId');
+  }
+
+  // 儲存選到第幾個預設頭貼
+  Future<void> saveClientImage(String path) async {
+    String? clientImage = path.toString();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('client_image', clientImage);
   }
 
   // 用戶選項方塊
   Widget buildGridItem(String imagePath, String ClientID, String number) {
+    // return buildGridItem(
+    //       message['random_numbers'], // 使用從訊息清單中取得的頭貼
+    //       message['sender_id'], // 使用發送者的 ID
+    //       message['unread_count'].toString() // 顯示未讀數量
+    //     );
     return GestureDetector(
       onTap: () {
-        saveNum(number);
+        saveClientImage(imagePath); // 儲存客戶 ID
         saveClientID(ClientID); // 儲存客戶 ID
+        // saveNum(number); // 儲存未讀訊息數
         Navigator.pushNamed(context, AppRoutes.dataScreen);
       },
       child: Container(
@@ -178,13 +211,6 @@ class _ShomeScreenState extends State<ShomeScreen> {
         ),
       ),
     );
-  }
-
-  // 儲存選到第幾個預設頭貼
-  Future<void> saveNum(String _currentNum) async {
-    String? number = _currentNum.toString();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('number', number);
   }
 }
 // 改成未讀訊息的數量 68

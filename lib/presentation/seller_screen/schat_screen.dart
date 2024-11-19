@@ -12,12 +12,12 @@ class SchatScreen extends StatefulWidget {
 class _SchatScreenState extends State<SchatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final ChatService _chatService = ChatService(); 
+  final ChatService _chatService = ChatService();
   List<Map<String, String>> messages = [];
   String? imageUrl;
-  String? userId; 
-  String? receiverId; 
-  String? number;
+  String? userId;
+  String? receiverId;
+  String? clientImage;
 
   @override
   void initState() {
@@ -31,13 +31,16 @@ class _SchatScreenState extends State<SchatScreen> {
   Future<void> initializeData() async {
     await loadSharedPreferencesData();
     if (userId != null && receiverId != null) {
-      List<Map<String, dynamic>> fetchedMessages = await _chatService.fetchMessages(userId!, receiverId!);
+      List<Map<String, dynamic>> fetchedMessages =
+          await _chatService.fetchMessages(userId!, receiverId!);
       setState(() {
-        messages = fetchedMessages.map((msg) => {
-              'senderId': msg['sender_id'].toString(),
-              'message': msg['message']?.toString() ?? '',
-              'timestamp': msg['timestamp']?.toString() ?? '',
-            }).toList();
+        messages = fetchedMessages
+            .map((msg) => {
+                  'senderId': msg['sender_id'].toString(),
+                  'message': msg['message']?.toString() ?? '',
+                  'timestamp': msg['timestamp']?.toString() ?? '',
+                })
+            .toList();
       });
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     }
@@ -46,11 +49,11 @@ class _SchatScreenState extends State<SchatScreen> {
   Future<void> loadSharedPreferencesData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      number = prefs.getString('number');
+      clientImage = prefs.getString('client_image');
       receiverId = prefs.getString('receiver_id');
       userId = prefs.getString('user_id');
     });
-    print('客戶頭貼為 $number');
+    print('客戶頭貼為 $clientImage');
     print('聊天對象為 $receiverId');
     print('User ID: $userId');
   }
@@ -87,12 +90,15 @@ class _SchatScreenState extends State<SchatScreen> {
             elevation: 0,
             backgroundColor: Color(0xFFF4F4E6),
             leading: IconButton(
-              icon: Image.asset('assets/images/arrow-left-g.png', color: Color.fromARGB(225, 167, 186, 137)),
+              icon: Image.asset('assets/images/arrow-left-g.png',
+                  color: Color.fromARGB(225, 167, 186, 137)),
               onPressed: () {
-                Navigator.pop(context);
+                // Navigator.pop(context);
+                Navigator.pushNamed(context, AppRoutes.shomeScreen);
               },
             ),
-            title: Image.asset('assets/store/chat.png', color: Color.fromARGB(225, 167, 186, 137)),
+            title: Image.asset('assets/store/chat.png',
+                color: Color.fromARGB(225, 167, 186, 137)),
             centerTitle: true,
             flexibleSpace: Container(
               decoration: BoxDecoration(
@@ -129,20 +135,28 @@ class _SchatScreenState extends State<SchatScreen> {
                                     child: _buildChosenIcon(sender),
                                   ),
                             subtitle: Row(
-                              mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                              mainAxisAlignment: isCurrentUser
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
                               children: [
                                 Container(
                                   constraints: BoxConstraints(maxWidth: 205.v),
-                                  padding: EdgeInsets.symmetric(vertical: 10.v, horizontal: 15.v),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10.v, horizontal: 15.v),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: const Color(0xFFA7BA89)),
+                                    border: Border.all(
+                                        color: const Color(0xFFA7BA89)),
                                     borderRadius: BorderRadius.circular(30.v),
-                                    color: isCurrentUser ? Colors.white : const Color(0xFFA7BA89),
+                                    color: isCurrentUser
+                                        ? Colors.white
+                                        : const Color(0xFFA7BA89),
                                   ),
                                   child: Text(
                                     message,
                                     style: TextStyle(
-                                      color: isCurrentUser ? Color(0xFFA7BA89) : Colors.white,
+                                      color: isCurrentUser
+                                          ? Color(0xFFA7BA89)
+                                          : Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -158,7 +172,9 @@ class _SchatScreenState extends State<SchatScreen> {
                       padding: EdgeInsets.all(10.0.v),
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Color.fromARGB(255, 218, 218, 218), width: 2.v),
+                          border: Border.all(
+                              color: Color.fromARGB(255, 218, 218, 218),
+                              width: 2.v),
                           borderRadius: BorderRadius.circular(20.v),
                           color: Colors.white.withOpacity(0.8),
                         ),
@@ -199,6 +215,8 @@ class _SchatScreenState extends State<SchatScreen> {
 
   // 選頭貼
   Widget _buildChosenIcon(String sender) {
+    print('clientImage 為 $clientImage');
+
     switch (sender) {
       case '76': // 商家
         return imageUrl != null
@@ -209,14 +227,15 @@ class _SchatScreenState extends State<SchatScreen> {
       default: // 用戶
         return imageUrl != null
             ? Image.network(imageUrl!)
-            : Image.asset('assets/images/default_avatar_$number.png');
+            : Image.asset('$clientImage');
     }
   }
 }
 
 class ChatService {
   // 把訊息紀錄到資料庫
-  Future<void> sendMessage(String senderId, String receiverId, String message) async {
+  Future<void> sendMessage(
+      String senderId, String receiverId, String message) async {
     try {
       final response = await http.post(
         Uri.parse('http://163.22.32.24/send_message'),
@@ -238,8 +257,10 @@ class ChatService {
       print('Error sending message: $e');
     }
   }
+
   //取得聊天紀錄
-  Future<List<Map<String, dynamic>>> fetchMessages(String senderId, String receiverId) async {
+  Future<List<Map<String, dynamic>>> fetchMessages(
+      String senderId, String receiverId) async {
     print('聊天紀錄載入中...');
     List<Map<String, dynamic>> messages = [];
 

@@ -42,5 +42,8 @@ class API
   static const getInvitedSum = "$hostConnect/user/getInvitedSum.php";
   static const getMusic = "$hostConnect/music/getMusic.php";
   static const getShomeMessageSum = "$hostConnect/sellerPage/getShomeMessageSum.php";
+  static const getData = "$hostConnect/sellerPage/getData.php";
+  static const cleanMessageSum = "$hostConnect/sellerPage/cleanMessageSum.php";
+  static const getTodayOil = "$hostConnect/flower/getTodayOil.php";
 
 }

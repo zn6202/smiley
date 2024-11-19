@@ -19,7 +19,8 @@ class DataScreen extends StatefulWidget {
 class _DataScreenState extends State<DataScreen> {
   bool isVisible = false;
   bool isLoading = true;
-  String? number;
+  String? todayOil;
+  String? clientImage; //客戶頭貼
   String? clientId; //客戶id
   String highestEmotionName = '';
   double highestEmotionValue = 0.0;
@@ -37,23 +38,57 @@ class _DataScreenState extends State<DataScreen> {
   };
 
   // 回饋文
-  Map<String, String> feedbackTexts = {
-    "開心":
-        "今天適合你的精油是「橙花」。橙花帶來幸福與歡樂的感覺，幫助你保持心情愉悅555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555。",
-    "喜歡": "今天適合你的精油是「檸檬草」。檸檬草可以提神醒腦，增強你對事物的熱情。",
-    "悲傷":
-        "今天適合你的精油是「薰衣草」。薰衣草有助於舒緩悲傷情緒，帶來寧靜與安定感555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555。",
-    "噁心": "今天適合你的精油是「生薑」。生薑有助於舒緩胃部不適，並減輕噁心感。",
-    "憤怒": "今天適合你的精油是「薄荷」。薄荷能夠幫助你冷靜下來，釋放憤怒情緒。",
-    "心無波瀾": "心無波瀾",
-  };
+  Map<String, String> generateFeedbackTexts() {
+    getTodayOil();
+    return {
+      "開心":
+          "\n今天適合你的精油是「$todayOil」\n\n< 緩解焦慮、舒緩壓力、恢復精力 >\n在壓力導致失眠的情況下，其強大的鎮靜效果著稱，且有助於平衡神經系統，可以幫助人們在壓力下放鬆心情，減少壓力感，使人在疲憊時感覺更有精神和舒適。\n\n< 推薦使用方式 - 擴香 >\n用途：放鬆身心、減壓、助眠\n方法：使用擴香器或加濕器，加入3-5滴精油到水中，讓精油的香氣隨著蒸汽散發到空氣中。",
+      "喜歡":
+          "\n今天適合你的精油是「$todayOil」\n\n<甜美、浪漫、幸福>\n具有極強的情感療癒效果，幫助增強愛與被愛的感覺。它的香氣能激發內心的甜美與浪漫，讓使用者感受到幸福與愛的美好，尤其適合在喜愛的情緒中使用。\n\n< 推薦使用方式 - 香氛噴霧 >\n用途：增強愛的情感、提升幸福感、營造浪漫氛圍\n方法：將3-5滴精油加入50ml蒸餾水，裝入噴霧瓶中，隨時噴灑於房間或衣物上，讓香氣隨著空氣蔓延，提升愉悅感。",
+      "悲傷":
+          "\n今天適合你的精油是「$todayOil」\n\n< 緩解悲傷、舒緩情緒 >\n其清新的木質香氣能幫助舒緩情緒，減輕內心的悲傷感。它具有強大的情緒調節作用，能為心靈提供安慰，讓使用者感覺更有力量來面對困難的情緒。\n\n< 推薦使用方式 - 香氛按摩 >\n用途：釋放悲傷、安撫心靈、增強內心力量\n方法：將2-3滴精油混合15ml基底油（如甜杏仁油），輕柔地按摩肩頸和手腕，讓香氣緩慢地散發，安撫緊繃的情緒，幫助釋放悲傷。",
+      "噁心":
+          "\n今天適合你的精油是「$todayOil」\n\n<淨化心靈、提振精神>\n其清新的氣息著稱，能有效驅散令人不愉快的感覺，讓人感到煥然一新。同時具有淨化心靈與空間的作用，幫助轉換負面情緒。\n\n<推薦使用方式 - 空氣淨化>\n用途：驅除負能量、提振心情、淨化空間\n方法：將3-5滴精油加入擴香器中，或滴在棉球上放置於房間四角，營造乾淨、清新的氛圍，驅走不愉快的感覺。",
+      "憤怒":
+          "\n今天適合你的精油是「$todayOil」\n\n<平復情緒波動、冷靜>\n辛香氣息具有強烈的放鬆效果，能有效減少情緒波動，平復因憤怒所帶來的心理壓力。它對於釋放情緒及促進冷靜與理智的回歸有顯著的效果。\n\n<推薦使用方式 - 熱敷>\n用途：平復怒氣、釋放壓力、促進情緒冷靜\n方法：將5滴精油滴入溫水中，浸濕毛巾後輕擰乾，敷在額頭或脖後，靜靜地深呼吸，幫助冷靜情緒並釋放怒氣。",
+      "心無波瀾":
+          "\n今天適合你的精油是「$todayOil」\n\n<放鬆、身心平衡>\n其以平衡與穩定的特性著稱，適合用於日常放鬆或不明確的情緒狀態，幫助人們重拾心靈的平靜與專注。\n\n< 推薦使用方式 - 擴香 >\n用途：放鬆身心、減壓、助眠\n方法：使用擴香器或加濕器，加入3-5滴精油到水中，讓精油的香氣隨著蒸汽散發到空氣中。",
+    };
+  }
 
   @override
   void initState() {
     super.initState();
-    getNumber();
+    getClientImage();
     fetchClientData();
     print('進入客戶資料頁面');
+  }
+
+  Future<void> getTodayOil() async {
+    String? userId = await getClientID(); //換成從上一個頁面傳過來的客戶id
+
+    print("抓取今日精油 user_id = $userId");
+
+    final response =
+        await http.post(Uri.parse(API.getTodayOil), body: {'user_id': userId});
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = jsonDecode(response.body);
+      print("今日推薦精油 = ${responseData["data"]}");
+
+      if (responseData['success'] == true) {
+        setState(() {
+          todayOil = responseData['oil_name'];
+        });
+        // fetchDataAndGenerateRandomNumbers();
+      } else {
+        print('瀏覽失敗... ${responseData['message']}');
+      }
+    } else {
+      print('瀏覽失敗...');
+    }
+    await Future.delayed(Duration(seconds: 1));
+    // return 5;
   }
 
   Future<String?> getClientID() async {
@@ -151,22 +186,49 @@ class _DataScreenState extends State<DataScreen> {
     }
   }
 
-  Future<void> getNumber() async {
+  Future<void> getClientImage() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      number = prefs.getString('number');
+      clientImage = prefs.getString('client_image');
     });
-    print('客戶頭貼為 $number ');
+    print('客戶頭貼為 $clientImage ');
+  }
+
+  Future<void> cleanMessageSum(String? clientID) async {
+    print("進入聊天室，更新訊息未讀數量, clientID = $clientID");
+
+    final response = await http.post(
+      Uri.parse(
+        API.cleanMessageSum), 
+        body: {
+          'user_id': clientID,
+        }
+      );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> responseData = jsonDecode(response.body);
+      print("更新訊息未讀數量成功 = ${responseData["data"]}");
+      // if (responseData['success'] == true) {
+      //   setState(() {
+
+      //   });
+      // } else {
+      //   print('瀏覽失敗... ${responseData['message']}');
+      // }
+    } else {
+      print('瀏覽失敗...');
+    }
+    await Future.delayed(Duration(seconds: 1));
   }
 
   Widget AppBarImage() {
-    if (number == null) {
+    if (clientImage == null) {
       return CircularProgressIndicator(); // 載入中的指示器
-    } else if (number!.isEmpty) {
+    } else if (clientImage!.isEmpty) {
       return Text("無法加載圖片");
     } else {
       return Image.asset(
-        'assets/images/default_avatar_$number.png',
+        clientImage!,
         height: 55.0.v, // 根據需要調整高度
         fit: BoxFit.cover,
       );
@@ -331,11 +393,15 @@ class _DataScreenState extends State<DataScreen> {
                                 ),
                               ),
                               SizedBox(height: 8.0.v),
-                              Text(
-                                feedbackTexts[highestEmotionName] ?? "無對應的回饋文",
-                                style: TextStyle(
-                                  fontSize: 14.0.v,
-                                  color: Color(0xFF4A4A4A),
+                              Center(
+                                child: Text(
+                                  generateFeedbackTexts()[highestEmotionName] ??
+                                      "無對應的回饋文",
+                                  textAlign: TextAlign.center, // 多行文字也會置中對齊
+                                  style: TextStyle(
+                                    fontSize: 14.0.v,
+                                    color: Color(0xFF4A4A4A),
+                                  ),
                                 ),
                               ),
                             ],
@@ -358,7 +424,8 @@ class _DataScreenState extends State<DataScreen> {
               onPressed: () async {
                 // Save client_id as receiver_id
                 clientId = await getClientID();
-                await saveClientID(clientId!);
+                // await saveClientID(clientId!);
+                cleanMessageSum(clientId);
 
                 // Navigate to SchatScreen
                 Navigator.push(
@@ -573,12 +640,12 @@ class _DataScreenState extends State<DataScreen> {
   }
 }
 
-Future<void> saveClientID(String clientId) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString(
-      'receiver_id', clientId); // Save client_id as receiver_id
-  print('Saved receiver_id: $clientId');
-}
+// Future<void> saveClientID(String clientId) async {
+//   final prefs = await SharedPreferences.getInstance();
+//   await prefs.setString(
+//       'receiver_id', clientId); // Save client_id as receiver_id
+//   print('Saved receiver_id: $clientId');
+// }
 
 // 要記得先去用戶帳號寫日記 目前沒有處理沒日記的話日分析的顯示
 // 24 60要改用讀取的

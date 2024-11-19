@@ -13,10 +13,10 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final ChatService _chatService = ChatService(); 
+  final ChatService _chatService = ChatService();
   List<Map<String, String>> messages = [];
   String? imageUrl;
-  String? userId; 
+  String? userId;
   String receiverId = '76'; //seller
   String? perfumeImage;
 
@@ -31,14 +31,17 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> initializeData() async {
     await loadSharedPreferencesData();
-    if (userId != null ) {
-      List<Map<String, dynamic>> fetchedMessages = await _chatService.fetchMessages(userId!, receiverId!);
+    if (userId != null) {
+      List<Map<String, dynamic>> fetchedMessages =
+          await _chatService.fetchMessages(userId!, receiverId!);
       setState(() {
-        messages = fetchedMessages.map((msg) => {
-              'senderId': msg['sender_id'].toString(),
-              'message': msg['message']?.toString() ?? '',
-              'timestamp': msg['timestamp']?.toString() ?? '',
-            }).toList();
+        messages = fetchedMessages
+            .map((msg) => {
+                  'senderId': msg['sender_id'].toString(),
+                  'message': msg['message']?.toString() ?? '',
+                  'timestamp': msg['timestamp']?.toString() ?? '',
+                })
+            .toList();
       });
       WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
     }
@@ -49,7 +52,6 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       userId = prefs.getString('user_id');
       perfumeImage = prefs.getString('perfumeImage');
-
     });
     print('聊天對象為 $receiverId');
     print('User ID: $userId');
@@ -98,7 +100,8 @@ class _ChatScreenState extends State<ChatScreen> {
             top: 40.0.v,
             left: 16.0.v,
             child: IconButton(
-              icon: Image.asset('assets/images/arrow-left-g.png', color: Colors.white),
+              icon: Image.asset('assets/images/arrow-left-g.png',
+                  color: Colors.white),
               onPressed: () {
                 Navigator.pushNamed(context, AppRoutes.homeScreen);
               },
@@ -133,20 +136,28 @@ class _ChatScreenState extends State<ChatScreen> {
                                     child: _buildChosenIcon(sender),
                                   ),
                             subtitle: Row(
-                              mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                              mainAxisAlignment: isCurrentUser
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
                               children: [
                                 Container(
                                   constraints: BoxConstraints(maxWidth: 205.v),
-                                  padding: EdgeInsets.symmetric(vertical: 10.v, horizontal: 15.v),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 10.v, horizontal: 15.v),
                                   decoration: BoxDecoration(
-                                    border: Border.all(color: const Color(0xFFA7BA89)),
+                                    border: Border.all(
+                                        color: const Color(0xFFA7BA89)),
                                     borderRadius: BorderRadius.circular(30.v),
-                                    color: isCurrentUser ? Colors.white : const Color(0xFFA7BA89),
+                                    color: isCurrentUser
+                                        ? Colors.white
+                                        : const Color(0xFFA7BA89),
                                   ),
                                   child: Text(
                                     message,
                                     style: TextStyle(
-                                      color: isCurrentUser ? Color(0xFFA7BA89) : Colors.white,
+                                      color: isCurrentUser
+                                          ? Color(0xFFA7BA89)
+                                          : Colors.white,
                                       fontSize: 18,
                                       fontWeight: FontWeight.w500,
                                     ),
@@ -162,7 +173,9 @@ class _ChatScreenState extends State<ChatScreen> {
                       padding: EdgeInsets.all(10.0.v),
                       child: Container(
                         decoration: BoxDecoration(
-                          border: Border.all(color: Color.fromARGB(255, 218, 218, 218), width: 2.v),
+                          border: Border.all(
+                              color: Color.fromARGB(255, 218, 218, 218),
+                              width: 2.v),
                           borderRadius: BorderRadius.circular(20.v),
                           color: Colors.white.withOpacity(0.8),
                         ),
@@ -231,7 +244,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
 class ChatService {
   // 把訊息紀錄到資料庫
-  Future<void> sendMessage(String senderId, String receiverId, String message) async {
+  Future<void> sendMessage(
+      String senderId, String receiverId, String message) async {
+    print("senderId為= $senderId, receiverId為=$receiverId, message為=$message");
     try {
       final response = await http.post(
         Uri.parse('http://163.22.32.24/send_message'),
@@ -253,8 +268,10 @@ class ChatService {
       print('Error sending message: $e');
     }
   }
+
   //取得聊天紀錄
-  Future<List<Map<String, dynamic>>> fetchMessages(String senderId, String receiverId) async {
+  Future<List<Map<String, dynamic>>> fetchMessages(
+      String senderId, String receiverId) async {
     print('聊天紀錄載入中...');
     List<Map<String, dynamic>> messages = [];
 
