@@ -728,6 +728,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   // 芳療師聊天室
                   GestureDetector(
                     onTap: () {
+                      // print('音樂暫停且資源釋放中 isPlaying: $isPlaying'); // 拉到左右返回見的時候會跑到這裡
+                      // WidgetsBinding.instance.removeObserver(this);
+                      // if (isPlaying == true) {
+                      //   player?.pause(); //音樂暫停
+                      //   saveMusicStatus(false);
+                      //   saveMusicTalk(' \\ 點我去聽音樂 ! /');
+                      //   saveMusicDialog(
+                      //       "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+                      // }
+                      // player?.dispose(); // 釋放音樂資源
                       Navigator.pushNamed(
                         context,
                         AppRoutes.chatScreen,
@@ -743,6 +753,16 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   //香氛商場
                   GestureDetector(
                     onTap: () {
+                      print('音樂暫停且資源釋放中 isPlaying: $isPlaying'); // 拉到左右返回見的時候會跑到這裡
+                      WidgetsBinding.instance.removeObserver(this);
+                      if (isPlaying == true) {
+                        player?.pause(); //音樂暫停
+                        saveMusicStatus(false);
+                        saveMusicTalk(' \\ 點我去聽音樂 ! /');
+                        saveMusicDialog(
+                            "音樂能療癒心靈，因為它能釋放情感、放鬆身心、帶來快樂化學物質、\n喚起美好記憶並增強人際聯繫。\n撥放音樂為你的房間增添一點點的溫馨和愉悅吧。");
+                      }
+                      player?.dispose(); // 釋放音樂資源
                       Navigator.pushNamed(context, AppRoutes.shopScreen);
                     },
                     child: styledContainer('去植芳園商場逛逛'),
