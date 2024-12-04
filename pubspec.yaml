@@ -109,6 +109,7 @@ flutter:
     - assets/store/functionList.png
     - assets/store/chat.png
     - assets/store/home.png
+    - assets/images/chatBot.png
   fonts: 
     - family: Inter
       fonts: 
