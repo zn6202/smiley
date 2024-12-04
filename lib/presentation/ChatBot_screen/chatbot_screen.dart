@@ -185,7 +185,9 @@ class _ChatBotScreenState extends State<ChatBotScreen> {
                                     senderName = "小蜜";
                                     break;
                                   case 'sys':
-                                    chosenIcon = const Icon(Icons.error);
+                                    chosenIcon = Image.asset(
+                                      'assets/images/chatBot.png',
+                                    );
                                     senderName = "系統訊息";
                                     break;
                                   default:
